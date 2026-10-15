@@ -29,3 +29,10 @@ Use the run button in your IDE's editor gutter, or run tests using Gradle tasks:
 ---
 
 Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+
+### Code quality
+
+- `./gradlew spotlessApply` formats Kotlin code with ktlint (plus the Compose rules); `spotlessCheck` only verifies.
+- `./gradlew detekt` runs static analysis. Overrides live in `config/detekt/detekt.yml`, the report in `build/reports/detekt/`.
+- Formatting rules come from `.editorconfig`, which IntelliJ and Android Studio pick up automatically.
+- CI (`.github/workflows/ci.yml`) runs lint, the Android build and tests, and the iOS simulator tests on every PR.

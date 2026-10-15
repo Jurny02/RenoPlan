@@ -1,0 +1,37 @@
+# Overrides on top of detekt's default config (buildUponDefaultConfig = true).
+# Only list rules whose defaults don't fit a Compose Multiplatform project.
+
+naming:
+  FunctionNaming:
+    # @Composable functions are PascalCase by convention.
+    ignoreAnnotated:
+      - Composable
+  MatchingDeclarationName:
+    # KMP actual files are named after the expect file (Platform.android.kt holds AndroidPlatform).
+    active: false
+  TopLevelPropertyNaming:
+    constantPattern: '[A-Z][A-Za-z0-9]*'
+
+complexity:
+  LongParameterList:
+    # Composables often take many parameters (modifier, state, callbacks).
+    ignoreAnnotated:
+      - Composable
+  TooManyFunctions:
+    ignorePrivate: true
+
+style:
+  MagicNumber:
+    excludes:
+      - '**/*Test/**'
+      - '**/test/**'
+    # Dimensions and colors in UI code are mostly literals.
+    ignorePropertyDeclaration: true
+    ignoreCompanionObjectPropertyDeclaration: true
+    ignoreAnnotated:
+      - Composable
+      - Preview
+  UnusedPrivateFunction:
+    # @Preview functions are only used by the IDE.
+    ignoreAnnotated:
+      - Preview
