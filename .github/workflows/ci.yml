@@ -18,7 +18,7 @@ jobs:
         with:
           distribution: zulu
           java-version: 21
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v6
       - run: ./gradlew spotlessCheck detekt
       - uses: github/codeql-action/upload-sarif@v3
         if: always()
@@ -35,7 +35,7 @@ jobs:
         with:
           distribution: zulu
           java-version: 21
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v6
       - run: ./gradlew :shared:testAndroidHostTest :androidApp:assembleDebug :androidApp:lintDebug
 
   ios:
@@ -50,5 +50,5 @@ jobs:
         with:
           distribution: zulu
           java-version: 21
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v6
       - run: ./gradlew :shared:iosSimulatorArm64Test
