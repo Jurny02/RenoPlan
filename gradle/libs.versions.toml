@@ -13,9 +13,9 @@ composeMultiplatform = "1.12.1"
 composeRules = "0.6.8"
 detekt = "2.0.0-alpha.6"
 junit = "4.13.2"
-kotlin = "2.4.20"
+kotlin = "2.4.21"
 ktlint = "1.8.0"
-material3 = "1.12.0-alpha03"
+material3 = "1.13.0-alpha02"
 spotless = "8.10.4"
 
 [libraries]
