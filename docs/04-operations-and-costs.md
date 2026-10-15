@@ -8,12 +8,12 @@ An **operation** is a piece of finishing work done on whole surfaces of a room
 ```kotlin
 sealed interface OperationType {
     data class Painting(val colour: String) : OperationType
-    data object SkimCoat : OperationType      // gładź
-    data object Priming : OperationType       // gruntowanie
-    data object Tiling : OperationType        // płytki
-    data object WallPanels : OperationType    // lamele
-    data object Skirting : OperationType      // listwy przypodłogowe
-    data object CrownMoulding : OperationType // listwy przysufitowe
+    data object SkimCoat : OperationType
+    data object Priming : OperationType
+    data object Tiling : OperationType
+    data object WallPanels : OperationType
+    data object Skirting : OperationType
+    data object CrownMoulding : OperationType
     data class Custom(val name: String) : OperationType
 }
 ```
