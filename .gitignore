@@ -25,3 +25,37 @@ replay_pid*
 
 # Kotlin Gradle plugin data, see https://kotlinlang.org/docs/whatsnew20.html#new-directory-for-kotlin-data-in-gradle-projects
 .kotlin/
+# Keep the Gradle wrapper jar (needed to build)
+!gradle/wrapper/gradle-wrapper.jar
+
+# Gradle
+.gradle/
+build/
+!src/**/build/
+
+# Local configuration (SDK paths, secrets)
+local.properties
+*.keystore
+*.jks
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.fleet/
+
+# Android
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Kotlin/Native & iOS
+xcuserdata/
+*.xcuserstate
+DerivedData/
+iosApp/Pods/
+*.xcworkspace/xcuserdata/
+.build/
+
+# macOS
+.DS_Store
