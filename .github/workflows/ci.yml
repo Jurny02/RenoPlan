@@ -42,6 +42,10 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+      - name: SwiftLint
+        run: |
+          command -v swiftlint || brew install swiftlint
+          swiftlint lint --strict --reporter github-actions-logging
       - uses: actions/setup-java@v4
         with:
           distribution: zulu
