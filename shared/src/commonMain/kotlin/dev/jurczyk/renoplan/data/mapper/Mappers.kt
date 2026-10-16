@@ -2,6 +2,7 @@ package dev.jurczyk.renoplan.data.mapper
 
 import dev.jurczyk.renoplan.data.local.LevelWithRooms
 import dev.jurczyk.renoplan.data.local.OpeningEntity
+import dev.jurczyk.renoplan.data.local.OperationEntity
 import dev.jurczyk.renoplan.data.local.RoomEntity
 import dev.jurczyk.renoplan.data.local.RoomWithWalls
 import dev.jurczyk.renoplan.data.local.WallEntity
@@ -42,6 +43,7 @@ fun RoomWithWalls.toDomain(): Room {
                 )
             },
         shapeInput = room.toShapeInput(),
+        operations = operations.sortedBy { it.position }.map { it.toDomain() },
     )
 }
 
@@ -50,6 +52,7 @@ data class RoomEntities(
     val room: RoomEntity,
     val walls: List<WallEntity>,
     val openings: List<OpeningEntity>,
+    val operations: List<OperationEntity>,
 )
 
 fun Room.toEntities(levelId: Uuid): RoomEntities {
@@ -80,6 +83,7 @@ fun Room.toEntities(levelId: Uuid): RoomEntities {
             walls
                 .flatMap { wall -> wall.openings.map { wall.number to it } }
                 .mapIndexed { index, (wallNumber, opening) -> opening.toEntity(roomId, wallNumber, index) },
+        operations = operations.mapIndexed { index, operation -> operation.toEntity(roomId, index) },
     )
 }
 

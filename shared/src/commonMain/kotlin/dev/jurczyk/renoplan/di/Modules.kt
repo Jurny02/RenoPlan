@@ -4,8 +4,10 @@ import dev.jurczyk.renoplan.data.local.RenoPlanDatabase
 import dev.jurczyk.renoplan.data.local.buildDatabase
 import dev.jurczyk.renoplan.data.repository.LocalLevelRepository
 import dev.jurczyk.renoplan.data.repository.LocalRoomRepository
+import dev.jurczyk.renoplan.data.repository.LocalTemplateRepository
 import dev.jurczyk.renoplan.domain.repository.LevelRepository
 import dev.jurczyk.renoplan.domain.repository.RoomRepository
+import dev.jurczyk.renoplan.domain.repository.TemplateRepository
 import dev.jurczyk.renoplan.presentation.level.LevelViewModel
 import dev.jurczyk.renoplan.presentation.levels.LevelsViewModel
 import dev.jurczyk.renoplan.presentation.roomdetails.RoomDetailsViewModel
@@ -24,8 +26,10 @@ val dataModule =
         single { buildDatabase(get()) }
         single { get<RenoPlanDatabase>().levelDao() }
         single { get<RenoPlanDatabase>().roomDao() }
+        single { get<RenoPlanDatabase>().templateDao() }
         singleOf(::LocalLevelRepository) bind LevelRepository::class
         singleOf(::LocalRoomRepository) bind RoomRepository::class
+        singleOf(::LocalTemplateRepository) bind TemplateRepository::class
     }
 
 /** Use cases and calculations. */

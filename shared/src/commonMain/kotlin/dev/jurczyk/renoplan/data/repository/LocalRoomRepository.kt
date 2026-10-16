@@ -25,7 +25,7 @@ class LocalRoomRepository(
         room: Room,
     ) {
         val entities = room.toEntities(levelId)
-        dao.save(entities.room, entities.walls, entities.openings)
+        dao.save(entities.room, entities.walls, entities.openings, entities.operations)
     }
 
     override suspend fun deleteRoom(id: Uuid) = dao.delete(id.toString())

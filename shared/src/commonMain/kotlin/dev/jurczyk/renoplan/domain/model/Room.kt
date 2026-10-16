@@ -12,8 +12,9 @@ data class Room(
     val height: Millimetres,
     val walls: List<Wall>,
     val shapeInput: ShapeInput,
+    val operations: List<Operation> = emptyList(),
 ) {
-    /** A copy under a new [id] (and new opening ids) with the same geometry and openings. */
+    /** A copy under a new [id] (and new opening and operation ids) with the same geometry, openings and operations. */
     fun duplicate(
         id: Uuid,
         name: String,
@@ -22,6 +23,7 @@ data class Room(
             id = id,
             name = name,
             walls = walls.map { wall -> wall.copy(openings = wall.openings.map { it.copy(id = Uuid.random()) }) },
+            operations = operations.map { it.copy(id = Uuid.random()) },
         )
 
     /**

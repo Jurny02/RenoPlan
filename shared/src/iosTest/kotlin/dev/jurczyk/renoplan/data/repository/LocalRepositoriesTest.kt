@@ -5,11 +5,18 @@ import androidx.room.useReaderConnection
 import app.cash.turbine.test
 import dev.jurczyk.renoplan.data.local.RenoPlanDatabase
 import dev.jurczyk.renoplan.data.local.buildDatabase
+import dev.jurczyk.renoplan.domain.model.Labour
 import dev.jurczyk.renoplan.domain.model.Level
+import dev.jurczyk.renoplan.domain.model.Money
 import dev.jurczyk.renoplan.domain.model.Opening
 import dev.jurczyk.renoplan.domain.model.OpeningSize
 import dev.jurczyk.renoplan.domain.model.OpeningType
+import dev.jurczyk.renoplan.domain.model.Operation
+import dev.jurczyk.renoplan.domain.model.OperationStatus
+import dev.jurczyk.renoplan.domain.model.OperationTemplate
+import dev.jurczyk.renoplan.domain.model.OperationType
 import dev.jurczyk.renoplan.domain.model.ShapeInput
+import dev.jurczyk.renoplan.domain.model.Surface
 import dev.jurczyk.renoplan.domain.model.Turn
 import dev.jurczyk.renoplan.domain.model.Wall
 import dev.jurczyk.renoplan.domain.model.mm
@@ -27,6 +34,7 @@ class LocalRepositoriesTest {
     private val database = buildDatabase(Room.inMemoryDatabaseBuilder<RenoPlanDatabase>())
     private val levels = LocalLevelRepository(database.levelDao())
     private val rooms = LocalRoomRepository(database.roomDao())
+    private val templates = LocalTemplateRepository(database.templateDao())
 
     private val groundFloor = Level(Uuid.random(), "Parter")
     private val bathroom = RenoRoom.rectangle(Uuid.random(), "Łazienka", 2_500.mm, 2_000.mm, 2_600.mm)
@@ -64,6 +72,11 @@ class LocalRepositoriesTest {
                 statement.getLong(0)
             }
         }
+
+    private fun operation(
+        type: OperationType,
+        surface: Surface,
+    ) = Operation(Uuid.random(), type, setOf(surface), Money(300), Labour.SelfDone)
 
     @AfterTest
     fun tearDown() {
@@ -131,10 +144,55 @@ class LocalRepositoriesTest {
         }
 
     @Test
+    fun roomOperationsSurviveARoundTripAndAreReplacedOnSave() =
+        runTest {
+            levels.saveLevel(groundFloor)
+            val priming = operation(OperationType.Priming, Surface.Ceiling)
+            val painting =
+                Operation(
+                    Uuid.random(),
+                    OperationType.Painting("biały"),
+                    setOf(Surface.Wall(1), Surface.Wall(2)),
+                    Money(600),
+                    Labour.PerUnit(Money(1_500)),
+                    OperationStatus.DONE,
+                )
+            val withOperations = kitchen.copy(operations = listOf(priming, painting))
+            rooms.saveRoom(groundFloor.id, withOperations)
+            assertEquals(withOperations, rooms.getRoom(kitchen.id))
+
+            rooms.saveRoom(groundFloor.id, withOperations.copy(operations = listOf(painting)))
+            assertEquals(listOf(painting), rooms.getRoom(kitchen.id)?.operations)
+            assertEquals(1L, count("operations"))
+        }
+
+    @Test
+    fun templatesKeepOrderAndCanBeEditedAndDeleted() =
+        runTest {
+            val white = OperationTemplate(Uuid.random(), OperationType.Painting("biały"), Money(600), Labour.SelfDone)
+            val tiles =
+                OperationTemplate(Uuid.random(), OperationType.Tiling, Money(8_000), Labour.LumpSum(Money(150_000)))
+            templates.saveTemplate(white)
+            templates.saveTemplate(tiles)
+            templates.saveTemplate(white.copy(materialPrice = Money(700)))
+
+            assertEquals(listOf(white.copy(materialPrice = Money(700)), tiles), templates.observeTemplates().first())
+
+            templates.deleteTemplate(white.id)
+            assertEquals(listOf(tiles), templates.observeTemplates().first())
+            assertNull(templates.getTemplate(white.id))
+        }
+
+    @Test
     fun deletingALevelDeletesItsRoomsWallsAndOpenings() =
         runTest {
             levels.saveLevel(groundFloor)
             rooms.saveRoom(groundFloor.id, kitchen)
+
+            rooms.saveRoom(
+                groundFloor.id,
+                kitchen.copy(operations = listOf(operation(OperationType.Tiling, Surface.Floor))),
+            )
 
             levels.deleteLevel(groundFloor.id)
 
@@ -142,5 +200,6 @@ class LocalRepositoriesTest {
             assertNull(rooms.getRoom(kitchen.id))
             assertEquals(0L, count("walls"))
             assertEquals(0L, count("openings"))
+            assertEquals(0L, count("operations"))
         }
 }

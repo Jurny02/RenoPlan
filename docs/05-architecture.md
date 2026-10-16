@@ -66,17 +66,22 @@ Room KMP with the bundled SQLite driver; small settings in multiplatform-setting
 Dependency injection with Koin, navigation with Navigation Compose
 ([ADR 0004](adr/0004-core-libraries.md)).
 
-- Repository interfaces live in `domain/repository` (`LevelRepository`, `RoomRepository`); the Room
-  implementations (`LocalLevelRepository`, `LocalRoomRepository`) in `data/repository`.
-- Tables: `levels`, `rooms`, `walls`, `openings`. Child rows are deleted with their parent
-  (`ON DELETE CASCADE`); an opening references its wall by `(roomId, wallNumber)`.
-- Lengths are stored as `Long` millimetres, ids as `Uuid` strings, enums by name. Levels and rooms keep
-  their creation order in a `position` column.
-- A room is saved as a whole: the room row is upserted, its walls and openings are replaced.
+- Repository interfaces live in `domain/repository` (`LevelRepository`, `RoomRepository`,
+  `TemplateRepository`); the Room implementations (`LocalLevelRepository`, `LocalRoomRepository`,
+  `LocalTemplateRepository`) in `data/repository`.
+- Tables: `levels`, `rooms`, `walls`, `openings`, `operations`, `templates`. Child rows are deleted with
+  their parent (`ON DELETE CASCADE`); an opening references its wall by `(roomId, wallNumber)`.
+- Lengths are stored as `Long` millimetres, money as `Long` grosze, ids as `Uuid` strings, enums by
+  name. An operation's type, surfaces (e.g. `WALL:1,CEILING`) and labour are stored as text
+  (`data/mapper/OperationMappers.kt`). Levels, rooms, operations and templates keep their order in a
+  `position` column.
+- A room is saved as a whole: the room row is upserted, its walls, openings and operations are
+  replaced.
 - `RenoPlanDatabase` is created by `buildDatabase(builder)` (bundled SQLite driver, `Dispatchers.IO`);
   the platform builder comes from Koin's `platformModule` (Android: app context, iOS: Documents folder).
-- Schema version 1 is exported to `shared/schemas/` and committed. Before the first public release the
-  schema may still change in place; after it, every change needs a migration.
+- Schemas are exported to `shared/schemas/` and committed. Every schema change bumps the version and
+  comes with a migration (an `AutoMigration` where Room can derive it), because the app is already
+  installed on test devices. Version 2 added `operations` and `templates`.
 - Database tests run in `iosTest` on the simulator, because the Android database builder needs a `Context`
   and the JVM host tests have no Robolectric; entity mappers are tested in `commonTest`.
 
