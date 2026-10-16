@@ -1,13 +1,14 @@
 # 0005 – Store money as integer grosze
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-10-17
 
 ## Context
 
 Operations have prices per m² or per metre and lump sums, and summaries add up many costs.
 Floating-point złoty values accumulate rounding errors (`0.1 + 0.2 ≠ 0.3`), so totals could differ
-by a grosz from the sum of the rows shown. The app works in PLN only.
+by a grosz from the sum of the rows shown. The MVP works in PLN; euro and US dollar will be supported
+later, each as a separate currency without conversion between them.
 
 ## Decision
 
@@ -18,5 +19,8 @@ is rounded to the nearest grosz once, per operation. Totals add rounded operatio
 ## Consequences
 
 - Sums and comparisons of amounts are exact, and a total always equals the sum of its rows.
-- Prices typed in złoty need converting to grosze and back for display.
-- A currency other than PLN would need a currency field; out of scope for the MVP.
+- Amounts are always shown in złoty (e.g. "11,43 zł"), never in grosze; prices are typed in złoty and
+  converted to grosze.
+- EUR and USD also have 100 minor units (cents), so the same integer representation works for them.
+  Supporting them means adding a currency to the amounts (likely set per project or level) and to the
+  formatting; amounts in different currencies are never added together or converted.
