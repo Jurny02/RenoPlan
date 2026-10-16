@@ -85,9 +85,14 @@ Creating a room or changing its geometry.
   - Rectangle: length, width.
   - Outline: list of rows `#, length, turn (L/R)`; add / remove row; "close automatically" option
     computes the last wall ([03 – Calculations](03-calculations.md#auto-closing-the-last-wall)).
+    Turning it on adds the computed wall after the typed rows; if the typed rows already close the
+    outline, their last row is replaced by the computed wall. Turning it off keeps the computed wall
+    as an editable row.
 - Read-only **preview** of the outline with wall numbers, so the user can match numbers to real walls.
+  The start point is marked with a dot; an outline that does not close shows the gap.
 - Live results: floor area, perimeter, volume.
-- Validation message when the outline does not close; **Save** is disabled until it does.
+- Validation message when the outline does not close (distance to the start point, or wrong turn
+  count); shown once every wall has a valid length. **Save** is disabled until it closes.
 - Switching Rectangle → Outline converts the 4 walls into rows; Outline → Rectangle is only allowed
   for a 4-wall outline.
 - Lengths are typed in metres with a comma or a dot (e.g. `2,65`) and stored as millimetres. A field
