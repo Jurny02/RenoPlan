@@ -25,6 +25,7 @@ import androidx.navigation.toRoute
 import dev.jurczyk.renoplan.ui.components.PlaceholderScreen
 import dev.jurczyk.renoplan.ui.level.LevelScreen
 import dev.jurczyk.renoplan.ui.levels.LevelsScreen
+import dev.jurczyk.renoplan.ui.roomdetails.RoomDetailsScreen
 import dev.jurczyk.renoplan.ui.roomeditor.RoomEditorScreen
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -84,8 +85,16 @@ private fun NavGraphBuilder.projectGraph(navController: NavHostController) {
                 levelId = Uuid.parse(route.levelId),
                 onBack = navController::popBackStack,
                 onAddRoom = { navController.navigate(RoomEditorRoute(route.levelId)) },
-                // Room details come in the next stage; until then a room opens in the editor.
-                onOpenRoom = { navController.navigate(RoomEditorRoute(route.levelId, it.toString())) },
+                onOpenRoom = { navController.navigate(RoomDetailsRoute(route.levelId, it.toString())) },
+            )
+        }
+        composable<RoomDetailsRoute> { entry ->
+            val route = entry.toRoute<RoomDetailsRoute>()
+            RoomDetailsScreen(
+                levelId = Uuid.parse(route.levelId),
+                roomId = Uuid.parse(route.roomId),
+                onBack = navController::popBackStack,
+                onEditShape = { navController.navigate(RoomEditorRoute(route.levelId, route.roomId)) },
             )
         }
         composable<RoomEditorRoute> { entry ->

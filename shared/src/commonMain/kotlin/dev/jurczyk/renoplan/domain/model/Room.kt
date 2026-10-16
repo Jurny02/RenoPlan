@@ -33,6 +33,41 @@ data class Room(
         return copy(walls = newWalls.map { it.copy(openings = openingsByNumber[it.number].orEmpty()) })
     }
 
+    /**
+     * Puts [opening] on wall [wallNumber]. An opening with the same id is replaced in place, or moved
+     * there from another wall.
+     */
+    fun withOpening(
+        wallNumber: Int,
+        opening: Opening,
+    ): Room =
+        copy(
+            walls =
+                walls.map { wall ->
+                    val index = wall.openings.indexOfFirst { it.id == opening.id }
+                    when {
+                        wall.number == wallNumber && index >= 0 -> {
+                            wall.copy(openings = wall.openings.toMutableList().apply { set(index, opening) })
+                        }
+
+                        wall.number == wallNumber -> {
+                            wall.copy(openings = wall.openings + opening)
+                        }
+
+                        index >= 0 -> {
+                            wall.copy(openings = wall.openings.filterNot { it.id == opening.id })
+                        }
+
+                        else -> {
+                            wall
+                        }
+                    }
+                },
+        )
+
+    fun withoutOpening(id: Uuid): Room =
+        copy(walls = walls.map { wall -> wall.copy(openings = wall.openings.filterNot { it.id == id }) })
+
     companion object {
         fun rectangle(
             id: Uuid,

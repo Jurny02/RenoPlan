@@ -49,4 +49,26 @@ class RoomTest {
         assertEquals(listOf(door), changed.walls[0].openings)
         assertEquals(emptyList(), changed.walls.flatMap { it.openings }.filter { it == window })
     }
+
+    @Test
+    fun withOpeningAddsReplacesAndMoves() {
+        val niche = Opening(Uuid.random(), OpeningType.NICHE, OpeningSize.Area(0.5))
+        val added = room.withOpening(1, niche)
+        assertEquals(listOf(door, niche), added.walls[0].openings)
+
+        val wider = door.copy(size = OpeningSize.Dimensions(900.mm, 2_000.mm))
+        assertEquals(listOf(wider, niche), added.withOpening(1, wider).walls[0].openings)
+
+        val moved = added.withOpening(3, door)
+        assertEquals(listOf(niche), moved.walls[0].openings)
+        assertEquals(listOf(door), moved.walls[2].openings)
+    }
+
+    @Test
+    fun withoutOpening() {
+        val changed = room.withoutOpening(door.id)
+
+        assertEquals(emptyList(), changed.walls[0].openings)
+        assertEquals(listOf(window), changed.walls[3].openings)
+    }
 }

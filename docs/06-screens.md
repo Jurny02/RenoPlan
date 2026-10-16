@@ -74,7 +74,7 @@ Rooms tab:
 - Card per room: name, floor area, net wall area, cost, progress.
 - **Add room** (FAB) → **Room editor** (new room).
 - Card menu: rename, duplicate (copies geometry, openings and operations), delete.
-- Tap a card → **Room details**. Until Room details exists, the card opens the **Room editor**.
+- Tap a card → **Room details**.
 
 ## 3. Room editor
 
@@ -108,10 +108,13 @@ The main working screen of a room.
 
 - Header: floor, ceiling, net walls, perimeter, skirting, volume. Button **Edit shape** → Room editor.
 - **Walls** section: row per wall `Wall 1 – 3.20 m – 7.20 m² net – 2 openings`; tap a wall to see its
-  openings; **Add opening** → Opening sheet.
+  openings (tap an opening to edit it); **Add opening** → Opening sheet. The floating **Add opening**
+  button preselects the expanded wall, or wall 1.
 - **Operations** section: row per operation with type, surfaces, quantity, cost and status chip;
   tap the status chip to cycle *to do → in progress → done*; **Add operation** → Operation editor.
 - Room totals: cost, done, remaining.
+- Operations and room totals arrive with stage 3 of the implementation order; until then the screen
+  shows the header and the walls.
 
 ## 5. Opening sheet
 
@@ -120,8 +123,12 @@ Bottom sheet for adding or editing an opening.
 - Type: window / door / passage / niche.
 - Wall: number picker (preselected when opened from a wall).
 - Size: toggle **Dimensions** (width, height) / **Area** (m²).
-- **Starts at floor** switch, default from type; when on, Dimensions mode is required.
+- **Starts at floor** switch, default from type (changing the type resets it); when on, Dimensions mode
+  is required and Area is disabled.
 - Live result: opening area, the wall's net area after the change.
+- Validation from [03](03-calculations.md#openings): wider than the wall, taller than the room, or
+  openings larger than the wall; **Save** is disabled while any of them applies. Changing the wall
+  moves the opening.
 - Delete (when editing).
 
 ## 6. Operation editor
