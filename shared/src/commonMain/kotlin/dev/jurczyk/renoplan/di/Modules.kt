@@ -8,6 +8,7 @@ import dev.jurczyk.renoplan.domain.repository.LevelRepository
 import dev.jurczyk.renoplan.domain.repository.RoomRepository
 import dev.jurczyk.renoplan.presentation.level.LevelViewModel
 import dev.jurczyk.renoplan.presentation.levels.LevelsViewModel
+import dev.jurczyk.renoplan.presentation.roomdetails.RoomDetailsViewModel
 import dev.jurczyk.renoplan.presentation.roomeditor.RoomEditorViewModel
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
@@ -36,6 +37,7 @@ val presentationModule =
         viewModelOf(::LevelsViewModel)
         viewModel { (levelId: Uuid) -> LevelViewModel(levelId, get(), get()) }
         viewModel { (levelId: Uuid, roomId: Uuid?) -> RoomEditorViewModel(levelId, roomId, get()) }
+        viewModel { (levelId: Uuid, roomId: Uuid) -> RoomDetailsViewModel(levelId, roomId, get()) }
     }
 
 val appModules: List<Module> = listOf(platformModule, dataModule, domainModule, presentationModule)

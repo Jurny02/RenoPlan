@@ -38,4 +38,15 @@ class MetresInputTest {
         assertEquals("3", 3_000.mm.toMetresInput())
         assertEquals("0,04", 40.mm.toMetresInput())
     }
+
+    @Test
+    fun squareMetres() {
+        assertEquals(1.25, parseSquareMetres("1,25"))
+        assertEquals(1.5, parseSquareMetres(" 1.5 "))
+        assertNull(parseSquareMetres("0"))
+        assertNull(parseSquareMetres("x"))
+        assertEquals("1,5", 1.5.toSquareMetresInput())
+        assertEquals("2", 2.0.toSquareMetresInput())
+        assertEquals("0,05", 0.049.toSquareMetresInput())
+    }
 }
