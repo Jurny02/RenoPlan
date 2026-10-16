@@ -66,6 +66,20 @@ Room KMP with the bundled SQLite driver; small settings in multiplatform-setting
 Dependency injection with Koin, navigation with Navigation Compose
 ([ADR 0004](adr/0004-core-libraries.md)).
 
+- Repository interfaces live in `domain/repository` (`LevelRepository`, `RoomRepository`); the Room
+  implementations (`LocalLevelRepository`, `LocalRoomRepository`) in `data/repository`.
+- Tables: `levels`, `rooms`, `walls`, `openings`. Child rows are deleted with their parent
+  (`ON DELETE CASCADE`); an opening references its wall by `(roomId, wallNumber)`.
+- Lengths are stored as `Long` millimetres, ids as `Uuid` strings, enums by name. Levels and rooms keep
+  their creation order in a `position` column.
+- A room is saved as a whole: the room row is upserted, its walls and openings are replaced.
+- `RenoPlanDatabase` is created by `buildDatabase(builder)` (bundled SQLite driver, `Dispatchers.IO`);
+  the platform builder comes from Koin's `platformModule` (Android: app context, iOS: Documents folder).
+- Schema version 1 is exported to `shared/schemas/` and committed. Before the first public release the
+  schema may still change in place; after it, every change needs a migration.
+- Database tests run in `iosTest` on the simulator, because the Android database builder needs a `Context`
+  and the JVM host tests have no Robolectric; entity mappers are tested in `commonTest`.
+
 ## Screens (MVP)
 
 See [06 – Screens](06-screens.md).
