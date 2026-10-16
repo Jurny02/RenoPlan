@@ -1,11 +1,17 @@
 package dev.jurczyk.renoplan.presentation.roomdetails
 
 import dev.jurczyk.renoplan.domain.geometry.OpeningError
+import dev.jurczyk.renoplan.domain.model.Labour
 import dev.jurczyk.renoplan.domain.model.Level
+import dev.jurczyk.renoplan.domain.model.Money
 import dev.jurczyk.renoplan.domain.model.Opening
 import dev.jurczyk.renoplan.domain.model.OpeningSize
 import dev.jurczyk.renoplan.domain.model.OpeningType
+import dev.jurczyk.renoplan.domain.model.Operation
+import dev.jurczyk.renoplan.domain.model.OperationStatus
+import dev.jurczyk.renoplan.domain.model.OperationType
 import dev.jurczyk.renoplan.domain.model.Room
+import dev.jurczyk.renoplan.domain.model.Surface
 import dev.jurczyk.renoplan.domain.model.mm
 import dev.jurczyk.renoplan.testing.FakeStore
 import dev.jurczyk.renoplan.testing.MainDispatcherTest
@@ -168,6 +174,32 @@ class RoomDetailsViewModelTest : MainDispatcherTest() {
 
             assertNull(loaded().form)
             assertTrue(room().walls.all { it.openings.isEmpty() })
+        }
+
+    @Test
+    fun operationsShowTheirCostAndStatusCycles() =
+        runTest {
+            val floor =
+                Operation(
+                    Uuid.random(),
+                    OperationType.Tiling,
+                    setOf(Surface.Floor),
+                    Money.fromZloty(80.0),
+                    Labour.SelfDone,
+                )
+            store.roomRepository.saveRoom(LEVEL_ID, kitchen.copy(operations = listOf(floor)))
+
+            val (operation, cost) = loaded().operations.single()
+            assertEquals(floor, operation)
+            assertEquals(Money.fromZloty(640.0), cost.total)
+            assertEquals(Money.Zero, loaded().costSummary?.done)
+
+            viewModel.cycleStatus(floor.id)
+            assertEquals(OperationStatus.IN_PROGRESS, room().operations.single().status)
+            viewModel.cycleStatus(floor.id)
+            assertEquals(Money.fromZloty(640.0), loaded().costSummary?.done)
+            viewModel.cycleStatus(floor.id)
+            assertEquals(OperationStatus.TODO, room().operations.single().status)
         }
 
     @Test

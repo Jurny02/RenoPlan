@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -53,6 +54,7 @@ import renoplan.shared.generated.resources.Res
 import renoplan.shared.generated.resources.ic_add
 import renoplan.shared.generated.resources.opening_add
 import renoplan.shared.generated.resources.opening_add_on_wall
+import renoplan.shared.generated.resources.operation_add
 import renoplan.shared.generated.resources.room_details_ceiling
 import renoplan.shared.generated.resources.room_details_edit_shape
 import renoplan.shared.generated.resources.room_details_floor
@@ -65,6 +67,7 @@ import renoplan.shared.generated.resources.room_details_wall
 import renoplan.shared.generated.resources.room_details_wall_summary
 import renoplan.shared.generated.resources.room_details_walls
 import renoplan.shared.generated.resources.room_details_walls_net
+import renoplan.shared.generated.resources.room_operations
 import renoplan.shared.generated.resources.unit_cubic_metres
 import renoplan.shared.generated.resources.unit_metres
 import renoplan.shared.generated.resources.unit_square_metres
@@ -76,6 +79,8 @@ fun RoomDetailsScreen(
     roomId: Uuid,
     onBack: () -> Unit,
     onEditShape: () -> Unit,
+    onAddOperation: () -> Unit,
+    onEditOperation: (Uuid) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: RoomDetailsViewModel = koinViewModel { parametersOf(levelId, roomId) },
 ) {
@@ -88,6 +93,12 @@ fun RoomDetailsScreen(
         onEditShape = onEditShape,
         onAddOpening = viewModel::addOpening,
         onEditOpening = viewModel::editOpening,
+        operationActions =
+            OperationActions(
+                onAdd = onAddOperation,
+                onEdit = onEditOperation,
+                onCycleStatus = viewModel::cycleStatus,
+            ),
         modifier = modifier,
     )
     state.form?.let { form ->
@@ -110,6 +121,7 @@ fun RoomDetailsContent(
     onEditShape: () -> Unit,
     onAddOpening: (Int) -> Unit,
     onEditOpening: (Uuid) -> Unit,
+    operationActions: OperationActions,
     modifier: Modifier = Modifier,
 ) {
     var expandedWall by rememberSaveable { mutableStateOf<Int?>(null) }
@@ -158,7 +170,44 @@ fun RoomDetailsContent(
                     onEditOpening = onEditOpening,
                 )
             }
+            operationsSection(state, operationActions)
         }
+    }
+}
+
+/** Operation callbacks, grouped to keep [RoomDetailsContent]'s signature short. */
+class OperationActions(
+    val onAdd: () -> Unit = {},
+    val onEdit: (Uuid) -> Unit = {},
+    val onCycleStatus: (Uuid) -> Unit = {},
+)
+
+private fun LazyListScope.operationsSection(
+    state: RoomDetailsUiState,
+    actions: OperationActions,
+) {
+    item {
+        Row(modifier = Modifier.fillMaxWidth().padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = stringResource(Res.string.room_operations),
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.weight(1f),
+            )
+            TextButton(onClick = actions.onAdd) {
+                Icon(painterResource(Res.drawable.ic_add), contentDescription = null)
+                Text(stringResource(Res.string.operation_add), modifier = Modifier.padding(start = 8.dp))
+            }
+        }
+    }
+    state.costSummary?.takeIf { state.operations.isNotEmpty() }?.let { summary -> item { RoomCostCard(summary) } }
+    if (state.operations.isEmpty()) item { NoOperations() }
+    items(state.operations, key = { it.first.id.toString() }) { (operation, cost) ->
+        OperationCard(
+            operation = operation,
+            cost = cost,
+            onClick = { actions.onEdit(operation.id) },
+            onCycleStatus = actions.onCycleStatus,
+        )
     }
 }
 
@@ -308,6 +357,7 @@ private fun RoomDetailsContentPreview() {
             onEditShape = {},
             onAddOpening = {},
             onEditOpening = {},
+            operationActions = OperationActions(),
         )
     }
 }

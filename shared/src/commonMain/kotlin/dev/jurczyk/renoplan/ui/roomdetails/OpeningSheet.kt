@@ -2,8 +2,6 @@ package dev.jurczyk.renoplan.ui.roomdetails
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,7 +13,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SegmentedButton
@@ -40,6 +37,7 @@ import dev.jurczyk.renoplan.domain.model.mm
 import dev.jurczyk.renoplan.presentation.roomdetails.OpeningForm
 import dev.jurczyk.renoplan.presentation.roomdetails.RoomDetailsUiState
 import dev.jurczyk.renoplan.presentation.roomdetails.SizeMode
+import dev.jurczyk.renoplan.ui.components.ChoiceChips
 import dev.jurczyk.renoplan.ui.components.UnitTextField
 import dev.jurczyk.renoplan.ui.format.formatDecimal
 import dev.jurczyk.renoplan.ui.theme.RenoPlanTheme
@@ -144,30 +142,6 @@ fun OpeningSheetContent(
             if (!form.isNew) TextButton(onClick = onDelete) { Text(stringResource(Res.string.action_delete)) }
             Spacer(Modifier.weight(1f))
             Button(onClick = onSave, enabled = state.canSaveForm) { Text(stringResource(Res.string.action_save)) }
-        }
-    }
-}
-
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-private fun <T> ChoiceChips(
-    title: String,
-    options: List<T>,
-    selected: T,
-    optionLabel: @Composable (T) -> String,
-    onSelect: (T) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Text(title, style = MaterialTheme.typography.labelLarge)
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            options.forEach { option ->
-                FilterChip(
-                    selected = option == selected,
-                    onClick = { onSelect(option) },
-                    label = { Text(optionLabel(option)) },
-                )
-            }
         }
     }
 }

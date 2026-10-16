@@ -1,9 +1,11 @@
 package dev.jurczyk.renoplan.testing
 
 import dev.jurczyk.renoplan.domain.model.Level
+import dev.jurczyk.renoplan.domain.model.OperationTemplate
 import dev.jurczyk.renoplan.domain.model.Room
 import dev.jurczyk.renoplan.domain.repository.LevelRepository
 import dev.jurczyk.renoplan.domain.repository.RoomRepository
+import dev.jurczyk.renoplan.domain.repository.TemplateRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -14,8 +16,11 @@ import kotlin.uuid.Uuid
 class FakeStore {
     val levels = MutableStateFlow<List<Level>>(emptyList())
 
+    val templates = MutableStateFlow<List<OperationTemplate>>(emptyList())
+
     val levelRepository = FakeLevelRepository(this)
     val roomRepository = FakeRoomRepository(this)
+    val templateRepository = FakeTemplateRepository(this)
 
     fun rooms(): List<Room> = levels.value.flatMap { it.rooms }
 }
@@ -75,5 +80,38 @@ class FakeRoomRepository(
     override suspend fun deleteRoom(id: Uuid) =
         store.levels.update { levels ->
             levels.map { level -> level.copy(rooms = level.rooms.filterNot { it.id == id }) }
+        }
+}
+
+class FakeTemplateRepository(
+    private val store: FakeStore,
+) : TemplateRepository {
+    override fun observeTemplates(): Flow<List<OperationTemplate>> = store.templates
+
+    override suspend fun getTemplate(id: Uuid): OperationTemplate? = store.templates.value.find { it.id == id }
+
+    override suspend fun saveTemplate(template: OperationTemplate) =
+        store.templates.update { templates ->
+            if (templates.any { it.id == template.id }) {
+                templates.map {
+                    if (it.id ==
+                        template.id
+                    ) {
+                        template
+                    } else {
+                        it
+                    }
+                }
+            } else {
+                templates + template
+            }
+        }
+
+    override suspend fun deleteTemplate(id: Uuid) =
+        store.templates.update { templates ->
+            templates.filterNot {
+                it.id ==
+                    id
+            }
         }
 }

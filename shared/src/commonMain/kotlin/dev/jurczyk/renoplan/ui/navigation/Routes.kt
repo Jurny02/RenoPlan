@@ -28,8 +28,26 @@ data class RoomEditorRoute(
     val roomId: String? = null,
 )
 
+/** Adds an operation when [operationId] is `null`, otherwise edits it. */
+@Serializable
+data class OperationEditorRoute(
+    val levelId: String,
+    val roomId: String,
+    val operationId: String? = null,
+)
+
+/** The Templates tab: the list and the template editor. */
+@Serializable
+data object TemplatesGraph
+
 @Serializable
 data object TemplatesRoute
+
+/** Creates a template when [templateId] is `null`, otherwise edits it. */
+@Serializable
+data class TemplateEditorRoute(
+    val templateId: String? = null,
+)
 
 @Serializable
 data object CalculatorRoute

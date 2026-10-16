@@ -2,6 +2,10 @@ package dev.jurczyk.renoplan.presentation.roomdetails
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dev.jurczyk.renoplan.domain.cost.CostSummary
+import dev.jurczyk.renoplan.domain.cost.OperationCost
+import dev.jurczyk.renoplan.domain.cost.cost
+import dev.jurczyk.renoplan.domain.cost.costSummary
 import dev.jurczyk.renoplan.domain.geometry.OpeningError
 import dev.jurczyk.renoplan.domain.geometry.ceilingArea
 import dev.jurczyk.renoplan.domain.geometry.floorArea
@@ -12,6 +16,8 @@ import dev.jurczyk.renoplan.domain.geometry.volume
 import dev.jurczyk.renoplan.domain.geometry.wallNetArea
 import dev.jurczyk.renoplan.domain.geometry.wallsNetArea
 import dev.jurczyk.renoplan.domain.model.Millimetres
+import dev.jurczyk.renoplan.domain.model.Operation
+import dev.jurczyk.renoplan.domain.model.OperationStatus
 import dev.jurczyk.renoplan.domain.model.Room
 import dev.jurczyk.renoplan.domain.repository.RoomRepository
 import dev.jurczyk.renoplan.presentation.common.WhileUiSubscribed
@@ -71,6 +77,12 @@ data class RoomDetailsUiState(
         }
 
     val canSaveForm: Boolean get() = formRoom != null && formErrors.isEmpty()
+
+    /** Each operation with its live cost. */
+    val operations: List<Pair<Operation, OperationCost>>
+        get() = room?.let { room -> room.operations.map { it to room.cost(it) } }.orEmpty()
+
+    val costSummary: CostSummary? get() = room?.costSummary
 }
 
 class RoomDetailsViewModel(
@@ -116,6 +128,18 @@ class RoomDetailsViewModel(
         }
     }
 
+    /** Moves the operation's status on: to do → in progress → done → to do. */
+    fun cycleStatus(operationId: Uuid) {
+        viewModelScope.launch {
+            val room = roomRepository.getRoom(roomId) ?: return@launch
+            val operations =
+                room.operations.map { operation ->
+                    if (operation.id == operationId) operation.copy(status = operation.status.next()) else operation
+                }
+            roomRepository.saveRoom(levelId, room.copy(operations = operations))
+        }
+    }
+
     fun deleteOpening() {
         val current = form.value ?: return
         viewModelScope.launch {
@@ -125,3 +149,9 @@ class RoomDetailsViewModel(
         }
     }
 }
+
+private fun OperationStatus.next(): OperationStatus =
+    OperationStatus.entries[
+        (ordinal + 1) %
+            OperationStatus.entries.size,
+    ]
