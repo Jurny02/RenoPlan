@@ -53,6 +53,17 @@ totalCost     = materialCost + labourCost
 
 Because `quantity` is derived from geometry, changing a room's dimensions updates every cost.
 
+- `Money` is an integer number of grosze ([ADR 0005](adr/0005-money-in-grosze.md)); each cost is
+  rounded to the nearest grosz once, and totals add the rounded costs.
+- The quantity of a wall surface is its net area; a wall that no longer exists (after the room's shape
+  changed) counts as 0. Floor and ceiling use their areas, skirting and crown moulding their lengths
+  from [03](03-calculations.md#mouldings).
+- One operation cannot mix area surfaces (walls, floor, ceiling) with linear ones (skirting, crown
+  moulding), because its prices are per unit.
+- *Done* in the summaries is the cost of operations with status `DONE`; *progress* is done ÷ total.
+
+In code: `Room.quantity(surface)`, `Room.cost(operation)` and `Room.costSummary` in `domain/cost`.
+
 ## Templates
 
 An `OperationTemplate` stores a type with default prices, e.g.
