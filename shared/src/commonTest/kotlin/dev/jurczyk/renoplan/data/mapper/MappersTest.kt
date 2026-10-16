@@ -3,11 +3,16 @@ package dev.jurczyk.renoplan.data.mapper
 import dev.jurczyk.renoplan.data.local.LevelEntity
 import dev.jurczyk.renoplan.data.local.LevelWithRooms
 import dev.jurczyk.renoplan.data.local.RoomWithWalls
+import dev.jurczyk.renoplan.domain.model.Labour
+import dev.jurczyk.renoplan.domain.model.Money
 import dev.jurczyk.renoplan.domain.model.Opening
 import dev.jurczyk.renoplan.domain.model.OpeningSize
 import dev.jurczyk.renoplan.domain.model.OpeningType
+import dev.jurczyk.renoplan.domain.model.Operation
+import dev.jurczyk.renoplan.domain.model.OperationType
 import dev.jurczyk.renoplan.domain.model.Room
 import dev.jurczyk.renoplan.domain.model.ShapeInput
+import dev.jurczyk.renoplan.domain.model.Surface
 import dev.jurczyk.renoplan.domain.model.Turn
 import dev.jurczyk.renoplan.domain.model.Wall
 import dev.jurczyk.renoplan.domain.model.mm
@@ -46,6 +51,24 @@ class MappersTest {
     }
 
     @Test
+    fun operationsKeepTheirOrderInARoundTrip() {
+        val operations =
+            listOf(
+                Operation(Uuid.random(), OperationType.Priming, setOf(Surface.Ceiling), Money(300), Labour.SelfDone),
+                Operation(
+                    Uuid.random(),
+                    OperationType.Painting("biały"),
+                    setOf(Surface.Wall(1)),
+                    Money(600),
+                    Labour.SelfDone,
+                ),
+            )
+        val withOperations = kitchen.copy(operations = operations)
+
+        assertEquals(withOperations, roundTrip(withOperations))
+    }
+
+    @Test
     fun rectangleShapeSurvivesARoundTrip() {
         val bathroom = Room.rectangle(Uuid.random(), "Bathroom", 2_500.mm, 2_000.mm, 2_600.mm)
 
@@ -79,12 +102,22 @@ class MappersTest {
 
     private fun Room.withPosition(position: Int): RoomWithWalls {
         val entities = toEntities(levelId)
-        return RoomWithWalls(entities.room.copy(position = position), entities.walls, entities.openings)
+        return RoomWithWalls(
+            entities.room.copy(position = position),
+            entities.walls,
+            entities.openings,
+            entities.operations,
+        )
     }
 
     private fun roundTrip(room: Room): Room {
         val entities = room.toEntities(levelId)
         // The database returns rows in no particular order.
-        return RoomWithWalls(entities.room, entities.walls.reversed(), entities.openings.reversed()).toDomain()
+        return RoomWithWalls(
+            entities.room,
+            entities.walls.reversed(),
+            entities.openings.reversed(),
+            entities.operations.reversed(),
+        ).toDomain()
     }
 }

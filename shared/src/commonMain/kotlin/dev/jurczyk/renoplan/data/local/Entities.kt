@@ -84,12 +84,52 @@ data class OpeningEntity(
     val position: Int,
 )
 
+/** Type, surfaces and labour are encoded as text, see `data/mapper/OperationMappers.kt`. */
+@Entity(
+    tableName = "operations",
+    foreignKeys = [
+        ForeignKey(
+            entity = RoomEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["roomId"],
+            onDelete = ForeignKey.CASCADE,
+        ),
+    ],
+    indices = [Index("roomId")],
+)
+data class OperationEntity(
+    @PrimaryKey val id: String,
+    val roomId: String,
+    val position: Int,
+    val typeKind: String,
+    /** Painting colour or custom name. */
+    val typeText: String?,
+    val surfaces: String,
+    val materialPriceGrosze: Long,
+    val labourKind: String,
+    val labourGrosze: Long?,
+    val status: String,
+)
+
+@Entity(tableName = "templates")
+data class TemplateEntity(
+    @PrimaryKey val id: String,
+    val position: Int,
+    val typeKind: String,
+    val typeText: String?,
+    val materialPriceGrosze: Long,
+    val labourKind: String,
+    val labourGrosze: Long?,
+)
+
 data class RoomWithWalls(
     @Embedded val room: RoomEntity,
     @Relation(parentColumn = "id", entityColumn = "roomId")
     val walls: List<WallEntity>,
     @Relation(parentColumn = "id", entityColumn = "roomId")
     val openings: List<OpeningEntity>,
+    @Relation(parentColumn = "id", entityColumn = "roomId")
+    val operations: List<OperationEntity> = emptyList(),
 )
 
 data class LevelWithRooms(
