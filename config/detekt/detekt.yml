@@ -10,7 +10,8 @@ naming:
     # KMP actual files are named after the expect file (Platform.android.kt holds AndroidPlatform).
     active: false
   TopLevelPropertyNaming:
-    constantPattern: '[A-Z][A-Za-z0-9]*'
+    # PascalCase for Compose values (colors), SCREAMING_SNAKE_CASE for const val (ktlint).
+    constantPattern: '[A-Z][_A-Za-z0-9]*'
 
 complexity:
   LongParameterList:

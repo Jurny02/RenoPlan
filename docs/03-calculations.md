@@ -29,6 +29,10 @@ The editor may compute the last wall's length: after walls `1..n−1`, the remai
 start point must be parallel to the last heading. Its length becomes `Lₙ`. If it is not parallel
 (or not positive), the outline cannot be closed with one wall and the user is shown an error.
 
+The turn at the end of the last wall is also computed: after walls `1..n−1` the net rotation must be
+`±3`, and the last turn makes it `±4` (`RIGHT` for `+3`, `LEFT` for `−3`). Any other rotation cannot be
+closed with one wall.
+
 ### Example: kitchen with a chimney in a corner
 
 ```
@@ -86,6 +90,18 @@ L_crown    = P
 
 Calculations use exact millimetre integers and `Double` for areas. Rounding happens only for display:
 areas to 0.01 m², lengths to 0.01 m, money to 0.01 PLN.
+
+## Code
+
+| Formula | Function (`domain/geometry`) |
+|---|---|
+| Outline vertices | `outlineVertices(walls)` |
+| Outline validation | `validateOutline(walls)` → list of `OutlineError` (empty = valid) |
+| Auto-closing | `closingWall(walls)` → `ClosingWall(length, turn)` or `null` |
+| Floor, ceiling, perimeter, volume | `Room.floorArea`, `ceilingArea`, `perimeter`, `volume` |
+| Openings | `Opening.area`, `Room.validateOpenings()` → list of `OpeningError` |
+| Walls | `Room.wallGrossArea(wall)`, `wallNetArea(wall)`, `wallsGrossArea`, `wallsNetArea` |
+| Mouldings | `Room.skirtingLength`, `crownMouldingLength` |
 
 ## Tests
 
