@@ -11,4 +11,65 @@
     <string name="screen_calculator">Kalkulator ceny za m²</string>
 
     <string name="placeholder_coming_soon">Wkrótce</string>
+
+    <!-- Common -->
+    <string name="action_save">Zapisz</string>
+    <string name="action_cancel">Anuluj</string>
+    <string name="action_delete">Usuń</string>
+    <string name="action_rename">Zmień nazwę</string>
+    <string name="action_duplicate">Duplikuj</string>
+    <string name="action_back">Wstecz</string>
+    <string name="action_more_options">Więcej opcji</string>
+    <string name="value_missing">—</string>
+
+    <!-- Units: %1$s is a formatted number -->
+    <string name="unit_metres_short">m</string>
+    <string name="unit_metres">%1$s m</string>
+    <string name="unit_square_metres">%1$s m²</string>
+    <string name="unit_cubic_metres">%1$s m³</string>
+
+    <!-- Levels list -->
+    <string name="level_add">Dodaj poziom</string>
+    <string name="level_name_label">Nazwa poziomu</string>
+    <string name="level_rename_title">Zmień nazwę poziomu</string>
+    <string name="level_delete_title">Usunąć poziom?</string>
+    <string name="level_delete_text">Poziom „%1$s” zostanie usunięty razem ze wszystkimi pokojami.</string>
+    <string name="levels_empty_title">Nie masz jeszcze żadnego poziomu</string>
+    <string name="levels_empty_text">Poziom to jedno piętro mieszkania, np. „Parter”. Dodaj go, a potem jego pokoje.</string>
+    <string name="levels_empty_action">Dodaj pierwszy poziom</string>
+    <plurals name="level_room_count">
+        <item quantity="one">%1$d pokój</item>
+        <item quantity="few">%1$d pokoje</item>
+        <item quantity="many">%1$d pokoi</item>
+        <item quantity="other">%1$d pokoju</item>
+    </plurals>
+    <string name="level_card_details">%1$s · podłoga %2$s</string>
+
+    <!-- Level -->
+    <string name="level_tab_rooms">Pokoje</string>
+    <string name="level_tab_summary">Podsumowanie</string>
+    <string name="level_tab_costs">Koszty</string>
+    <string name="room_add">Dodaj pokój</string>
+    <string name="room_name_label">Nazwa pokoju</string>
+    <string name="room_rename_title">Zmień nazwę pokoju</string>
+    <string name="room_copy_name">%1$s (kopia)</string>
+    <string name="room_delete_title">Usunąć pokój?</string>
+    <string name="room_delete_text">Pokój „%1$s” zostanie usunięty razem z otworami.</string>
+    <string name="rooms_empty_title">Brak pokoi</string>
+    <string name="rooms_empty_text">Dodaj pokój i podaj jego wymiary, a powierzchnie policzą się same.</string>
+    <string name="room_card_details">Podłoga %1$s · ściany netto %2$s</string>
+
+    <!-- Room editor -->
+    <string name="room_editor_new_title">Nowy pokój</string>
+    <string name="room_editor_edit_title">Edytuj pokój</string>
+    <string name="room_height_label">Wysokość</string>
+    <string name="room_length_label">Długość</string>
+    <string name="room_width_label">Szerokość</string>
+    <string name="room_shape_rectangle">Prostokąt</string>
+    <string name="room_shape_outline">Obrys</string>
+    <string name="room_shape_outline_soon">Tryb obrysu będzie dostępny wkrótce.</string>
+    <string name="room_length_error">Podaj liczbę większą od zera, np. 2,65</string>
+    <string name="room_results_floor_area">Powierzchnia podłogi</string>
+    <string name="room_results_perimeter">Obwód</string>
+    <string name="room_results_volume">Kubatura</string>
 </resources>
