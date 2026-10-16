@@ -22,7 +22,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import dev.jurczyk.renoplan.ui.components.PlaceholderScreen
+import dev.jurczyk.renoplan.ui.calculator.CalculatorScreen
 import dev.jurczyk.renoplan.ui.level.LevelScreen
 import dev.jurczyk.renoplan.ui.levels.LevelsScreen
 import dev.jurczyk.renoplan.ui.operation.OperationEditorScreen
@@ -32,8 +32,6 @@ import dev.jurczyk.renoplan.ui.templates.TemplateEditorScreen
 import dev.jurczyk.renoplan.ui.templates.TemplatesScreen
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import renoplan.shared.generated.resources.Res
-import renoplan.shared.generated.resources.screen_calculator
 import kotlin.uuid.Uuid
 
 @Composable
@@ -67,9 +65,7 @@ fun RenoPlanNavigation(
         ) {
             projectGraph(navController)
             templatesGraph(navController)
-            composable<CalculatorRoute> {
-                PlaceholderScreen(title = stringResource(Res.string.screen_calculator))
-            }
+            composable<CalculatorRoute> { CalculatorScreen() }
         }
     }
 }

@@ -174,6 +174,10 @@ single room from Room details).
 - Inputs: package price, package amount, unit (L / kg), coverage (m² per unit), coats (default 2).
 - Results: area per package, **price per m²**, and the 1-coat price for reference.
 - Copy-to-clipboard button for the result; the user enters it into an operation manually.
+  It copies the bare amount (e.g. `11,43`) and confirms with a snackbar.
+- Unit toggle above the amount; the amount and coverage suffixes follow it (`L`, `m²/L`).
+- Results appear once every field is valid; a field shows an error only after something invalid has
+  been typed. Nothing is saved: the form resets when the app restarts.
 
 ## 10. Costs
 

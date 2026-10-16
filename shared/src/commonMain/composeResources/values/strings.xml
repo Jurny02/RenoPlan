@@ -12,6 +12,26 @@
 
     <string name="placeholder_coming_soon">Wkrótce</string>
 
+    <!-- Calculator -->
+    <string name="calculator_package_price_label">Cena opakowania</string>
+    <string name="calculator_amount_label">Ilość w opakowaniu</string>
+    <string name="calculator_unit_label">Jednostka</string>
+    <string name="calculator_unit_litre">L</string>
+    <string name="calculator_unit_kilogram">kg</string>
+    <string name="calculator_coverage_label">Wydajność (1 warstwa)</string>
+    <string name="calculator_coverage_unit">m²/%1$s</string>
+    <string name="calculator_coats_label">Liczba warstw</string>
+    <string name="calculator_currency">zł</string>
+    <string name="calculator_number_error">Podaj liczbę większą od zera, np. 2,5</string>
+    <string name="calculator_coats_error">Podaj liczbę całkowitą większą od zera</string>
+    <string name="calculator_hint">Wpisz dane z opakowania, a cena za m² policzy się sama.</string>
+    <string name="calculator_result_area">Powierzchnia z opakowania</string>
+    <string name="calculator_result_price">Cena za m²</string>
+    <string name="calculator_result_one_coat">Cena za m² przy 1 warstwie</string>
+    <string name="calculator_price_per_square_metre">%1$s zł/m²</string>
+    <string name="calculator_copy">Kopiuj cenę</string>
+    <string name="calculator_copied">Skopiowano %1$s zł/m². Wpisz ją jako cenę materiału w operacji.</string>
+
     <!-- Common -->
     <string name="action_save">Zapisz</string>
     <string name="action_cancel">Anuluj</string>
