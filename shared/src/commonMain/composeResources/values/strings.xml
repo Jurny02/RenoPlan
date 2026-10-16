@@ -137,4 +137,83 @@
     <string name="opening_error_exceeds">Otwory zajmują więcej niż cała ściana.</string>
     <string name="opening_result_area">Powierzchnia otworu</string>
     <string name="opening_result_wall_net">Ściana %1$d netto po zmianie</string>
+
+    <!-- Operations -->
+    <string name="operation_type_painting">Malowanie</string>
+    <string name="operation_type_skim_coat">Gładź</string>
+    <string name="operation_type_priming">Gruntowanie</string>
+    <string name="operation_type_tiling">Płytki</string>
+    <string name="operation_type_wall_panels">Lamele</string>
+    <string name="operation_type_skirting">Listwy przypodłogowe</string>
+    <string name="operation_type_crown_moulding">Listwy przysufitowe</string>
+    <string name="operation_type_custom">Inna</string>
+    <string name="operation_type_with_text">%1$s – %2$s</string>
+    <string name="operation_colour_label">Kolor</string>
+    <string name="operation_custom_name_label">Nazwa pracy</string>
+    <string name="operation_text_required">Wymagane</string>
+
+    <string name="surface_all_walls">Wszystkie ściany</string>
+    <string name="surface_walls">Ściany %1$s</string>
+    <string name="surface_floor">Podłoga</string>
+    <string name="surface_ceiling">Sufit</string>
+    <string name="surface_skirting">Listwy przypodłogowe</string>
+    <string name="surface_crown_moulding">Listwy przysufitowe</string>
+    <string name="list_separator"> · </string>
+
+    <string name="operation_status_todo">Do zrobienia</string>
+    <string name="operation_status_in_progress">W trakcie</string>
+    <string name="operation_status_done">Zrobione</string>
+
+    <string name="labour_per_unit">Za jednostkę</string>
+    <string name="labour_lump_sum">Ryczałt</string>
+    <string name="labour_self_done">Robię sam</string>
+
+    <string name="unit_zloty">%1$s zł</string>
+    <string name="unit_zloty_short">zł</string>
+    <string name="unit_zloty_per_square_metre">zł/m²</string>
+    <string name="unit_zloty_per_metre">zł/m</string>
+    <string name="unit_zloty_per_unit">zł/jedn.</string>
+    <string name="price_per_square_metre">%1$s zł/m²</string>
+    <string name="price_per_metre">%1$s zł/m</string>
+    <string name="price_per_unit">%1$s zł/jedn.</string>
+
+    <string name="operation_new_title">Nowa operacja</string>
+    <string name="operation_edit_title">Edytuj operację</string>
+    <string name="operation_from_template">Z szablonu</string>
+    <string name="operation_type_label">Rodzaj pracy</string>
+    <string name="operation_surfaces_label">Powierzchnie</string>
+    <string name="operation_surfaces_hint">Ścian, podłogi i sufitu (m²) nie można łączyć z listwami (m) w jednej operacji.</string>
+    <string name="operation_material_price_label">Cena materiału</string>
+    <string name="operation_labour_label">Robocizna</string>
+    <string name="operation_labour_price_label">Cena robocizny</string>
+    <string name="operation_labour_amount_label">Kwota ryczałtu</string>
+    <string name="operation_price_error">Podaj cenę, np. 12,50</string>
+    <string name="operation_status_label">Status</string>
+    <string name="operation_save_as_template">Zapisz też jako szablon</string>
+    <string name="operation_quantity">Ilość</string>
+    <string name="operation_cost_material">Materiał</string>
+    <string name="operation_cost_labour">Robocizna</string>
+    <string name="operation_cost_total">Razem</string>
+    <string name="operation_delete_title">Usunąć operację?</string>
+    <string name="operation_delete_text">Operacja zostanie usunięta z pokoju.</string>
+
+    <string name="room_operations">Operacje</string>
+    <string name="room_operations_empty">Brak operacji. Dodaj np. gruntowanie ścian albo płytki na podłodze.</string>
+    <string name="operation_add">Dodaj operację</string>
+    <string name="room_cost_total">Koszt</string>
+    <string name="room_cost_done">Zrobione</string>
+    <string name="room_cost_remaining">Pozostało</string>
+
+    <!-- Templates -->
+    <string name="templates_empty_title">Brak szablonów</string>
+    <string name="templates_empty_text">Szablon zapamiętuje rodzaj pracy i ceny, np. „Malowanie – biały, 6 zł/m², robocizna 15 zł/m²”. Dodasz go tutaj albo zaznaczając „Zapisz też jako szablon” przy operacji.</string>
+    <string name="template_add">Dodaj szablon</string>
+    <string name="template_new_title">Nowy szablon</string>
+    <string name="template_edit_title">Edytuj szablon</string>
+    <string name="template_delete_title">Usunąć szablon?</string>
+    <string name="template_delete_text">Operacje dodane wcześniej z tego szablonu się nie zmienią.</string>
+    <string name="template_details">Materiał %1$s · robocizna %2$s</string>
+    <string name="template_labour_lump_sum">%1$s ryczałt</string>
+    <string name="template_labour_self_done">robię sam</string>
+    <string name="template_editor_hint">Ceny są za jednostkę operacji: m² dla ścian, podłogi i sufitu, metr dla listew. Zmiana szablonu nie zmienia operacji dodanych wcześniej.</string>
 </resources>

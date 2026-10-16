@@ -25,13 +25,15 @@ import androidx.navigation.toRoute
 import dev.jurczyk.renoplan.ui.components.PlaceholderScreen
 import dev.jurczyk.renoplan.ui.level.LevelScreen
 import dev.jurczyk.renoplan.ui.levels.LevelsScreen
+import dev.jurczyk.renoplan.ui.operation.OperationEditorScreen
 import dev.jurczyk.renoplan.ui.roomdetails.RoomDetailsScreen
 import dev.jurczyk.renoplan.ui.roomeditor.RoomEditorScreen
+import dev.jurczyk.renoplan.ui.templates.TemplateEditorScreen
+import dev.jurczyk.renoplan.ui.templates.TemplatesScreen
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import renoplan.shared.generated.resources.Res
 import renoplan.shared.generated.resources.screen_calculator
-import renoplan.shared.generated.resources.screen_templates
 import kotlin.uuid.Uuid
 
 @Composable
@@ -64,9 +66,7 @@ fun RenoPlanNavigation(
             modifier = Modifier.padding(innerPadding).consumeWindowInsets(innerPadding),
         ) {
             projectGraph(navController)
-            composable<TemplatesRoute> {
-                PlaceholderScreen(title = stringResource(Res.string.screen_templates))
-            }
+            templatesGraph(navController)
             composable<CalculatorRoute> {
                 PlaceholderScreen(title = stringResource(Res.string.screen_calculator))
             }
@@ -95,6 +95,21 @@ private fun NavGraphBuilder.projectGraph(navController: NavHostController) {
                 roomId = Uuid.parse(route.roomId),
                 onBack = navController::popBackStack,
                 onEditShape = { navController.navigate(RoomEditorRoute(route.levelId, route.roomId)) },
+                onAddOperation = { navController.navigate(OperationEditorRoute(route.levelId, route.roomId)) },
+                onEditOperation = {
+                    navController.navigate(
+                        OperationEditorRoute(route.levelId, route.roomId, it.toString()),
+                    )
+                },
+            )
+        }
+        composable<OperationEditorRoute> { entry ->
+            val route = entry.toRoute<OperationEditorRoute>()
+            OperationEditorScreen(
+                levelId = Uuid.parse(route.levelId),
+                roomId = Uuid.parse(route.roomId),
+                operationId = route.operationId?.let(Uuid::parse),
+                onBack = navController::popBackStack,
             )
         }
         composable<RoomEditorRoute> { entry ->
@@ -102,6 +117,23 @@ private fun NavGraphBuilder.projectGraph(navController: NavHostController) {
             RoomEditorScreen(
                 levelId = Uuid.parse(route.levelId),
                 roomId = route.roomId?.let(Uuid::parse),
+                onBack = navController::popBackStack,
+            )
+        }
+    }
+}
+
+private fun NavGraphBuilder.templatesGraph(navController: NavHostController) {
+    navigation<TemplatesGraph>(startDestination = TemplatesRoute) {
+        composable<TemplatesRoute> {
+            TemplatesScreen(
+                onAddTemplate = { navController.navigate(TemplateEditorRoute()) },
+                onOpenTemplate = { navController.navigate(TemplateEditorRoute(it.toString())) },
+            )
+        }
+        composable<TemplateEditorRoute> { entry ->
+            TemplateEditorScreen(
+                templateId = entry.toRoute<TemplateEditorRoute>().templateId?.let(Uuid::parse),
                 onBack = navController::popBackStack,
             )
         }
