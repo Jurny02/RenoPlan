@@ -102,5 +102,5 @@ Planned tools:
 ## Quality
 
 - Formatting and lint: Spotless with ktlint (and Compose rules), detekt, SwiftLint. See the root README.
-- CI: GitHub Actions (`.github/workflows/ci.yml`) runs lint, the Android build and tests, SwiftLint and
-  the iOS simulator tests on every pull request.
+- CI: GitHub Actions (`.github/workflows/ci.yml`) runs lint, the Android build and tests, SwiftLint, the
+  iOS simulator tests and an Xcode build of the iOS app on every pull request.
