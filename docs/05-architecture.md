@@ -13,9 +13,30 @@ Kotlin Multiplatform with a shared Compose Multiplatform UI for Android and iOS
 | `androidApp` | Android entry point |
 | `iosApp` | iOS entry point (Xcode project, minimal Swift) |
 
-Inside `shared/src/commonMain/kotlin`, layers are separate packages (`domain`, `data`, `presentation`, `ui`).
+Packages in `shared/src/commonMain/kotlin/dev/jurczyk/renoplan/`:
+
+| Package | Contents |
+|---|---|
+| `domain` | Model, calculations, repository interfaces. Pure Kotlin, no framework imports |
+| `data` | Room database, repository implementations |
+| `presentation` | ViewModels and UI state |
+| `ui` | Compose screens and components; `ui/theme` (Material 3 theme), `ui/navigation` (routes, bottom bar) |
+| `di` | Koin modules and `initKoin()` |
+
 If the domain grows, it can be extracted into its own module without changes to its code, because it
 has no dependencies on the other layers.
+
+### Startup
+
+- Android: `RenoPlanApplication` calls `initKoin { androidContext(...) }`, then `MainActivity` shows `App()`.
+- iOS: `iOSApp.init()` calls `KoinKt.doInitKoin()`, then `MainViewController()` shows `App()`.
+- `App()` applies `RenoPlanTheme` and hosts the navigation with the bottom bar.
+
+### Resources
+
+All UI texts live in `shared/src/commonMain/composeResources/values/strings.xml` (Polish is the
+default locale) and are read with `stringResource(...)`. No hard-coded UI strings in Kotlin.
+Icons are vector drawables in `composeResources/drawable/`.
 
 ## Layers
 

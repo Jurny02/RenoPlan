@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RenoPlan</string>
+
+    <string name="nav_project">Projekt</string>
+    <string name="nav_templates">Szablony</string>
+    <string name="nav_calculator">Kalkulator</string>
+
+    <string name="screen_levels">Poziomy</string>
+    <string name="screen_templates">Szablony operacji</string>
+    <string name="screen_calculator">Kalkulator ceny za m²</string>
+
+    <string name="placeholder_coming_soon">Wkrótce</string>
+</resources>
