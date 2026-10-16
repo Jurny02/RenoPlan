@@ -15,6 +15,7 @@ not millimetre-exact bills of quantities.
 | [03 – Calculations](03-calculations.md) | Geometry formulas: outline, areas, volume, mouldings |
 | [04 – Operations and costs](04-operations-and-costs.md) | Work operations, pricing, summaries, price-per-m² calculator |
 | [05 – Architecture](05-architecture.md) | Layers, modules, persistence, future sync |
+| [06 – Screens](06-screens.md) | Screens, navigation and options on each screen |
 | [Glossary](glossary.md) | Polish ↔ English terms used in code and UI |
 | [ADR](adr/) | Architecture Decision Records |
 

@@ -46,13 +46,7 @@ as an ADR).
 
 ## Screens (MVP)
 
-1. Levels list
-2. Rooms list of a level
-3. Room editor – shape (rectangle / outline with read-only preview), height, walls, openings
-4. Room operations – operations per surface, prices, status
-5. Summary – per room / whole level
-6. Operation templates
-7. Price-per-m² calculator
+See [06 – Screens](06-screens.md).
 
 ## Future: sharing via Firebase
 
