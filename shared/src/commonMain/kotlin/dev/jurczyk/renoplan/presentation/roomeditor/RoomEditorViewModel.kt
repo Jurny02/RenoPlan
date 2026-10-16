@@ -2,14 +2,11 @@ package dev.jurczyk.renoplan.presentation.roomeditor
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dev.jurczyk.renoplan.domain.geometry.floorArea
-import dev.jurczyk.renoplan.domain.geometry.perimeter
-import dev.jurczyk.renoplan.domain.geometry.volume
-import dev.jurczyk.renoplan.domain.model.Millimetres
 import dev.jurczyk.renoplan.domain.model.Room
 import dev.jurczyk.renoplan.domain.model.ShapeInput
+import dev.jurczyk.renoplan.domain.model.Turn
+import dev.jurczyk.renoplan.domain.model.Wall
 import dev.jurczyk.renoplan.domain.repository.RoomRepository
-import dev.jurczyk.renoplan.presentation.common.parseMetres
 import dev.jurczyk.renoplan.presentation.common.toMetresInput
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,49 +15,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.uuid.Uuid
 
-/** Room editor form in rectangle mode. Lengths are typed in metres; results are derived, never stored. */
-data class RoomEditorUiState(
-    val isNew: Boolean = true,
-    val isLoading: Boolean = false,
-    val name: String = "",
-    val height: String = "",
-    val length: String = "",
-    val width: String = "",
-    val isSaved: Boolean = false,
-) {
-    val heightMm: Millimetres? get() = parseMetres(height)
-    val lengthMm: Millimetres? get() = parseMetres(length)
-    val widthMm: Millimetres? get() = parseMetres(width)
-
-    /** Errors are shown only for fields the user has typed into. */
-    val heightError: Boolean get() = height.isNotBlank() && heightMm == null
-    val lengthError: Boolean get() = length.isNotBlank() && lengthMm == null
-    val widthError: Boolean get() = width.isNotBlank() && widthMm == null
-
-    /** The room as it would be saved, or `null` while the form is incomplete. */
-    val preview: Room? get() = heightMm?.let { height -> rectangle()?.copy(name = name.trim(), height = height) }
-
-    /** m², or `null` until length and width are valid. */
-    val floorArea: Double? get() = rectangle()?.floorArea
-    val perimeter: Millimetres? get() = rectangle()?.perimeter
-    val volume: Double? get() = preview?.volume
-
-    val canSave: Boolean get() = !isLoading && name.isNotBlank() && preview != null
-
-    private fun rectangle(): Room? {
-        val length = lengthMm
-        val width = widthMm
-        return if (length != null && width != null) {
-            Room.rectangle(id = PREVIEW_ID, name = "", length = length, width = width, height = Millimetres.Zero)
-        } else {
-            null
-        }
-    }
-
-    private companion object {
-        val PREVIEW_ID = Uuid.NIL
-    }
-}
+private const val NEW_OUTLINE_ROWS = 4
 
 class RoomEditorViewModel(
     private val levelId: Uuid,
@@ -70,7 +25,7 @@ class RoomEditorViewModel(
     private val _state = MutableStateFlow(RoomEditorUiState(isNew = roomId == null, isLoading = roomId != null))
     val state: StateFlow<RoomEditorUiState> = _state.asStateFlow()
 
-    /** The stored room being edited; its openings are kept when the walls change. */
+    /** The stored room being edited; its openings are kept on walls that still exist. */
     private var original: Room? = null
 
     init {
@@ -85,20 +40,105 @@ class RoomEditorViewModel(
 
     fun onWidthChange(width: String) = _state.update { it.copy(width = width) }
 
+    /**
+     * Rectangle → Outline turns the rectangle into four rows (or four empty rows).
+     * Outline → Rectangle works only for a closed 4-wall outline.
+     */
+    fun onShapeModeChange(mode: ShapeMode) =
+        _state.update { state ->
+            when {
+                mode == state.shapeMode -> {
+                    state
+                }
+
+                mode == ShapeMode.OUTLINE -> {
+                    state.copy(
+                        shapeMode = ShapeMode.OUTLINE,
+                        rows = state.walls?.toRows() ?: List(NEW_OUTLINE_ROWS) { WallRow() },
+                        autoClose = false,
+                    )
+                }
+
+                state.canSwitchToRectangle -> {
+                    val walls = state.closedWalls.orEmpty()
+                    state.copy(
+                        shapeMode = ShapeMode.RECTANGLE,
+                        length = walls[0].length.toMetresInput(),
+                        width = walls[1].length.toMetresInput(),
+                    )
+                }
+
+                else -> {
+                    state
+                }
+            }
+        }
+
+    fun onRowLengthChange(
+        index: Int,
+        length: String,
+    ) = updateRow(index) { it.copy(length = length) }
+
+    fun onRowTurnChange(
+        index: Int,
+        turn: Turn,
+    ) = updateRow(index) { it.copy(turn = turn) }
+
+    fun addRow() = _state.update { it.copy(rows = it.rows + WallRow()) }
+
+    fun removeRow(index: Int) =
+        _state.update { state -> state.copy(rows = state.rows.filterIndexed { i, _ -> i != index }) }
+
+    /**
+     * Turning it on adds a computed wall after the typed ones; if the typed walls already close the
+     * outline, their last wall is dropped instead, because it is the one that gets computed.
+     * Turning it off keeps the computed wall as an editable row.
+     */
+    fun onAutoCloseChange(autoClose: Boolean) =
+        _state.update { state ->
+            when {
+                autoClose == state.autoClose -> {
+                    state
+                }
+
+                autoClose -> {
+                    val alreadyClosed = state.closedWalls != null
+                    state.copy(autoClose = true, rows = if (alreadyClosed) state.rows.dropLast(1) else state.rows)
+                }
+
+                else -> {
+                    val closing = state.closingWall
+                    val row = closing?.let { WallRow(it.length.toMetresInput(), it.turn) } ?: WallRow()
+                    state.copy(autoClose = false, rows = state.rows + row)
+                }
+            }
+        }
+
     fun save() {
-        val current = _state.value
-        val preview = current.preview ?: return
-        if (!current.canSave) return
-        val room =
-            original?.let { stored ->
-                stored
-                    .copy(name = preview.name, height = preview.height, shapeInput = preview.shapeInput)
-                    .withWalls(preview.walls)
-            } ?: preview.copy(id = Uuid.random())
+        val room = _state.value.takeIf { it.canSave }?.let(::toRoom) ?: return
         viewModelScope.launch {
             roomRepository.saveRoom(levelId, room)
             _state.update { it.copy(isSaved = true) }
         }
+    }
+
+    private fun toRoom(state: RoomEditorUiState): Room? {
+        val walls = state.closedWalls
+        val height = state.heightMm
+        val shapeInput = state.shapeInput
+        if (walls == null || height == null || shapeInput == null) return null
+        val name = state.name.trim()
+        return original
+            ?.copy(name = name, height = height, shapeInput = shapeInput)
+            ?.withWalls(walls)
+            ?: Room(id = Uuid.random(), name = name, height = height, walls = walls, shapeInput = shapeInput)
+    }
+
+    private fun updateRow(
+        index: Int,
+        change: (WallRow) -> WallRow,
+    ) = _state.update { state ->
+        state.copy(rows = state.rows.mapIndexed { i, row -> if (i == index) change(row) else row })
     }
 
     private suspend fun load(id: Uuid) {
@@ -110,9 +150,21 @@ class RoomEditorViewModel(
                 isLoading = false,
                 name = room?.name.orEmpty(),
                 height = room?.height?.toMetresInput().orEmpty(),
+                shapeMode = if (room != null && rectangle == null) ShapeMode.OUTLINE else ShapeMode.RECTANGLE,
                 length = rectangle?.length?.toMetresInput().orEmpty(),
                 width = rectangle?.width?.toMetresInput().orEmpty(),
+                rows = if (rectangle == null) room?.walls?.toRows().orEmpty() else emptyList(),
+                wallsWithOpenings =
+                    room
+                        ?.walls
+                        ?.filter { wall ->
+                            wall.openings.isNotEmpty()
+                        }?.map { wall -> wall.number }
+                        ?.toSet()
+                        .orEmpty(),
             )
         }
     }
 }
+
+private fun List<Wall>.toRows(): List<WallRow> = map { WallRow(it.length.toMetresInput(), it.turn) }
