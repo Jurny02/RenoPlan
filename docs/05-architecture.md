@@ -41,20 +41,28 @@ has no dependencies on the other layers.
 
 ## Persistence
 
-Local database on the device. Candidates: SQLDelight or Room KMP (decision pending, to be recorded
-as an ADR).
+Room KMP with the bundled SQLite driver; small settings in multiplatform-settings.
+Dependency injection with Koin, navigation with Navigation Compose
+([ADR 0004](adr/0004-core-libraries.md)).
 
 ## Screens (MVP)
 
 See [06 – Screens](06-screens.md).
 
-## Future: sharing via Firebase
+## Future: accounts, sharing and crash reporting via Firebase
 
 Sharing a level with other people is planned later. The MVP prepares for it by:
 
 - generating `Uuid` IDs on the device;
 - hiding storage behind repository interfaces, so a synced implementation can be added without
   touching the domain or UI.
+
+Planned tools:
+
+- Accounts and sharing: Firebase Authentication and Firestore (free Spark plan covers a first app).
+- Crash reporting: Firebase Crashlytics (free), added together with Firebase. iOS stack traces from
+  Kotlin need CrashKiOS to be readable.
+- Kotlin access to Firebase from `commonMain`: GitLive Firebase SDK.
 
 ## Quality
 
