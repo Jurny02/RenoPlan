@@ -113,8 +113,7 @@ The main working screen of a room.
 - **Operations** section: row per operation with type, surfaces, quantity, cost and status chip;
   tap the status chip to cycle *to do → in progress → done*; **Add operation** → Operation editor.
 - Room totals: cost, done, remaining.
-- Operations and room totals arrive with stage 3 of the implementation order; until then the screen
-  shows the header and the walls.
+- Room totals sit above the operations list, with a progress bar (done ÷ total cost).
 
 ## 5. Opening sheet
 
@@ -144,6 +143,12 @@ Bottom sheet for adding or editing an opening.
 - **Status**: to do / in progress / done.
 - Live cost: material, labour, total.
 - **Save as template** checkbox.
+- Templates, when there are any, are offered as chips at the top; picking one fills the type and
+  prices.
+- Prices are typed in złoty; a blank price counts as 0 zł.
+- Choosing Skirting or Crown moulding as the type preselects that surface when nothing is selected.
+  Selecting a surface of the other unit (m² vs m) starts a new selection instead of mixing them.
+- **Delete** (with confirmation) in the top bar when editing.
 
 ## 7. Summary
 
@@ -158,8 +163,9 @@ single room from Room details).
 
 ## 8. Templates
 
-- List of templates: type, material price, labour.
-- Add / edit / delete. The editor is the Operation editor without surfaces and status.
+- List of templates: type, material price, labour (prices per unit of the operation).
+- Add (FAB) / edit (tap a template) / delete (in the editor, with confirmation). The editor is the
+  Operation editor without surfaces and status.
 - Editing a template does not change operations created from it earlier
   ([04](04-operations-and-costs.md#templates)).
 
