@@ -15,10 +15,15 @@ A bottom bar with three destinations:
 
 ```mermaid
 flowchart TD
+    LS[Launch screen] -->|first run| OB[Onboarding]
+    LS -->|next runs| L
+    OB --> L
     L[1. Levels list] --> LV[2. Level]
     LV -->|Rooms tab| RE[3. Room editor]
     LV -->|Rooms tab| RD[4. Room details]
     LV -->|Summary tab| S[7. Summary]
+    LV -->|Costs tab| CO[10. Costs]
+    CO --> OP
     RD --> RE
     RD --> O[5. Opening sheet]
     RD --> OP[6. Operation editor]
@@ -30,6 +35,25 @@ flowchart TD
 Every derived number (areas, lengths, costs) is recalculated live on every screen; nothing needs a
 "recalculate" button.
 
+## Launch screen
+
+- Native splash, not a Compose screen: Android SplashScreen API, iOS launch screen in `Info.plist`.
+- App icon on the brand background colour; shown only while the app and database start.
+- Routes to **Onboarding** on the first run, otherwise to **Levels list**.
+
+## Onboarding
+
+Shown once on the first run; skippable at any time. Can be reopened from the help icon on the
+Levels list.
+
+1. **Plan your renovation** – what the app does: rooms, areas, work and costs in one place.
+2. **Measure rooms** – rectangle or outline, walls are numbered; openings are subtracted.
+3. **Add work and prices** – operations on walls, floor and ceiling; material and labour prices.
+4. **Track costs and progress** – summary per room or level; mark work as done.
+
+Last page: **Create your first level** (asks for a name, opens the Level) or **Skip**.
+A "seen" flag is stored locally so onboarding does not show again.
+
 ## 1. Levels list
 
 Home screen of the Project tab.
@@ -38,11 +62,12 @@ Home screen of the Project tab.
 - **Add level** (FAB): asks for a name.
 - Card menu: rename, delete (with confirmation).
 - Empty state: short explanation and an "Add your first level" button.
+- Top bar: help icon → Onboarding.
 - Tap a card → **Level**.
 
 ## 2. Level
 
-Two tabs: **Rooms** and **Summary** (see screen 7).
+Three tabs: **Rooms**, **Summary** (quantities, screen 7) and **Costs** (money, screen 10).
 
 Rooms tab:
 
@@ -107,14 +132,14 @@ Bottom sheet for adding or editing an opening.
 
 ## 7. Summary
 
-Shown as the Summary tab of a Level (and as a filtered view for a single room from Room details).
+Quantities only: how much of what. Shown as the Summary tab of a Level (and as a filtered view for a
+single room from Room details).
 
 - Toggle **By room** / **Whole level**.
 - Geometry block: total floor, ceiling and net wall area, skirting and crown moulding length.
-- Table grouped by operation type (with colour for painting): surfaces, quantity, cost, done, remaining.
+- Table grouped by operation type (with colour for painting): surfaces, quantity, status counts.
   - By room: one group per room.
   - Whole level: one row per type, e.g. "Skim coat – 10 walls – 100.00 m²".
-- Totals: cost, done, remaining, progress bar.
 
 ## 8. Templates
 
@@ -129,16 +154,31 @@ Shown as the Summary tab of a Level (and as a filtered view for a single room fr
 - Results: area per package, **price per m²**, and the 1-coat price for reference.
 - Copy-to-clipboard button for the result; the user enters it into an operation manually.
 
+## 10. Costs
+
+Money: what it costs and how prices are set. Costs tab of a Level.
+
+- Header: total cost, done, remaining, progress bar; split into material and labour.
+- Toggle **By room** / **By operation type**.
+- Row per operation group: quantity, material price, labour (per unit / lump sum / self), cost, status.
+  Tap a row → **Operation editor**.
+- **Edit price for all**: on a type group (e.g. "Painting – white"), set material price and labour once
+  and apply them to every operation of that type on the level. Shows how many operations will change
+  and the cost before → after.
+- Toggle labour **I do it myself** for a whole group, to see quickly how much doing it yourself saves.
+- Levels list cards show each level's total, so the cost of the whole apartment is visible on the
+  home screen.
+
 ## Implementation order
 
 Follows the [roadmap](01-scope.md#roadmap):
 
-1. Levels list, Level (Rooms tab), Room editor – rectangle mode.
+1. Launch screen, Levels list, Level (Rooms tab), Room editor – rectangle mode.
 2. Room editor – outline mode with preview; Room details – walls and openings.
-3. Operation editor, Room details – operations, Summary, Templates.
-4. Statuses and progress, Calculator.
+3. Operation editor, Room details – operations, Summary, Costs, Templates.
+4. Statuses and progress, Calculator, Onboarding (last, when the screens it describes are stable).
 
 ## Out of scope for the MVP
 
-Settings (currency, units are fixed to PLN and metres), onboarding, export/share, dark/light theme
+Settings (currency, units are fixed to PLN and metres), export/share, dark/light theme
 switch beyond the system setting.
