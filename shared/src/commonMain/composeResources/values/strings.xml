@@ -89,4 +89,52 @@
     <string name="room_results_floor_area">Powierzchnia podłogi</string>
     <string name="room_results_perimeter">Obwód</string>
     <string name="room_results_volume">Kubatura</string>
+
+    <!-- Room details -->
+    <string name="room_details_edit_shape">Edytuj kształt</string>
+    <string name="room_details_floor">Podłoga</string>
+    <string name="room_details_ceiling">Sufit</string>
+    <string name="room_details_walls_net">Ściany netto</string>
+    <string name="room_details_perimeter">Obwód</string>
+    <string name="room_details_skirting">Listwy przypodłogowe</string>
+    <string name="room_details_volume">Kubatura</string>
+    <string name="room_details_walls">Ściany</string>
+    <string name="room_details_wall">Ściana %1$d</string>
+    <string name="room_details_wall_summary">%1$s · %2$s netto · %3$s</string>
+    <plurals name="room_details_opening_count">
+        <item quantity="one">%1$d otwór</item>
+        <item quantity="few">%1$d otwory</item>
+        <item quantity="many">%1$d otworów</item>
+        <item quantity="other">%1$d otworu</item>
+    </plurals>
+    <string name="room_details_no_openings">Brak otworów na tej ścianie.</string>
+    <string name="opening_add">Dodaj otwór</string>
+    <string name="opening_add_on_wall">Dodaj otwór na ścianie %1$d</string>
+
+    <!-- Opening -->
+    <string name="opening_type_window">Okno</string>
+    <string name="opening_type_door">Drzwi</string>
+    <string name="opening_type_passage">Przejście</string>
+    <string name="opening_type_niche">Wnęka</string>
+    <string name="opening_dimensions">%1$s × %2$s m</string>
+    <string name="opening_summary">%1$s · %2$s</string>
+    <string name="opening_at_floor">od podłogi</string>
+    <string name="opening_new_title">Nowy otwór</string>
+    <string name="opening_edit_title">Edytuj otwór</string>
+    <string name="opening_type_label">Rodzaj</string>
+    <string name="opening_wall_label">Ściana</string>
+    <string name="opening_size_dimensions">Wymiary</string>
+    <string name="opening_size_area">Powierzchnia</string>
+    <string name="opening_width_label">Szerokość</string>
+    <string name="opening_height_label">Wysokość</string>
+    <string name="opening_area_label">Powierzchnia</string>
+    <string name="unit_square_metres_short">m²</string>
+    <string name="opening_starts_at_floor">Od podłogi</string>
+    <string name="opening_starts_at_floor_hint">Skraca listwę przypodłogową o szerokość otworu, dlatego wymaga wymiarów.</string>
+    <string name="opening_area_error">Podaj liczbę większą od zera, np. 1,5</string>
+    <string name="opening_error_wider">Otwór jest szerszy niż ściana (%1$s).</string>
+    <string name="opening_error_taller">Otwór jest wyższy niż pokój (%1$s).</string>
+    <string name="opening_error_exceeds">Otwory zajmują więcej niż cała ściana.</string>
+    <string name="opening_result_area">Powierzchnia otworu</string>
+    <string name="opening_result_wall_net">Ściana %1$d netto po zmianie</string>
 </resources>

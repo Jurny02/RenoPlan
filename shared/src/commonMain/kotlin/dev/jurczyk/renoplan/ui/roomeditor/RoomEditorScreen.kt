@@ -41,6 +41,7 @@ import dev.jurczyk.renoplan.presentation.roomeditor.RoomEditorViewModel
 import dev.jurczyk.renoplan.presentation.roomeditor.ShapeMode
 import dev.jurczyk.renoplan.presentation.roomeditor.WallRow
 import dev.jurczyk.renoplan.ui.components.BackButton
+import dev.jurczyk.renoplan.ui.components.UnitTextField
 import dev.jurczyk.renoplan.ui.format.formatDecimal
 import dev.jurczyk.renoplan.ui.theme.RenoPlanTheme
 import org.jetbrains.compose.resources.stringResource
@@ -185,16 +186,15 @@ private fun MetresField(
     modifier: Modifier = Modifier,
     imeAction: ImeAction = ImeAction.Next,
 ) {
-    OutlinedTextField(
+    UnitTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(label) },
-        suffix = { Text(stringResource(Res.string.unit_metres_short)) },
+        label = label,
+        unit = stringResource(Res.string.unit_metres_short),
         isError = isError,
-        supportingText = if (isError) ({ Text(stringResource(Res.string.room_length_error)) }) else null,
-        singleLine = true,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = imeAction),
-        modifier = modifier.fillMaxWidth(),
+        errorText = stringResource(Res.string.room_length_error),
+        modifier = modifier,
+        imeAction = imeAction,
     )
 }
 

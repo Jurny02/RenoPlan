@@ -15,6 +15,12 @@ data class LevelRoute(
     val levelId: String,
 )
 
+@Serializable
+data class RoomDetailsRoute(
+    val levelId: String,
+    val roomId: String,
+)
+
 /** Creates a room when [roomId] is `null`, otherwise edits it. */
 @Serializable
 data class RoomEditorRoute(
