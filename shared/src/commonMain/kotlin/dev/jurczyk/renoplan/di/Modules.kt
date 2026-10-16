@@ -6,6 +6,7 @@ import dev.jurczyk.renoplan.data.repository.LocalLevelRepository
 import dev.jurczyk.renoplan.data.repository.LocalRoomRepository
 import dev.jurczyk.renoplan.domain.repository.LevelRepository
 import dev.jurczyk.renoplan.domain.repository.RoomRepository
+import dev.jurczyk.renoplan.presentation.calculator.CalculatorViewModel
 import dev.jurczyk.renoplan.presentation.level.LevelViewModel
 import dev.jurczyk.renoplan.presentation.levels.LevelsViewModel
 import dev.jurczyk.renoplan.presentation.roomdetails.RoomDetailsViewModel
@@ -35,6 +36,7 @@ val domainModule = module { }
 val presentationModule =
     module {
         viewModelOf(::LevelsViewModel)
+        viewModelOf(::CalculatorViewModel)
         viewModel { (levelId: Uuid) -> LevelViewModel(levelId, get(), get()) }
         viewModel { (levelId: Uuid, roomId: Uuid?) -> RoomEditorViewModel(levelId, roomId, get()) }
         viewModel { (levelId: Uuid, roomId: Uuid) -> RoomDetailsViewModel(levelId, roomId, get()) }
