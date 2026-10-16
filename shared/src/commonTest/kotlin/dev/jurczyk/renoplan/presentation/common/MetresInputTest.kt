@@ -1,5 +1,6 @@
 package dev.jurczyk.renoplan.presentation.common
 
+import dev.jurczyk.renoplan.domain.model.Money
 import dev.jurczyk.renoplan.domain.model.mm
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -48,5 +49,19 @@ class MetresInputTest {
         assertEquals("1,5", 1.5.toSquareMetresInput())
         assertEquals("2", 2.0.toSquareMetresInput())
         assertEquals("0,05", 0.049.toSquareMetresInput())
+    }
+
+    @Test
+    fun money() {
+        assertEquals(Money(1_143), parseMoney("11,43"))
+        assertEquals(Money(650), parseMoney("6.5"))
+        assertEquals(Money.Zero, parseMoney(""))
+        assertEquals(Money.Zero, parseMoney("0"))
+        assertNull(parseMoney("-1"))
+        assertNull(parseMoney("abc"))
+        assertEquals("6,5", Money(650).toMoneyInput())
+        assertEquals("11,43", Money(1_143).toMoneyInput())
+        assertEquals("1500", Money(150_000).toMoneyInput())
+        assertEquals("", Money.Zero.toMoneyInput())
     }
 }

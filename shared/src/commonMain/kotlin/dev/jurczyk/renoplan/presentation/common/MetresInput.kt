@@ -1,6 +1,7 @@
 package dev.jurczyk.renoplan.presentation.common
 
 import dev.jurczyk.renoplan.domain.model.Millimetres
+import dev.jurczyk.renoplan.domain.model.Money
 import kotlin.math.round
 
 private const val MILLIMETRES_PER_METRE = 1_000L
@@ -46,5 +47,30 @@ fun Double.toSquareMetresInput(): String {
     val hundredths = round(this * AREA_INPUT_DECIMALS).toLong()
     val fraction = (hundredths % AREA_INPUT_DECIMALS.toLong()).toString().padStart(2, '0').trimEnd('0')
     val whole = hundredths / AREA_INPUT_DECIMALS.toLong()
+    return if (fraction.isEmpty()) "$whole" else "$whole,$fraction"
+}
+
+private const val GROSZE_PER_ZLOTY = 100L
+
+/**
+ * Parses a price typed in złoty, with a comma or a dot. Blank means 0 zł; returns `null` for
+ * malformed or negative input.
+ */
+fun parseMoney(text: String): Money? {
+    if (text.isBlank()) return Money.Zero
+    val zloty =
+        text
+            .trim()
+            .replace(',', '.')
+            .toDoubleOrNull()
+            ?.takeIf { it.isFinite() && it >= 0 }
+    return zloty?.let { Money.fromZloty(it) }
+}
+
+/** Formats a price for an input field, without trailing zeros, e.g. 650 gr → `"6,5"`, 0 → `""`. */
+fun Money.toMoneyInput(): String {
+    if (grosze == 0L) return ""
+    val fraction = (grosze % GROSZE_PER_ZLOTY).toString().padStart(2, '0').trimEnd('0')
+    val whole = grosze / GROSZE_PER_ZLOTY
     return if (fraction.isEmpty()) "$whole" else "$whole,$fraction"
 }
