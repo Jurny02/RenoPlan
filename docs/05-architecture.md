@@ -77,8 +77,8 @@ Dependency injection with Koin, navigation with Navigation Compose
   the platform builder comes from Koin's `platformModule` (Android: app context, iOS: Documents folder).
 - Schema version 1 is exported to `shared/schemas/` and committed. Before the first public release the
   schema may still change in place; after it, every change needs a migration.
-- Database tests run in `iosTest` on the simulator, because the bundled SQLite driver has no native
-  library for the JVM host tests; entity mappers are tested in `commonTest`.
+- Database tests run in `iosTest` on the simulator, because the Android database builder needs a `Context`
+  and the JVM host tests have no Robolectric; entity mappers are tested in `commonTest`.
 
 ## Screens (MVP)
 

@@ -22,7 +22,7 @@ import kotlin.test.assertNull
 import kotlin.uuid.Uuid
 import dev.jurczyk.renoplan.domain.model.Room as RenoRoom
 
-// Runs on the iOS simulator only: the bundled SQLite driver has no native library for the JVM host tests.
+// Runs on the iOS simulator only: the Android database builder needs a Context, which the JVM host tests lack.
 class LocalRepositoriesTest {
     private val database = buildDatabase(Room.inMemoryDatabaseBuilder<RenoPlanDatabase>())
     private val levels = LocalLevelRepository(database.levelDao())
