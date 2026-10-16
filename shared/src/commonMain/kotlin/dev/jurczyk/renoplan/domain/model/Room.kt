@@ -13,6 +13,26 @@ data class Room(
     val walls: List<Wall>,
     val shapeInput: ShapeInput,
 ) {
+    /** A copy under a new [id] (and new opening ids) with the same geometry and openings. */
+    fun duplicate(
+        id: Uuid,
+        name: String,
+    ): Room =
+        copy(
+            id = id,
+            name = name,
+            walls = walls.map { wall -> wall.copy(openings = wall.openings.map { it.copy(id = Uuid.random()) }) },
+        )
+
+    /**
+     * Replaces the walls, keeping each old wall's openings on the wall with the same number.
+     * Openings of walls that no longer exist are dropped.
+     */
+    fun withWalls(newWalls: List<Wall>): Room {
+        val openingsByNumber = walls.associate { it.number to it.openings }
+        return copy(walls = newWalls.map { it.copy(openings = openingsByNumber[it.number].orEmpty()) })
+    }
+
     companion object {
         fun rectangle(
             id: Uuid,

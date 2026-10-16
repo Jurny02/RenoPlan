@@ -16,7 +16,7 @@ enum class TopLevelDestination(
     val label: StringResource,
     val icon: DrawableResource,
 ) {
-    PROJECT(LevelsRoute, Res.string.nav_project, Res.drawable.ic_project),
+    PROJECT(ProjectGraph, Res.string.nav_project, Res.drawable.ic_project),
     TEMPLATES(TemplatesRoute, Res.string.nav_templates, Res.drawable.ic_templates),
     CALCULATOR(CalculatorRoute, Res.string.nav_calculator, Res.drawable.ic_calculator),
 }

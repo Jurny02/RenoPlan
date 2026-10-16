@@ -74,7 +74,7 @@ Rooms tab:
 - Card per room: name, floor area, net wall area, cost, progress.
 - **Add room** (FAB) → **Room editor** (new room).
 - Card menu: rename, duplicate (copies geometry, openings and operations), delete.
-- Tap a card → **Room details**.
+- Tap a card → **Room details**. Until Room details exists, the card opens the **Room editor**.
 
 ## 3. Room editor
 
@@ -90,6 +90,9 @@ Creating a room or changing its geometry.
 - Validation message when the outline does not close; **Save** is disabled until it does.
 - Switching Rectangle → Outline converts the 4 walls into rows; Outline → Rectangle is only allowed
   for a 4-wall outline.
+- Lengths are typed in metres with a comma or a dot (e.g. `2,65`) and stored as millimetres. A field
+  shows an error only once something invalid has been typed into it; Save stays disabled until the
+  name and every length are valid.
 
 Changing geometry keeps openings and operations. If a wall number disappears (fewer walls), the user
 is warned which openings and operations will lose that wall.
