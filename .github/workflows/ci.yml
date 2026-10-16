@@ -52,3 +52,13 @@ jobs:
           java-version: 21
       - uses: gradle/actions/setup-gradle@v6
       - run: ./gradlew :shared:iosSimulatorArm64Test
+      - name: Build the iOS app
+        # Builds the whole app (Swift code and the Xcode project), not just the shared module.
+        # The Xcode build phase runs Gradle to embed the shared framework. No signing on CI.
+        run: |
+          xcodebuild build \
+            -project iosApp/iosApp.xcodeproj \
+            -scheme iosApp \
+            -configuration Debug \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO

@@ -21,11 +21,19 @@ interface RoomDao {
     @Query("SELECT * FROM rooms WHERE id = :id")
     suspend fun get(id: String): RoomWithWalls?
 
-    @Query("SELECT position FROM rooms WHERE id = :id")
-    suspend fun position(id: String): Int?
-
-    @Query("SELECT COALESCE(MAX(position) + 1, 0) FROM rooms WHERE levelId = :levelId")
-    suspend fun nextPosition(levelId: String): Int
+    /** The room's current position, or the next free one in level [levelId] for a new room. */
+    @Query(
+        """
+        SELECT COALESCE(
+            (SELECT position FROM rooms WHERE id = :id),
+            (SELECT COALESCE(MAX(position) + 1, 0) FROM rooms WHERE levelId = :levelId)
+        )
+        """,
+    )
+    suspend fun positionFor(
+        id: String,
+        levelId: String,
+    ): Int
 
     /** An update, unlike REPLACE, does not cascade-delete the room's walls. */
     @Upsert
@@ -34,26 +42,34 @@ interface RoomDao {
     @Query("DELETE FROM walls WHERE roomId = :roomId")
     suspend fun deleteWalls(roomId: String)
 
-    @Insert
-    suspend fun insertWalls(walls: List<WallEntity>)
+    @Query("DELETE FROM operations WHERE roomId = :roomId")
+    suspend fun deleteOperations(roomId: String)
 
     @Insert
-    suspend fun insertOpenings(openings: List<OpeningEntity>)
+    suspend fun insertChildren(
+        walls: List<WallEntity>,
+        openings: List<OpeningEntity>,
+        operations: List<OperationEntity>,
+    )
 
     @Query("DELETE FROM rooms WHERE id = :id")
     suspend fun delete(id: String)
 
-    /** Saves the room and replaces its walls and openings. [room]'s position is kept for an existing room. */
+    /**
+     * Saves the room and replaces its walls, openings and operations. [room]'s position is kept for an
+     * existing room.
+     */
     @Transaction
     suspend fun save(
         room: RoomEntity,
         walls: List<WallEntity>,
         openings: List<OpeningEntity>,
+        operations: List<OperationEntity>,
     ) {
-        val position = position(room.id) ?: nextPosition(room.levelId)
-        upsert(room.copy(position = position))
+        upsert(room.copy(position = positionFor(room.id, room.levelId)))
+        // Deleting the walls also deletes their openings.
         deleteWalls(room.id)
-        insertWalls(walls)
-        insertOpenings(openings)
+        deleteOperations(room.id)
+        insertChildren(walls, openings, operations)
     }
 }

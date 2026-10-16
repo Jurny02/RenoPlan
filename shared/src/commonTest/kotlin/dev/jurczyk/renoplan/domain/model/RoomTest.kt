@@ -27,7 +27,12 @@ class RoomTest {
     @Test
     fun duplicateGetsNewIdsAndKeepsEverythingElse() {
         val newId = Uuid.random()
-        val copy = room.duplicate(newId, "Kuchnia (kopia)")
+        val priming = Operation(Uuid.random(), OperationType.Priming, setOf(Surface.Floor), Money(500), Labour.SelfDone)
+        val copy = room.copy(operations = listOf(priming)).duplicate(newId, "Kuchnia (kopia)")
+
+        val copiedOperation = copy.operations.single()
+        assertNotEquals(priming.id, copiedOperation.id)
+        assertEquals(priming.copy(id = copiedOperation.id), copiedOperation)
 
         assertEquals(newId, copy.id)
         assertEquals("Kuchnia (kopia)", copy.name)

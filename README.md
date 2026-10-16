@@ -38,4 +38,4 @@ Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-mu
 - `./gradlew detekt` runs static analysis. Overrides live in `config/detekt/detekt.yml`, the report in `build/reports/detekt/`.
 - `swiftlint` (from the repo root) lints the Swift code in `iosApp/`, configured in `.swiftlint.yml`; `swiftlint --fix` fixes what it can. Install with `brew install swiftlint`.
 - Formatting rules come from `.editorconfig`, which IntelliJ and Android Studio pick up automatically.
-- CI (`.github/workflows/ci.yml`) runs lint, the Android build and tests, SwiftLint, and the iOS simulator tests on every PR.
+- CI (`.github/workflows/ci.yml`) runs lint, the Android build and tests, SwiftLint, the iOS simulator tests and an Xcode build of the iOS app on every PR.
