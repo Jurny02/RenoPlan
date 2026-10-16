@@ -1,5 +1,6 @@
 package dev.jurczyk.renoplan.ui.navigation
 
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -13,18 +14,24 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import dev.jurczyk.renoplan.ui.components.PlaceholderScreen
+import dev.jurczyk.renoplan.ui.level.LevelScreen
+import dev.jurczyk.renoplan.ui.levels.LevelsScreen
+import dev.jurczyk.renoplan.ui.roomeditor.RoomEditorScreen
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import renoplan.shared.generated.resources.Res
 import renoplan.shared.generated.resources.screen_calculator
-import renoplan.shared.generated.resources.screen_levels
 import renoplan.shared.generated.resources.screen_templates
+import kotlin.uuid.Uuid
 
 @Composable
 fun RenoPlanNavigation(
@@ -51,18 +58,43 @@ fun RenoPlanNavigation(
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = LevelsRoute,
-            modifier = Modifier.padding(innerPadding),
+            startDestination = ProjectGraph,
+            // Screens have their own Scaffold; consuming the insets keeps them from padding twice.
+            modifier = Modifier.padding(innerPadding).consumeWindowInsets(innerPadding),
         ) {
-            composable<LevelsRoute> {
-                PlaceholderScreen(title = stringResource(Res.string.screen_levels))
-            }
+            projectGraph(navController)
             composable<TemplatesRoute> {
                 PlaceholderScreen(title = stringResource(Res.string.screen_templates))
             }
             composable<CalculatorRoute> {
                 PlaceholderScreen(title = stringResource(Res.string.screen_calculator))
             }
+        }
+    }
+}
+
+private fun NavGraphBuilder.projectGraph(navController: NavHostController) {
+    navigation<ProjectGraph>(startDestination = LevelsRoute) {
+        composable<LevelsRoute> {
+            LevelsScreen(onOpenLevel = { navController.navigate(LevelRoute(it.toString())) })
+        }
+        composable<LevelRoute> { entry ->
+            val route = entry.toRoute<LevelRoute>()
+            LevelScreen(
+                levelId = Uuid.parse(route.levelId),
+                onBack = navController::popBackStack,
+                onAddRoom = { navController.navigate(RoomEditorRoute(route.levelId)) },
+                // Room details come in the next stage; until then a room opens in the editor.
+                onOpenRoom = { navController.navigate(RoomEditorRoute(route.levelId, it.toString())) },
+            )
+        }
+        composable<RoomEditorRoute> { entry ->
+            val route = entry.toRoute<RoomEditorRoute>()
+            RoomEditorScreen(
+                levelId = Uuid.parse(route.levelId),
+                roomId = route.roomId?.let(Uuid::parse),
+                onBack = navController::popBackStack,
+            )
         }
     }
 }
