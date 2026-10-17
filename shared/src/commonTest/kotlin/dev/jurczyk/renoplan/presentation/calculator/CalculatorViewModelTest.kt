@@ -94,4 +94,35 @@ class CalculatorViewModelTest : MainDispatcherTest() {
         assertFalse(state.packagePriceError || state.amountError || state.coverageError || state.coatsError)
         assertNull(state.result)
     }
+
+    @Test
+    fun metreModeGivesThePricePerMetre() {
+        val viewModel = CalculatorViewModel()
+        viewModel.onModeChange(CalculatorMode.METRE)
+        viewModel.onPackagePriceChange("50")
+        viewModel.onMetresChange("2,5")
+
+        assertEquals(Money.fromZloty(20.0), viewModel.state.pricePerMetre)
+        assertNull(viewModel.state.result)
+    }
+
+    @Test
+    fun metreModeWaitsForValidMetres() {
+        val viewModel = CalculatorViewModel()
+        viewModel.onModeChange(CalculatorMode.METRE)
+        viewModel.onPackagePriceChange("50")
+        viewModel.onMetresChange("0")
+
+        assertTrue(viewModel.state.metresError)
+        assertNull(viewModel.state.pricePerMetre)
+    }
+
+    @Test
+    fun squareMetreModeIgnoresTheMetresField() {
+        val viewModel = CalculatorViewModel()
+        viewModel.onPackagePriceChange("50")
+        viewModel.onMetresChange("2,5")
+
+        assertNull(viewModel.state.pricePerMetre)
+    }
 }

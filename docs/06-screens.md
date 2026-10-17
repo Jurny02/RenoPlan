@@ -182,7 +182,9 @@ single room from Room details).
 
 ## 9. Calculator
 
-- Inputs: package price, package amount, unit (L / kg), coverage (m² per unit), coats (default 2).
+- Toggle **Per m²** / **Per metre**.
+- Per m² inputs: package price, package amount, unit (L / kg), coverage (m² per unit), coats (default 2).
+- Per metre inputs: package price and metres in the package; result: price per metre.
 - Results: area per package, **price per m²**, and the 1-coat price for reference.
 - Copy-to-clipboard button for the result; the user enters it into an operation manually.
   It copies the bare amount (e.g. `11,43`) and confirms with a snackbar.

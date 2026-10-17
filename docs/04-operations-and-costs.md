@@ -102,3 +102,14 @@ price per m²     = package price / area per package
 
 Example: 200 PLN, 5 L, coverage 7 m²/L, 2 coats → 5 · 7 / 2 = 17.5 m² per package →
 **11.43 PLN/m²** (5.71 PLN/m² for one coat).
+
+### Price per metre
+
+For material sold by length (skirting, crown moulding, trims): package price and metres in the
+package.
+
+```
+price per m = package price / metres
+```
+
+Example: 50 PLN for a 2.5 m strip → **20.00 PLN/m**.
