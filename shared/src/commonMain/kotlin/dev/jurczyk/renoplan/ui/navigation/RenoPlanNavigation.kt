@@ -62,6 +62,10 @@ fun RenoPlanNavigation(
             startDestination = ProjectGraph,
             // Screens have their own Scaffold; consuming the insets keeps them from padding twice.
             modifier = Modifier.padding(innerPadding).consumeWindowInsets(innerPadding),
+            enterTransition = enterTransition,
+            exitTransition = exitTransition,
+            popEnterTransition = popEnterTransition,
+            popExitTransition = popExitTransition,
         ) {
             projectGraph(navController)
             templatesGraph(navController)
