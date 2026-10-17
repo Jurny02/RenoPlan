@@ -220,6 +220,10 @@ Follows the [roadmap](01-scope.md#roadmap):
   scroll instead of clipping, and labels are not shrunk to fit.
 - Icons that act on their own have a content description; decorative ones next to a label do not.
 - Toggles are whole rows (switch, checkbox) so the label is part of the touch target.
+- Tapping outside a field or dragging the content hides the keyboard on every screen and in the
+  opening sheet; the iOS number pad has no key to close it.
+- Operation statuses differ by icon and colour (to do: empty circle, grey; in progress: half circle,
+  yellow; done: check mark, green), so colour is never the only cue.
 
 ## Out of scope for the MVP
 

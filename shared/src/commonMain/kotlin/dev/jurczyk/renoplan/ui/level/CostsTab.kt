@@ -26,7 +26,7 @@ import dev.jurczyk.renoplan.domain.model.sum
 import dev.jurczyk.renoplan.presentation.level.LevelUiState
 import dev.jurczyk.renoplan.presentation.level.OperationEntry
 import dev.jurczyk.renoplan.ui.components.EmptyState
-import dev.jurczyk.renoplan.ui.operation.label
+import dev.jurczyk.renoplan.ui.operation.StatusLabel
 import dev.jurczyk.renoplan.ui.operation.labourLabel
 import dev.jurczyk.renoplan.ui.operation.moneyLabel
 import dev.jurczyk.renoplan.ui.operation.operationTypeLabel
@@ -153,15 +153,10 @@ private fun CostRow(
                     } else {
                         stringResource(Res.string.costs_row_labour, labourLabel(operation.labour, operation.unit))
                     },
-                    stringResource(operation.status.label),
                 ).joinToString(separator),
             style = MaterialTheme.typography.bodyMedium,
-            color =
-                if (operation.status == OperationStatus.DONE) {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    MaterialTheme.colorScheme.onSurfaceVariant
-                },
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
+        StatusLabel(operation.status)
     }
 }

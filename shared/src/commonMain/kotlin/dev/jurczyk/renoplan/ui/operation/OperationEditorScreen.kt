@@ -206,11 +206,9 @@ private fun OperationFields(
             onKindChange = actions.onKindChange,
         )
         SurfacePicker(state, actions)
-        ChoiceChips(
+        StatusPicker(
             title = stringResource(Res.string.operation_status_label),
-            options = OperationStatus.entries,
             selected = state.form.status,
-            optionLabel = { stringResource(it.label) },
             onSelect = actions.onStatusChange,
         )
         SaveAsTemplateRow(state.form.saveAsTemplate, actions.onSaveAsTemplateChange)
