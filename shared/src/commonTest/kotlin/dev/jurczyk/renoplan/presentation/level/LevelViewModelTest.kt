@@ -1,10 +1,16 @@
 package dev.jurczyk.renoplan.presentation.level
 
+import dev.jurczyk.renoplan.domain.model.Labour
 import dev.jurczyk.renoplan.domain.model.Level
+import dev.jurczyk.renoplan.domain.model.Money
 import dev.jurczyk.renoplan.domain.model.Opening
 import dev.jurczyk.renoplan.domain.model.OpeningSize
 import dev.jurczyk.renoplan.domain.model.OpeningType
+import dev.jurczyk.renoplan.domain.model.Operation
+import dev.jurczyk.renoplan.domain.model.OperationStatus
+import dev.jurczyk.renoplan.domain.model.OperationType
 import dev.jurczyk.renoplan.domain.model.Room
+import dev.jurczyk.renoplan.domain.model.Surface
 import dev.jurczyk.renoplan.domain.model.mm
 import dev.jurczyk.renoplan.testing.FakeStore
 import dev.jurczyk.renoplan.testing.MainDispatcherTest
@@ -49,6 +55,39 @@ class LevelViewModelTest : MainDispatcherTest() {
             assertEquals("Parter", state.name)
             // Walls: 10 m perimeter × 2.5 m = 25 m², minus the 1.6 m² door.
             assertEquals(listOf(RoomCard(kitchen.id, "Kuchnia", floorArea = 6.0, netWallArea = 23.4)), state.rooms)
+        }
+
+    @Test
+    fun summaryAndCostsCoverEveryRoom() =
+        runTest {
+            val floor =
+                Operation(
+                    Uuid.random(),
+                    OperationType.Tiling,
+                    setOf(Surface.Floor),
+                    Money.fromZloty(80.0),
+                    Labour.SelfDone,
+                    OperationStatus.DONE,
+                )
+            val bathroom =
+                Room.rectangle(Uuid.random(), "Łazienka", 2_000.mm, 2_000.mm, 2_500.mm).copy(operations = listOf(floor))
+            store.levels.value = listOf(level.copy(rooms = listOf(kitchen, bathroom)))
+            val state =
+                LevelViewModel(
+                    level.id,
+                    store.levelRepository,
+                    store.roomRepository,
+                ).state.first { !it.isLoading }
+
+            assertEquals(10.0, state.geometry.floorArea, 1e-9)
+            assertEquals(listOf("Kuchnia", "Łazienka"), state.roomSummaries.map { it.name })
+            assertEquals(listOf(OperationType.Tiling), state.operationGroups.map { it.type })
+            assertEquals(Money.fromZloty(320.0), state.costSummary.total)
+            assertEquals(Money.fromZloty(320.0), state.costSummary.done)
+            assertEquals(listOf(Money.Zero, Money.fromZloty(320.0)), state.rooms.map { it.cost.total })
+            val entry = state.operations.single()
+            assertEquals(bathroom.id to "Łazienka", entry.roomId to entry.roomName)
+            assertEquals(4.0, entry.cost.quantity, 1e-9)
         }
 
     @Test

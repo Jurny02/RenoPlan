@@ -2,6 +2,8 @@ package dev.jurczyk.renoplan.presentation.levels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dev.jurczyk.renoplan.domain.cost.CostSummary
+import dev.jurczyk.renoplan.domain.cost.costSummary
 import dev.jurczyk.renoplan.domain.geometry.floorArea
 import dev.jurczyk.renoplan.domain.model.Level
 import dev.jurczyk.renoplan.domain.repository.LevelRepository
@@ -18,6 +20,7 @@ data class LevelCard(
     val roomCount: Int,
     /** Total floor area in m². */
     val floorArea: Double,
+    val cost: CostSummary = CostSummary.Zero,
 )
 
 data class LevelsUiState(
@@ -57,4 +60,10 @@ class LevelsViewModel(
 }
 
 private fun Level.toCard(): LevelCard =
-    LevelCard(id = id, name = name, roomCount = rooms.size, floorArea = rooms.sumOf { it.floorArea })
+    LevelCard(
+        id = id,
+        name = name,
+        roomCount = rooms.size,
+        floorArea = rooms.sumOf { it.floorArea },
+        cost = costSummary,
+    )
