@@ -283,4 +283,20 @@
     <string name="costs_row_labour">robocizna %1$s</string>
     <string name="costs_labour">Robocizna</string>
     <string name="costs_no_operations">Brak operacji, więc nie ma jeszcze kosztów. Dodaj je w szczegółach pokoju.</string>
+
+    <!-- Custom quantity and preview in the operation editor -->
+    <string name="surface_custom">własna ilość %1$s</string>
+    <string name="operation_custom_quantity_label">Własna ilość</string>
+    <string name="operation_custom_quantity_hint">Np. pół ściany pod kolor albo listwa na jednej ścianie. Dodaje się do zaznaczonych powierzchni.</string>
+    <string name="operation_custom_quantity_error">Podaj liczbę większą od zera, np. 4,5</string>
+    <string name="unit_square_metres_unit">m²</string>
+    <string name="unit_metres_unit">m</string>
+    <string name="operation_show_outline">Pokaż ściany pokoju</string>
+    <string name="operation_hide_outline">Ukryj ściany pokoju</string>
+    <plurals name="surface_count_customs">
+        <item quantity="one">%1$d własna ilość</item>
+        <item quantity="few">%1$d własne ilości</item>
+        <item quantity="many">%1$d własnych ilości</item>
+        <item quantity="other">%1$d własnej ilości</item>
+    </plurals>
 </resources>

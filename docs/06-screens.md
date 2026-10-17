@@ -68,7 +68,8 @@ Home screen of the Project tab.
 
 ## 2. Level
 
-Three tabs: **Rooms**, **Summary** (quantities, screen 7) and **Costs** (money, screen 10).
+Three tabs: **Rooms**, **Summary** (quantities, screen 7) and **Costs** (money, screen 10). The tab row
+scrolls when the labels do not fit (large system font), so labels never wrap.
 
 Rooms tab:
 
@@ -147,8 +148,13 @@ Bottom sheet for adding or editing an opening.
 - Templates, when there are any, are offered as chips at the top; picking one fills the type and
   prices.
 - Prices are typed in złoty; a blank price counts as 0 zł.
-- Choosing Skirting or Crown moulding as the type preselects that surface when nothing is selected.
-  Selecting a surface of the other unit (m² vs m) starts a new selection instead of mixing them.
+- Choosing Skirting or Crown moulding as the type selects that surface, replacing an area selection or
+  the other moulding; mouldings chosen by hand are kept. Leaving a moulding type clears the moulding it
+  selected. Selecting a surface of the other unit (m² vs m) starts a new selection instead of mixing
+  them.
+- **Show the room's walls** toggles the outline preview with wall numbers, to match numbers to walls.
+- **Custom quantity**: a typed amount (e.g. half a wall, crown moulding on one wall) added to the
+  selected surfaces, in their unit; with no surface selected the user picks m² or m.
 - **Delete** (with confirmation) in the top bar when editing.
 
 ## 7. Summary
@@ -207,6 +213,13 @@ Follows the [roadmap](01-scope.md#roadmap):
 2. Room editor – outline mode with preview; Room details – walls and openings.
 3. Operation editor, Room details – operations, Summary, Costs, Templates.
 4. Statuses and progress, Calculator, Onboarding (last, when the screens it describes are stable).
+
+## Accessibility
+
+- Text sizes are in `sp`, so they follow the system font size on Android and iOS; layouts wrap or
+  scroll instead of clipping, and labels are not shrunk to fit.
+- Icons that act on their own have a content description; decorative ones next to a label do not.
+- Toggles are whole rows (switch, checkbox) so the label is part of the touch target.
 
 ## Out of scope for the MVP
 
