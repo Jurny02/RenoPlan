@@ -24,7 +24,7 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import dev.jurczyk.renoplan.ui.calculator.CalculatorScreen
-import dev.jurczyk.renoplan.ui.components.hideKeyboardOnTapOrScroll
+import dev.jurczyk.renoplan.ui.components.hideKeyboardOnTapOrDrag
 import dev.jurczyk.renoplan.ui.level.LevelScreen
 import dev.jurczyk.renoplan.ui.levels.LevelsScreen
 import dev.jurczyk.renoplan.ui.operation.OperationEditorScreen
@@ -46,7 +46,7 @@ fun RenoPlanNavigation(
 
     val focusManager = LocalFocusManager.current
     Scaffold(
-        modifier = modifier.hideKeyboardOnTapOrScroll(focusManager),
+        modifier = modifier.hideKeyboardOnTapOrDrag(focusManager),
         bottomBar = {
             NavigationBar {
                 TopLevelDestination.entries.forEach { destination ->

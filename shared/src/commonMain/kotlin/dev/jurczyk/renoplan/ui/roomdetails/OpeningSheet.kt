@@ -40,7 +40,7 @@ import dev.jurczyk.renoplan.presentation.roomdetails.RoomDetailsUiState
 import dev.jurczyk.renoplan.presentation.roomdetails.SizeMode
 import dev.jurczyk.renoplan.ui.components.ChoiceChips
 import dev.jurczyk.renoplan.ui.components.UnitTextField
-import dev.jurczyk.renoplan.ui.components.hideKeyboardOnTapOrScroll
+import dev.jurczyk.renoplan.ui.components.hideKeyboardOnTapOrDrag
 import dev.jurczyk.renoplan.ui.format.formatDecimal
 import dev.jurczyk.renoplan.ui.theme.RenoPlanTheme
 import org.jetbrains.compose.resources.stringResource
@@ -113,7 +113,7 @@ fun OpeningSheetContent(
         modifier =
             modifier
                 .fillMaxWidth()
-                .hideKeyboardOnTapOrScroll(focusManager)
+                .hideKeyboardOnTapOrDrag(focusManager)
                 .imePadding()
                 .verticalScroll(rememberScrollState())
                 .padding(start = 16.dp, end = 16.dp, bottom = 24.dp),
