@@ -40,8 +40,8 @@ import dev.jurczyk.renoplan.ui.components.EmptyState
 import dev.jurczyk.renoplan.ui.components.MenuAction
 import dev.jurczyk.renoplan.ui.components.NameDialog
 import dev.jurczyk.renoplan.ui.components.OverflowMenu
-import dev.jurczyk.renoplan.ui.components.PlaceholderScreen
 import dev.jurczyk.renoplan.ui.format.formatDecimal
+import dev.jurczyk.renoplan.ui.operation.CostProgress
 import dev.jurczyk.renoplan.ui.theme.RenoPlanTheme
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
@@ -74,6 +74,7 @@ fun LevelScreen(
     onBack: () -> Unit,
     onAddRoom: () -> Unit,
     onOpenRoom: (Uuid) -> Unit,
+    onOpenOperation: (roomId: Uuid, operationId: Uuid) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: LevelViewModel = koinViewModel { parametersOf(levelId) },
 ) {
@@ -85,6 +86,7 @@ fun LevelScreen(
         onBack = onBack,
         onAddRoom = onAddRoom,
         onOpenRoom = onOpenRoom,
+        onOpenOperation = onOpenOperation,
         onRenameRoom = viewModel::renameRoom,
         onDuplicateRoom = viewModel::duplicateRoom,
         onDeleteRoom = viewModel::deleteRoom,
@@ -111,6 +113,7 @@ fun LevelContent(
     onDuplicateRoom: (Uuid, String) -> Unit,
     onDeleteRoom: (Uuid) -> Unit,
     modifier: Modifier = Modifier,
+    onOpenOperation: (roomId: Uuid, operationId: Uuid) -> Unit = { _, _ -> },
 ) {
     var selectedTab by rememberSaveable { mutableStateOf(LevelTab.ROOMS) }
     Scaffold(
@@ -153,8 +156,12 @@ fun LevelContent(
                 )
             }
 
-            else -> {
-                PlaceholderScreen(title = stringResource(selectedTab.label), modifier = contentModifier)
+            LevelTab.SUMMARY -> {
+                SummaryTab(state = state, modifier = contentModifier)
+            }
+
+            LevelTab.COSTS -> {
+                CostsTab(state = state, onOpenOperation = onOpenOperation, modifier = contentModifier)
             }
         }
     }
@@ -285,6 +292,7 @@ private fun RoomCardItem(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+                CostProgress(room.cost, modifier = Modifier.padding(top = 4.dp, end = 12.dp))
             }
             OverflowMenu(
                 MenuAction(Res.string.action_rename, onRename),

@@ -236,4 +236,49 @@
     <string name="template_labour_lump_sum">%1$s ryczałt</string>
     <string name="template_labour_self_done">robię sam</string>
     <string name="template_editor_hint">Ceny są za jednostkę operacji: m² dla ścian, podłogi i sufitu, metr dla listew. Zmiana szablonu nie zmienia operacji dodanych wcześniej.</string>
+
+    <!-- Level summary and costs -->
+    <string name="cost_progress">Koszt %1$s · zrobione %2$d%%</string>
+    <string name="summary_by_room">Według pokoi</string>
+    <string name="summary_whole_level">Cały poziom</string>
+    <string name="costs_by_type">Według rodzaju</string>
+    <string name="summary_geometry">Wymiary</string>
+    <string name="summary_no_operations">Brak operacji. Dodaj je w szczegółach pokoju.</string>
+    <string name="summary_no_rooms">Ten poziom nie ma jeszcze pokoi.</string>
+    <plurals name="surface_count_walls">
+        <item quantity="one">%1$d ściana</item>
+        <item quantity="few">%1$d ściany</item>
+        <item quantity="many">%1$d ścian</item>
+        <item quantity="other">%1$d ściany</item>
+    </plurals>
+    <plurals name="surface_count_floors">
+        <item quantity="one">%1$d podłoga</item>
+        <item quantity="few">%1$d podłogi</item>
+        <item quantity="many">%1$d podłóg</item>
+        <item quantity="other">%1$d podłogi</item>
+    </plurals>
+    <plurals name="surface_count_ceilings">
+        <item quantity="one">%1$d sufit</item>
+        <item quantity="few">%1$d sufity</item>
+        <item quantity="many">%1$d sufitów</item>
+        <item quantity="other">%1$d sufitu</item>
+    </plurals>
+    <plurals name="surface_count_skirtings">
+        <item quantity="one">listwy przypodłogowe w %1$d pokoju</item>
+        <item quantity="few">listwy przypodłogowe w %1$d pokojach</item>
+        <item quantity="many">listwy przypodłogowe w %1$d pokojach</item>
+        <item quantity="other">listwy przypodłogowe w %1$d pokoju</item>
+    </plurals>
+    <plurals name="surface_count_crown_mouldings">
+        <item quantity="one">listwy przysufitowe w %1$d pokoju</item>
+        <item quantity="few">listwy przysufitowe w %1$d pokojach</item>
+        <item quantity="many">listwy przysufitowe w %1$d pokojach</item>
+        <item quantity="other">listwy przysufitowe w %1$d pokoju</item>
+    </plurals>
+    <string name="status_count_todo">%1$d do zrobienia</string>
+    <string name="status_count_in_progress">%1$d w trakcie</string>
+    <string name="status_count_done">%1$d zrobione</string>
+    <string name="costs_material">Materiał</string>
+    <string name="costs_labour">Robocizna</string>
+    <string name="costs_no_operations">Brak operacji, więc nie ma jeszcze kosztów. Dodaj je w szczegółach pokoju.</string>
 </resources>
