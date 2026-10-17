@@ -13,7 +13,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.PrimaryTabRow
+import androidx.compose.material3.PrimaryScrollableTabRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
@@ -121,12 +121,13 @@ fun LevelContent(
         topBar = {
             Column {
                 TopAppBar(title = { Text(state.name) }, navigationIcon = { BackButton(onClick = onBack) })
-                PrimaryTabRow(selectedTabIndex = selectedTab.ordinal) {
+                // Scrollable, so labels keep one line at large font sizes instead of breaking mid-word.
+                PrimaryScrollableTabRow(selectedTabIndex = selectedTab.ordinal, edgePadding = 8.dp) {
                     LevelTab.entries.forEach { tab ->
                         Tab(
                             selected = tab == selectedTab,
                             onClick = { selectedTab = tab },
-                            text = { Text(stringResource(tab.label)) },
+                            text = { Text(stringResource(tab.label), maxLines = 1) },
                             unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }

@@ -120,6 +120,8 @@ private fun LabourFields(
                     selected = pricing.labourMode == mode,
                     onClick = { onPricingChange(pricing.copy(labourMode = mode)) },
                     shape = SegmentedButtonDefaults.itemShape(index = index, count = LabourMode.entries.size),
+                    // No check mark: three labels need the room at large font sizes.
+                    icon = {},
                 ) { Text(stringResource(mode.label)) }
             }
         }
