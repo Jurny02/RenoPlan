@@ -287,7 +287,8 @@
     <!-- Custom quantity and preview in the operation editor -->
     <string name="surface_custom">własna ilość %1$s</string>
     <string name="operation_custom_quantity_label">Własna ilość</string>
-    <string name="operation_custom_quantity_hint">Np. pół ściany pod kolor albo listwa na jednej ścianie. Dodaje się do zaznaczonych powierzchni.</string>
+    <string name="operation_custom_quantity_hint">Np. pół ściany pod kolor albo listwa na jednej ścianie. Zamiast liczyć z powierzchni, operacja użyje tej ilości.</string>
+    <string name="operation_quantity_from_surfaces">Z powierzchni</string>
     <string name="operation_custom_quantity_error">Podaj liczbę większą od zera, np. 4,5</string>
     <string name="unit_square_metres_unit">m²</string>
     <string name="unit_metres_unit">m</string>

@@ -153,8 +153,9 @@ Bottom sheet for adding or editing an opening.
   selected. Selecting a surface of the other unit (m² vs m) starts a new selection instead of mixing
   them.
 - **Show the room's walls** toggles the outline preview with wall numbers, to match numbers to walls.
-- **Custom quantity**: a typed amount (e.g. half a wall, crown moulding on one wall) added to the
-  selected surfaces, in their unit; with no surface selected the user picks m² or m.
+- The quantity is **either** computed from surfaces (**From surfaces**: wall, floor, ceiling and
+  moulding chips) **or** typed (**Custom quantity**: e.g. half a wall or crown moulding on one wall,
+  in m² or m; a moulding type picks m). A toggle chooses; only the chosen one counts.
 - **Delete** (with confirmation) in the top bar when editing.
 
 ## 7. Summary

@@ -172,13 +172,12 @@ class OperationEditorViewModelTest : MainDispatcherTest() {
         }
 
     @Test
-    fun customQuantityAloneUsesItsOwnUnit() =
+    fun crownMouldingAlongOneWallAsACustomQuantity() =
         runTest {
             val editor = editor()
             editor.onKindChange(OperationKind.CROWN_MOULDING)
-            editor.onSurfaceToggle(Surface.CrownMoulding)
-            editor.onCustomUnitChange(MeasureUnit.METRE)
-            editor.onCustomQuantityChange("4")
+            editor.onQuantityModeChange(QuantityMode.CUSTOM)
+            editor.onCustomQuantityChange(quantity = "4")
             editor.onPricingChange(
                 editor
                     .loaded()
@@ -193,23 +192,49 @@ class OperationEditorViewModelTest : MainDispatcherTest() {
         }
 
     @Test
-    fun customQuantityIsAddedToTheSelectedSurfacesInTheirUnit() =
+    fun customQuantityReplacesTheSurfaces() =
         runTest {
             val editor = editor()
             editor.onPricingChange(PricingForm(OperationKind.PAINTING, "zielony", "10", LabourMode.SELF_DONE))
             editor.onSurfaceToggle(Surface.Ceiling)
-            editor.onCustomUnitChange(MeasureUnit.METRE)
-            editor.onCustomQuantityChange("5")
+            assertEquals(12.0, editor.loaded().quantity, 1e-9)
 
+            editor.onQuantityModeChange(QuantityMode.CUSTOM)
+            editor.onCustomQuantityChange(quantity = "4,5")
             val state = editor.loaded()
-            assertEquals(MeasureUnit.SQUARE_METRE, state.customUnit)
-            assertEquals(17.0, state.quantity, 1e-9)
+            assertEquals(4.5, state.quantity, 1e-9)
+            assertEquals(MeasureUnit.SQUARE_METRE, state.unit)
 
             editor.save()
             assertEquals(
-                setOf(Surface.Ceiling, Surface.Custom(5.0, MeasureUnit.SQUARE_METRE)),
+                setOf<Surface>(Surface.Custom(4.5, MeasureUnit.SQUARE_METRE)),
                 savedOperations().single().surfaces,
             )
+        }
+
+    @Test
+    fun switchingBackToSurfacesIgnoresTheTypedQuantity() =
+        runTest {
+            val editor = editor()
+            editor.onSurfaceToggle(Surface.Floor)
+            editor.onQuantityModeChange(QuantityMode.CUSTOM)
+            editor.onCustomQuantityChange(quantity = "abc")
+            assertTrue(editor.loaded().customQuantityError)
+
+            editor.onQuantityModeChange(QuantityMode.SURFACES)
+
+            assertFalse(editor.loaded().customQuantityError)
+            assertEquals(12.0, editor.loaded().quantity, 1e-9)
+        }
+
+    @Test
+    fun mouldingTypeSwitchesTheCustomUnitToMetres() =
+        runTest {
+            val editor = editor()
+            editor.onQuantityModeChange(QuantityMode.CUSTOM)
+            editor.onKindChange(OperationKind.CROWN_MOULDING)
+
+            assertEquals(MeasureUnit.METRE, editor.loaded().unit)
         }
 
     @Test
@@ -217,7 +242,8 @@ class OperationEditorViewModelTest : MainDispatcherTest() {
         runTest {
             val editor = editor()
             editor.onPricingChange(PricingForm(OperationKind.PRIMING))
-            editor.onCustomQuantityChange("abc")
+            editor.onQuantityModeChange(QuantityMode.CUSTOM)
+            editor.onCustomQuantityChange(quantity = "abc")
 
             assertTrue(editor.loaded().customQuantityError)
             assertFalse(editor.loaded().canSave)
@@ -237,6 +263,7 @@ class OperationEditorViewModelTest : MainDispatcherTest() {
             store.roomRepository.saveRoom(LEVEL_ID, room.copy(operations = listOf(half)))
 
             val form = editor(half.id).loaded().form
+            assertEquals(QuantityMode.CUSTOM, form.quantityMode)
             assertEquals("4,5", form.customQuantity)
             assertTrue(form.surfaces.isEmpty())
         }
