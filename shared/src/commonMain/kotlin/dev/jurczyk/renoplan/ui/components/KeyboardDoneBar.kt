@@ -1,18 +1,18 @@
 package dev.jurczyk.renoplan.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -26,10 +26,10 @@ import renoplan.shared.generated.resources.keyboard_done
  * no return key, and Compose cannot attach a native accessory view to it. Use it as a screen's
  * Scaffold `bottomBar`, so the content is laid out above it.
  */
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun KeyboardDoneBar(modifier: Modifier = Modifier) {
-    if (!WindowInsets.isImeVisible) return
+    // `WindowInsets.isImeVisible` is Android-only; the keyboard inset works on both platforms.
+    if (WindowInsets.ime.getBottom(LocalDensity.current) == 0) return
     val focusManager = LocalFocusManager.current
     Surface(tonalElevation = 3.dp, modifier = modifier.fillMaxWidth().imePadding()) {
         KeyboardDoneRow(onDone = { focusManager.clearFocus() })
