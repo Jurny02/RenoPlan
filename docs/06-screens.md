@@ -59,6 +59,7 @@ A "seen" flag is stored locally so onboarding does not show again.
 Home screen of the Project tab.
 
 - Card per level: name, number of rooms, total floor area, total cost, progress (% of cost done).
+  Cost and progress appear once the level has operations; room cards on the Level screen show the same.
 - **Add level** (FAB): asks for a name.
 - Card menu: rename, delete (with confirmation).
 - Empty state: short explanation and an "Add your first level" button.
@@ -160,6 +161,9 @@ single room from Room details).
 - Table grouped by operation type (with colour for painting): surfaces, quantity, status counts.
   - By room: one group per room.
   - Whole level: one row per type, e.g. "Skim coat – 10 walls – 100.00 m²".
+- A group is one operation type and unit: painting is grouped per colour, custom work per name.
+  Mouldings count the rooms they are in ("skirting in 4 rooms").
+- The single-room view from Room details is not built yet.
 
 ## 8. Templates
 
@@ -185,12 +189,13 @@ Money: what it costs and how prices are set. Costs tab of a Level.
 
 - Header: total cost, done, remaining, progress bar; split into material and labour.
 - Toggle **By room** / **By operation type**.
-- Row per operation group: quantity, material price, labour (per unit / lump sum / self), cost, status.
-  Tap a row → **Operation editor**.
+- Under each room or type heading (with its total), one row per operation: quantity, material price,
+  labour (per unit / lump sum / self), cost, status. Tap a row → **Operation editor**.
 - **Edit price for all**: on a type group (e.g. "Painting – white"), set material price and labour once
   and apply them to every operation of that type on the level. Shows how many operations will change
   and the cost before → after.
 - Toggle labour **I do it myself** for a whole group, to see quickly how much doing it yourself saves.
+- *Edit price for all* and the group-wide *I do it myself* toggle are not built yet.
 - Levels list cards show each level's total, so the cost of the whole apartment is visible on the
   home screen.
 
