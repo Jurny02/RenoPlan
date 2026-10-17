@@ -20,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.jurczyk.renoplan.domain.cost.CostSummary
+import dev.jurczyk.renoplan.domain.model.Labour
 import dev.jurczyk.renoplan.domain.model.OperationStatus
 import dev.jurczyk.renoplan.domain.model.sum
 import dev.jurczyk.renoplan.presentation.level.LevelUiState
@@ -38,6 +39,8 @@ import renoplan.shared.generated.resources.costs_by_type
 import renoplan.shared.generated.resources.costs_labour
 import renoplan.shared.generated.resources.costs_material
 import renoplan.shared.generated.resources.costs_no_operations
+import renoplan.shared.generated.resources.costs_row_labour
+import renoplan.shared.generated.resources.costs_row_material
 import renoplan.shared.generated.resources.list_separator
 import renoplan.shared.generated.resources.summary_by_room
 import kotlin.uuid.Uuid
@@ -141,8 +144,15 @@ private fun CostRow(
             text =
                 listOf(
                     quantityLabel(entry.cost.quantity, entry.cost.unit),
-                    unitPriceLabel(operation.materialPrice, operation.unit),
-                    labourLabel(operation.labour, operation.unit),
+                    stringResource(
+                        Res.string.costs_row_material,
+                        unitPriceLabel(operation.materialPrice, operation.unit),
+                    ),
+                    if (operation.labour == Labour.SelfDone) {
+                        labourLabel(operation.labour, operation.unit)
+                    } else {
+                        stringResource(Res.string.costs_row_labour, labourLabel(operation.labour, operation.unit))
+                    },
                     stringResource(operation.status.label),
                 ).joinToString(separator),
             style = MaterialTheme.typography.bodyMedium,

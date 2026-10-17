@@ -238,7 +238,7 @@
     <string name="template_editor_hint">Ceny są za jednostkę operacji: m² dla ścian, podłogi i sufitu, metr dla listew. Zmiana szablonu nie zmienia operacji dodanych wcześniej.</string>
 
     <!-- Level summary and costs -->
-    <string name="cost_progress">Koszt %1$s · zrobione %2$d%%</string>
+    <string name="cost_progress">Koszt %1$s · zrobione %2$d%</string>
     <string name="summary_by_room">Według pokoi</string>
     <string name="summary_whole_level">Cały poziom</string>
     <string name="costs_by_type">Według rodzaju</string>
@@ -279,6 +279,8 @@
     <string name="status_count_in_progress">%1$d w trakcie</string>
     <string name="status_count_done">%1$d zrobione</string>
     <string name="costs_material">Materiał</string>
+    <string name="costs_row_material">materiał %1$s</string>
+    <string name="costs_row_labour">robocizna %1$s</string>
     <string name="costs_labour">Robocizna</string>
     <string name="costs_no_operations">Brak operacji, więc nie ma jeszcze kosztów. Dodaj je w szczegółach pokoju.</string>
 </resources>
