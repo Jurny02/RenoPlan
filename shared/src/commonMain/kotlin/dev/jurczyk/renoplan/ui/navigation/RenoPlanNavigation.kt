@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -23,6 +24,7 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import dev.jurczyk.renoplan.ui.calculator.CalculatorScreen
+import dev.jurczyk.renoplan.ui.components.hideKeyboardOnTapOrScroll
 import dev.jurczyk.renoplan.ui.level.LevelScreen
 import dev.jurczyk.renoplan.ui.levels.LevelsScreen
 import dev.jurczyk.renoplan.ui.operation.OperationEditorScreen
@@ -42,8 +44,9 @@ fun RenoPlanNavigation(
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
 
+    val focusManager = LocalFocusManager.current
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.hideKeyboardOnTapOrScroll(focusManager),
         bottomBar = {
             NavigationBar {
                 TopLevelDestination.entries.forEach { destination ->
