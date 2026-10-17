@@ -82,6 +82,11 @@ private fun NavGraphBuilder.projectGraph(navController: NavHostController) {
                 onBack = navController::popBackStack,
                 onAddRoom = { navController.navigate(RoomEditorRoute(route.levelId)) },
                 onOpenRoom = { navController.navigate(RoomDetailsRoute(route.levelId, it.toString())) },
+                onOpenOperation = { roomId, operationId ->
+                    navController.navigate(
+                        OperationEditorRoute(route.levelId, roomId.toString(), operationId.toString()),
+                    )
+                },
             )
         }
         composable<RoomDetailsRoute> { entry ->

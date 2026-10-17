@@ -35,6 +35,7 @@ import dev.jurczyk.renoplan.ui.components.MenuAction
 import dev.jurczyk.renoplan.ui.components.NameDialog
 import dev.jurczyk.renoplan.ui.components.OverflowMenu
 import dev.jurczyk.renoplan.ui.format.formatDecimal
+import dev.jurczyk.renoplan.ui.operation.CostProgress
 import dev.jurczyk.renoplan.ui.theme.RenoPlanTheme
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.pluralStringResource
@@ -230,6 +231,7 @@ private fun LevelCardItem(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+                CostProgress(level.cost, modifier = Modifier.padding(top = 4.dp, end = 12.dp))
             }
             OverflowMenu(
                 MenuAction(Res.string.action_rename, onRename),

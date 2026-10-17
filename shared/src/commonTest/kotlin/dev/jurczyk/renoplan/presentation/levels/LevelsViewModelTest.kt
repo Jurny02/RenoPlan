@@ -1,8 +1,13 @@
 package dev.jurczyk.renoplan.presentation.levels
 
 import app.cash.turbine.test
+import dev.jurczyk.renoplan.domain.model.Labour
 import dev.jurczyk.renoplan.domain.model.Level
+import dev.jurczyk.renoplan.domain.model.Money
+import dev.jurczyk.renoplan.domain.model.Operation
+import dev.jurczyk.renoplan.domain.model.OperationType
 import dev.jurczyk.renoplan.domain.model.Room
+import dev.jurczyk.renoplan.domain.model.Surface
 import dev.jurczyk.renoplan.domain.model.mm
 import dev.jurczyk.renoplan.testing.FakeStore
 import dev.jurczyk.renoplan.testing.MainDispatcherTest
@@ -37,6 +42,37 @@ class LevelsViewModelTest : MainDispatcherTest() {
             store.levels.value = listOf(level)
 
             assertEquals(listOf(LevelCard(level.id, "Parter", roomCount = 2, floorArea = 9.0)), loaded().levels)
+        }
+
+    @Test
+    fun cardsShowTheLevelCost() =
+        runTest {
+            val painting =
+                Operation(
+                    Uuid.random(),
+                    OperationType.Painting("biały"),
+                    setOf(Surface.Ceiling),
+                    Money.fromZloty(10.0),
+                    Labour.SelfDone,
+                )
+            val room =
+                Room
+                    .rectangle(
+                        Uuid.random(),
+                        "Salon",
+                        4_000.mm,
+                        3_000.mm,
+                        2_500.mm,
+                    ).copy(operations = listOf(painting))
+            store.levels.value = listOf(Level(Uuid.random(), "Parter", listOf(room)))
+
+            assertEquals(
+                Money.fromZloty(120.0),
+                loaded()
+                    .levels
+                    .single()
+                    .cost.total,
+            )
         }
 
     @Test

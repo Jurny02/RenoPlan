@@ -6,13 +6,13 @@ import dev.jurczyk.renoplan.domain.geometry.floorArea
 import dev.jurczyk.renoplan.domain.geometry.skirtingLength
 import dev.jurczyk.renoplan.domain.geometry.wallNetArea
 import dev.jurczyk.renoplan.domain.model.Labour
+import dev.jurczyk.renoplan.domain.model.Level
 import dev.jurczyk.renoplan.domain.model.MeasureUnit
 import dev.jurczyk.renoplan.domain.model.Money
 import dev.jurczyk.renoplan.domain.model.Operation
 import dev.jurczyk.renoplan.domain.model.OperationStatus
 import dev.jurczyk.renoplan.domain.model.Room
 import dev.jurczyk.renoplan.domain.model.Surface
-import dev.jurczyk.renoplan.domain.model.sum
 
 // Formulas from docs/04-operations-and-costs.md.
 
@@ -51,22 +51,33 @@ fun Room.cost(operation: Operation): OperationCost {
     )
 }
 
-/** Cost of the room's operations: everything, done, and the rest. */
+/** Cost of a set of operations: material and labour, how much is done, and the rest. */
 data class CostSummary(
-    val total: Money,
+    val material: Money,
+    val labour: Money,
     val done: Money,
 ) {
+    val total: Money get() = material + labour
     val remaining: Money get() = total - done
 
     /** Share of the cost that is done, 0..1; 0 when nothing costs anything. */
     val progress: Double get() = if (total.grosze == 0L) 0.0 else done.grosze.toDouble() / total.grosze
+
+    operator fun plus(other: CostSummary): CostSummary =
+        CostSummary(material + other.material, labour + other.labour, done + other.done)
+
+    companion object {
+        val Zero = CostSummary(Money.Zero, Money.Zero, Money.Zero)
+    }
 }
 
 val Room.costSummary: CostSummary
-    get() {
-        val costs = operations.map { it to cost(it).total }
-        return CostSummary(
-            total = costs.map { it.second }.sum(),
-            done = costs.filter { it.first.status == OperationStatus.DONE }.map { it.second }.sum(),
-        )
-    }
+    get() =
+        operations
+            .map { operation ->
+                val cost = cost(operation)
+                val done = if (operation.status == OperationStatus.DONE) cost.total else Money.Zero
+                CostSummary(cost.material, cost.labour, done)
+            }.fold(CostSummary.Zero, CostSummary::plus)
+
+val Level.costSummary: CostSummary get() = rooms.map { it.costSummary }.fold(CostSummary.Zero, CostSummary::plus)

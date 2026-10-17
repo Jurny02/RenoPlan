@@ -62,7 +62,9 @@ Because `quantity` is derived from geometry, changing a room's dimensions update
   moulding), because its prices are per unit.
 - *Done* in the summaries is the cost of operations with status `DONE`; *progress* is done ÷ total.
 
-In code: `Room.quantity(surface)`, `Room.cost(operation)` and `Room.costSummary` in `domain/cost`.
+In code: `Room.quantity(surface)`, `Room.cost(operation)`, `Room.costSummary` and `Level.costSummary`
+in `domain/cost`; summaries group operations with `groupOperations(rooms)` (by type and unit, painting
+per colour, custom work per name) and add geometry up with `geometryTotals(rooms)`.
 
 ## Templates
 
