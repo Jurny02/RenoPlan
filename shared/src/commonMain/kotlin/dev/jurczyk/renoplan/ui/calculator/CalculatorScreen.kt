@@ -33,7 +33,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.jurczyk.renoplan.domain.calculator.PackageUnit
 import dev.jurczyk.renoplan.domain.calculator.PricePerSquareMetre
 import dev.jurczyk.renoplan.domain.model.Money
@@ -76,7 +75,7 @@ fun CalculatorScreen(
     modifier: Modifier = Modifier,
     viewModel: CalculatorViewModel = koinViewModel(),
 ) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
+    val state = viewModel.state
     val clipboard = LocalClipboard.current
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()

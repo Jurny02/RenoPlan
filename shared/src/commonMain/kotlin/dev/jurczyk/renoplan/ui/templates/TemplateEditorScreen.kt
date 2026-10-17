@@ -25,7 +25,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.jurczyk.renoplan.presentation.operation.LabourMode
 import dev.jurczyk.renoplan.presentation.operation.OperationKind
 import dev.jurczyk.renoplan.presentation.operation.PricingForm
@@ -56,7 +55,7 @@ fun TemplateEditorScreen(
     modifier: Modifier = Modifier,
     viewModel: TemplateEditorViewModel = koinViewModel { parametersOf(templateId) },
 ) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
+    val state = viewModel.state
     val currentOnBack by rememberUpdatedState(onBack)
     LaunchedEffect(state.isSaved) { if (state.isSaved) currentOnBack() }
     TemplateEditorContent(

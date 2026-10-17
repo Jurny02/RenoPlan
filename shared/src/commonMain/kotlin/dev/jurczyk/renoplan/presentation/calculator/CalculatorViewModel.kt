@@ -1,14 +1,13 @@
 package dev.jurczyk.renoplan.presentation.calculator
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import dev.jurczyk.renoplan.domain.calculator.PackageUnit
 import dev.jurczyk.renoplan.domain.calculator.PricePerSquareMetre
 import dev.jurczyk.renoplan.domain.calculator.pricePerSquareMetre
 import dev.jurczyk.renoplan.domain.model.Money
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 
 private const val DEFAULT_COATS = 2
 
@@ -38,18 +37,26 @@ data class CalculatorUiState(
 
 /** Price-per-m² calculator (screen 9). Nothing is stored; the user copies the result into an operation. */
 class CalculatorViewModel : ViewModel() {
-    private val _state = MutableStateFlow(CalculatorUiState())
-    val state: StateFlow<CalculatorUiState> = _state.asStateFlow()
+    /**
+     * The inputs. Compose state rather than a flow, so text fields get every change synchronously;
+     * asynchronous updates move the cursor (seen on iOS).
+     */
+    var state: CalculatorUiState by mutableStateOf(CalculatorUiState())
+        private set
 
-    fun onPackagePriceChange(text: String) = _state.update { it.copy(packagePrice = text) }
+    fun onPackagePriceChange(text: String) = update { it.copy(packagePrice = text) }
 
-    fun onAmountChange(text: String) = _state.update { it.copy(amount = text) }
+    fun onAmountChange(text: String) = update { it.copy(amount = text) }
 
-    fun onUnitChange(unit: PackageUnit) = _state.update { it.copy(unit = unit) }
+    fun onUnitChange(unit: PackageUnit) = update { it.copy(unit = unit) }
 
-    fun onCoverageChange(text: String) = _state.update { it.copy(coverage = text) }
+    fun onCoverageChange(text: String) = update { it.copy(coverage = text) }
 
-    fun onCoatsChange(text: String) = _state.update { it.copy(coats = text) }
+    fun onCoatsChange(text: String) = update { it.copy(coats = text) }
+
+    private fun update(change: (CalculatorUiState) -> CalculatorUiState) {
+        state = change(state)
+    }
 }
 
 private fun parsePositiveDecimal(text: String): Double? =

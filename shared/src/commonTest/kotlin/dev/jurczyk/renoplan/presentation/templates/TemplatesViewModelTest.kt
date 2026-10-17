@@ -38,7 +38,7 @@ class TemplatesViewModelTest : MainDispatcherTest() {
     fun createATemplate() =
         runTest {
             val editor = TemplateEditorViewModel(templateId = null, templateRepository = store.templateRepository)
-            assertFalse(editor.state.value.canSave)
+            assertFalse(editor.state.canSave)
 
             editor.onPricingChange(PricingForm(OperationKind.CUSTOM, "Tapeta", "35,5", LabourMode.PER_UNIT, "20"))
             editor.save()
@@ -47,7 +47,7 @@ class TemplatesViewModelTest : MainDispatcherTest() {
             assertEquals(OperationType.Custom("Tapeta"), saved.type)
             assertEquals(Money(3_550), saved.materialPrice)
             assertEquals(Labour.PerUnit(Money(2_000)), saved.labour)
-            assertTrue(editor.state.value.isSaved)
+            assertTrue(editor.state.isSaved)
         }
 
     @Test
@@ -55,11 +55,11 @@ class TemplatesViewModelTest : MainDispatcherTest() {
         runTest {
             store.templates.value = listOf(tiles)
             val editor = TemplateEditorViewModel(tiles.id, store.templateRepository)
-            assertEquals("80", editor.state.value.pricing.materialPrice)
-            assertEquals(LabourMode.LUMP_SUM, editor.state.value.pricing.labourMode)
+            assertEquals("80", editor.state.pricing.materialPrice)
+            assertEquals(LabourMode.LUMP_SUM, editor.state.pricing.labourMode)
 
             editor.onPricingChange(
-                editor.state.value.pricing
+                editor.state.pricing
                     .copy(materialPrice = "90"),
             )
             editor.save()

@@ -32,7 +32,6 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.jurczyk.renoplan.domain.geometry.OutlineError
 import dev.jurczyk.renoplan.domain.model.Turn
 import dev.jurczyk.renoplan.presentation.roomeditor.OutlineProblem
@@ -84,7 +83,7 @@ fun RoomEditorScreen(
     modifier: Modifier = Modifier,
     viewModel: RoomEditorViewModel = koinViewModel { parametersOf(levelId, roomId) },
 ) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
+    val state = viewModel.state
     val currentOnBack by rememberUpdatedState(onBack)
     LaunchedEffect(state.isSaved) { if (state.isSaved) currentOnBack() }
     RoomEditorContent(

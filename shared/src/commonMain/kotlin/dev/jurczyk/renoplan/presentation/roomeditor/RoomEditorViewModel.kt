@@ -1,5 +1,8 @@
 package dev.jurczyk.renoplan.presentation.roomeditor
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.jurczyk.renoplan.domain.model.Room
@@ -8,10 +11,6 @@ import dev.jurczyk.renoplan.domain.model.Turn
 import dev.jurczyk.renoplan.domain.model.Wall
 import dev.jurczyk.renoplan.domain.repository.RoomRepository
 import dev.jurczyk.renoplan.presentation.common.toMetresInput
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.uuid.Uuid
 
@@ -22,8 +21,14 @@ class RoomEditorViewModel(
     private val roomId: Uuid?,
     private val roomRepository: RoomRepository,
 ) : ViewModel() {
-    private val _state = MutableStateFlow(RoomEditorUiState(isNew = roomId == null, isLoading = roomId != null))
-    val state: StateFlow<RoomEditorUiState> = _state.asStateFlow()
+    /**
+     * The form. Compose state rather than a flow, so text fields get every change synchronously;
+     * asynchronous updates move the cursor (seen on iOS).
+     */
+    var state: RoomEditorUiState by mutableStateOf(
+        RoomEditorUiState(isNew = roomId == null, isLoading = roomId != null),
+    )
+        private set
 
     /** The stored room being edited; its openings are kept on walls that still exist. */
     private var original: Room? = null
@@ -32,20 +37,20 @@ class RoomEditorViewModel(
         if (roomId != null) viewModelScope.launch { load(roomId) }
     }
 
-    fun onNameChange(name: String) = _state.update { it.copy(name = name) }
+    fun onNameChange(name: String) = update { it.copy(name = name) }
 
-    fun onHeightChange(height: String) = _state.update { it.copy(height = height) }
+    fun onHeightChange(height: String) = update { it.copy(height = height) }
 
-    fun onLengthChange(length: String) = _state.update { it.copy(length = length) }
+    fun onLengthChange(length: String) = update { it.copy(length = length) }
 
-    fun onWidthChange(width: String) = _state.update { it.copy(width = width) }
+    fun onWidthChange(width: String) = update { it.copy(width = width) }
 
     /**
      * Rectangle → Outline turns the rectangle into four rows (or four empty rows).
      * Outline → Rectangle works only for a closed 4-wall outline.
      */
     fun onShapeModeChange(mode: ShapeMode) =
-        _state.update { state ->
+        update { state ->
             when {
                 mode == state.shapeMode -> {
                     state
@@ -84,10 +89,9 @@ class RoomEditorViewModel(
         turn: Turn,
     ) = updateRow(index) { it.copy(turn = turn) }
 
-    fun addRow() = _state.update { it.copy(rows = it.rows + WallRow()) }
+    fun addRow() = update { it.copy(rows = it.rows + WallRow()) }
 
-    fun removeRow(index: Int) =
-        _state.update { state -> state.copy(rows = state.rows.filterIndexed { i, _ -> i != index }) }
+    fun removeRow(index: Int) = update { state -> state.copy(rows = state.rows.filterIndexed { i, _ -> i != index }) }
 
     /**
      * Turning it on adds a computed wall after the typed ones; if the typed walls already close the
@@ -95,7 +99,7 @@ class RoomEditorViewModel(
      * Turning it off keeps the computed wall as an editable row.
      */
     fun onAutoCloseChange(autoClose: Boolean) =
-        _state.update { state ->
+        update { state ->
             when {
                 autoClose == state.autoClose -> {
                     state
@@ -115,10 +119,10 @@ class RoomEditorViewModel(
         }
 
     fun save() {
-        val room = _state.value.takeIf { it.canSave }?.let(::toRoom) ?: return
+        val room = state.takeIf { it.canSave }?.let(::toRoom) ?: return
         viewModelScope.launch {
             roomRepository.saveRoom(levelId, room)
-            _state.update { it.copy(isSaved = true) }
+            update { it.copy(isSaved = true) }
         }
     }
 
@@ -137,7 +141,7 @@ class RoomEditorViewModel(
     private fun updateRow(
         index: Int,
         change: (WallRow) -> WallRow,
-    ) = _state.update { state ->
+    ) = update { state ->
         state.copy(rows = state.rows.mapIndexed { i, row -> if (i == index) change(row) else row })
     }
 
@@ -145,7 +149,7 @@ class RoomEditorViewModel(
         val room = roomRepository.getRoom(id)
         original = room
         val rectangle = room?.shapeInput as? ShapeInput.Rectangle
-        _state.update {
+        update {
             it.copy(
                 isLoading = false,
                 name = room?.name.orEmpty(),
@@ -164,6 +168,10 @@ class RoomEditorViewModel(
                         .orEmpty(),
             )
         }
+    }
+
+    private fun update(change: (RoomEditorUiState) -> RoomEditorUiState) {
+        state = change(state)
     }
 }
 

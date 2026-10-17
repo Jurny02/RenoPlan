@@ -94,7 +94,9 @@ fun OperationEditorScreen(
     modifier: Modifier = Modifier,
     viewModel: OperationEditorViewModel = koinViewModel { parametersOf(levelId, roomId, operationId) },
 ) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
+    val stored by viewModel.state.collectAsStateWithLifecycle()
+    // The form is read straight from the ViewModel so typing is never delayed.
+    val state = stored.copy(form = viewModel.form)
     val currentOnBack by rememberUpdatedState(onBack)
     LaunchedEffect(state.form.isSaved) { if (state.form.isSaved) currentOnBack() }
     OperationEditorContent(

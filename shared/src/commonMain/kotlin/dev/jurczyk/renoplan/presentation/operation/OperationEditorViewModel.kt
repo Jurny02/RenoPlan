@@ -1,5 +1,8 @@
 package dev.jurczyk.renoplan.presentation.operation
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.jurczyk.renoplan.domain.cost.OperationCost
@@ -17,11 +20,9 @@ import dev.jurczyk.renoplan.domain.repository.TemplateRepository
 import dev.jurczyk.renoplan.presentation.common.WhileUiSubscribed
 import dev.jurczyk.renoplan.presentation.common.parseSquareMetres
 import dev.jurczyk.renoplan.presentation.common.toSquareMetresInput
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.uuid.Uuid
 
@@ -93,22 +94,25 @@ class OperationEditorViewModel(
     private val roomRepository: RoomRepository,
     private val templateRepository: TemplateRepository,
 ) : ViewModel() {
-    private val form = MutableStateFlow(OperationForm(isLoaded = operationId == null))
+    /**
+     * What the user has entered. Compose state rather than a flow, so text fields get every change
+     * synchronously; asynchronous updates move the cursor (seen on iOS). The screen combines it with
+     * [state].
+     */
+    var form: OperationForm by mutableStateOf(OperationForm(isLoaded = operationId == null))
+        private set
 
+    /** The room and templates, without the form; see [form]. */
     val state: StateFlow<OperationEditorUiState> =
-        combine(
-            roomRepository.observeRoom(roomId),
-            templateRepository.observeTemplates(),
-            form,
-        ) { room, templates, form ->
-            OperationEditorUiState(isNew = operationId == null, room = room, templates = templates, form = form)
+        combine(roomRepository.observeRoom(roomId), templateRepository.observeTemplates()) { room, templates ->
+            OperationEditorUiState(isNew = operationId == null, room = room, templates = templates)
         }.stateIn(viewModelScope, WhileUiSubscribed, OperationEditorUiState(isNew = operationId == null))
 
     init {
         if (operationId != null) viewModelScope.launch { load(operationId) }
     }
 
-    fun onPricingChange(pricing: PricingForm) = form.update { it.copy(pricing = pricing) }
+    fun onPricingChange(pricing: PricingForm) = updateForm { it.copy(pricing = pricing) }
 
     /**
      * Skirting and crown moulding select their own surface unless other mouldings are already chosen
@@ -116,7 +120,7 @@ class OperationEditorViewModel(
      * moulding it selected.
      */
     fun onKindChange(kind: OperationKind) =
-        form.update { current ->
+        updateForm { current ->
             val moulding = kind.moulding
             val previous = current.pricing.kind.moulding
             val surfaces =
@@ -136,13 +140,13 @@ class OperationEditorViewModel(
             current.copy(pricing = current.pricing.copy(kind = kind), surfaces = surfaces)
         }
 
-    fun onCustomQuantityChange(quantity: String) = form.update { it.copy(customQuantity = quantity) }
+    fun onCustomQuantityChange(quantity: String) = updateForm { it.copy(customQuantity = quantity) }
 
-    fun onCustomUnitChange(unit: MeasureUnit) = form.update { it.copy(customUnit = unit) }
+    fun onCustomUnitChange(unit: MeasureUnit) = updateForm { it.copy(customUnit = unit) }
 
     /** Selecting a surface of the other unit (m² vs m) starts a new selection, because they cannot be mixed. */
     fun onSurfaceToggle(surface: Surface) =
-        form.update { current ->
+        updateForm { current ->
             val surfaces =
                 when {
                     surface in current.surfaces -> current.surfaces - surface
@@ -162,7 +166,7 @@ class OperationEditorViewModel(
                     .orEmpty()
                     .map { Surface.Wall(it.number) }
                     .toSet()
-            form.update { current ->
+            updateForm { current ->
                 val surfaces =
                     when {
                         current.surfaces.containsAll(walls) -> current.surfaces - walls
@@ -174,16 +178,16 @@ class OperationEditorViewModel(
         }
     }
 
-    fun onStatusChange(status: OperationStatus) = form.update { it.copy(status = status) }
+    fun onStatusChange(status: OperationStatus) = updateForm { it.copy(status = status) }
 
-    fun onSaveAsTemplateChange(saveAsTemplate: Boolean) = form.update { it.copy(saveAsTemplate = saveAsTemplate) }
+    fun onSaveAsTemplateChange(saveAsTemplate: Boolean) = updateForm { it.copy(saveAsTemplate = saveAsTemplate) }
 
     /** Copies the template's type and prices; later edits of the template do not change this operation. */
     fun applyTemplate(template: OperationTemplate) =
-        form.update { it.copy(pricing = PricingForm.from(template.type, template.materialPrice, template.labour)) }
+        updateForm { it.copy(pricing = PricingForm.from(template.type, template.materialPrice, template.labour)) }
 
     fun save() {
-        val current = form.value
+        val current = form
         viewModelScope.launch {
             val room = roomRepository.getRoom(roomId) ?: return@launch
             val ui = OperationEditorUiState(isNew = operationId == null, room = room, form = current)
@@ -200,7 +204,7 @@ class OperationEditorViewModel(
                     OperationTemplate(Uuid.random(), operation.type, operation.materialPrice, operation.labour),
                 )
             }
-            form.update { it.copy(isSaved = true) }
+            updateForm { it.copy(isSaved = true) }
         }
     }
 
@@ -209,13 +213,17 @@ class OperationEditorViewModel(
         viewModelScope.launch {
             val room = roomRepository.getRoom(roomId) ?: return@launch
             roomRepository.saveRoom(levelId, room.copy(operations = room.operations.filterNot { it.id == id }))
-            form.update { it.copy(isSaved = true) }
+            updateForm { it.copy(isSaved = true) }
         }
+    }
+
+    private fun updateForm(change: (OperationForm) -> OperationForm) {
+        form = change(form)
     }
 
     private suspend fun load(id: Uuid) {
         val operation = roomRepository.getRoom(roomId)?.operations?.find { it.id == id }
-        form.value =
+        form =
             if (operation == null) {
                 OperationForm(isLoaded = true)
             } else {

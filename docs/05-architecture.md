@@ -59,6 +59,10 @@ Icons are vector drawables in `composeResources/drawable/`.
   ([ADR 0003](adr/0003-uuid-ids-and-repository-interfaces.md)).
 - **Presentation** exposes immutable UI state; derived values (areas, costs) are computed from
   domain functions, never stored.
+- Form input that text fields edit (room, opening, operation, template editors and the calculator)
+  is Compose `mutableStateOf` in the ViewModel, not a `StateFlow`: text fields need every change
+  synchronously, and the extra hop of collecting a flow moved the cursor on iOS. Data from the
+  repositories still arrives as flows.
 
 ## Persistence
 

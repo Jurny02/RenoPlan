@@ -30,7 +30,8 @@ class OperationEditorViewModelTest : MainDispatcherTest() {
     private fun editor(operationId: Uuid? = null) =
         OperationEditorViewModel(LEVEL_ID, room.id, operationId, store.roomRepository, store.templateRepository)
 
-    private suspend fun OperationEditorViewModel.loaded() = state.first { !it.isLoading }
+    /** The state as the screen sees it: stored room and templates plus the form. */
+    private suspend fun OperationEditorViewModel.loaded() = state.first { it.room != null }.copy(form = form)
 
     private fun savedOperations() = store.rooms().single().operations
 
