@@ -15,4 +15,13 @@ sealed interface Surface {
 
     /** Linear, measured in metres. */
     data object CrownMoulding : Surface
+
+    /**
+     * A quantity typed by the user instead of measured, e.g. half a wall (m²) or crown moulding on one
+     * wall (m). An operation has at most one.
+     */
+    data class Custom(
+        val quantity: Double,
+        val unit: MeasureUnit,
+    ) : Surface
 }

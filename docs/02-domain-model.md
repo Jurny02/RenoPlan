@@ -68,6 +68,7 @@ sealed interface Surface {
     data object Ceiling : Surface
     data object Skirting : Surface       // linear, metres
     data object CrownMoulding : Surface  // linear, metres
+    data class Custom(val quantity: Double, val unit: MeasureUnit) : Surface  // typed by the user
 }
 ```
 

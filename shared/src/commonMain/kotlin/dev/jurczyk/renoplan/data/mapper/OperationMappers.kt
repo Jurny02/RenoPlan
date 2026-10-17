@@ -3,6 +3,7 @@ package dev.jurczyk.renoplan.data.mapper
 import dev.jurczyk.renoplan.data.local.OperationEntity
 import dev.jurczyk.renoplan.data.local.TemplateEntity
 import dev.jurczyk.renoplan.domain.model.Labour
+import dev.jurczyk.renoplan.domain.model.MeasureUnit
 import dev.jurczyk.renoplan.domain.model.Money
 import dev.jurczyk.renoplan.domain.model.Operation
 import dev.jurczyk.renoplan.domain.model.OperationStatus
@@ -15,6 +16,8 @@ import kotlin.uuid.Uuid
 
 private const val SURFACE_SEPARATOR = ","
 private const val WALL_PREFIX = "WALL:"
+private const val CUSTOM_PREFIX = "CUSTOM:"
+private const val CUSTOM_PART_SEPARATOR = ":"
 
 private fun OperationType.kind(): String =
     when (this) {
@@ -51,7 +54,7 @@ private fun operationType(
         else -> error("Unknown operation type $kind")
     }
 
-/** E.g. `WALL:1,WALL:2,CEILING`. */
+/** E.g. `WALL:1,WALL:2,CEILING`; a custom quantity is `CUSTOM:SQUARE_METRE:4.5`. */
 private fun Set<Surface>.encode(): String =
     joinToString(SURFACE_SEPARATOR) { surface ->
         when (surface) {
@@ -60,6 +63,7 @@ private fun Set<Surface>.encode(): String =
             Surface.Ceiling -> "CEILING"
             Surface.Skirting -> "SKIRTING"
             Surface.CrownMoulding -> "CROWN_MOULDING"
+            is Surface.Custom -> "$CUSTOM_PREFIX${surface.unit.name}$CUSTOM_PART_SEPARATOR${surface.quantity}"
         }
     }
 
@@ -68,12 +72,34 @@ private fun decodeSurfaces(text: String): Set<Surface> =
         .split(SURFACE_SEPARATOR)
         .map { code ->
             when {
-                code.startsWith(WALL_PREFIX) -> Surface.Wall(code.removePrefix(WALL_PREFIX).toInt())
-                code == "FLOOR" -> Surface.Floor
-                code == "CEILING" -> Surface.Ceiling
-                code == "SKIRTING" -> Surface.Skirting
-                code == "CROWN_MOULDING" -> Surface.CrownMoulding
-                else -> error("Unknown surface $code")
+                code.startsWith(WALL_PREFIX) -> {
+                    Surface.Wall(code.removePrefix(WALL_PREFIX).toInt())
+                }
+
+                code.startsWith(CUSTOM_PREFIX) -> {
+                    val (unit, quantity) = code.removePrefix(CUSTOM_PREFIX).split(CUSTOM_PART_SEPARATOR)
+                    Surface.Custom(quantity.toDouble(), MeasureUnit.valueOf(unit))
+                }
+
+                code == "FLOOR" -> {
+                    Surface.Floor
+                }
+
+                code == "CEILING" -> {
+                    Surface.Ceiling
+                }
+
+                code == "SKIRTING" -> {
+                    Surface.Skirting
+                }
+
+                code == "CROWN_MOULDING" -> {
+                    Surface.CrownMoulding
+                }
+
+                else -> {
+                    error("Unknown surface $code")
+                }
             }
         }.toCollection(LinkedHashSet())
 

@@ -51,6 +51,7 @@ import renoplan.shared.generated.resources.summary_no_rooms
 import renoplan.shared.generated.resources.summary_whole_level
 import renoplan.shared.generated.resources.surface_count_ceilings
 import renoplan.shared.generated.resources.surface_count_crown_mouldings
+import renoplan.shared.generated.resources.surface_count_customs
 import renoplan.shared.generated.resources.surface_count_floors
 import renoplan.shared.generated.resources.surface_count_skirtings
 import renoplan.shared.generated.resources.surface_count_walls
@@ -195,16 +196,16 @@ private fun GroupRow(
 /** E.g. "8 ścian · 2 sufity". */
 @Composable
 fun surfaceCountsLabel(counts: SurfaceCounts): String =
-    listOfNotNull(
-        counts.walls.takeIf { it > 0 }?.let { pluralStringResource(Res.plurals.surface_count_walls, it, it) },
-        counts.floors.takeIf { it > 0 }?.let { pluralStringResource(Res.plurals.surface_count_floors, it, it) },
-        counts.ceilings.takeIf { it > 0 }?.let { pluralStringResource(Res.plurals.surface_count_ceilings, it, it) },
-        counts.skirtings.takeIf { it > 0 }?.let { pluralStringResource(Res.plurals.surface_count_skirtings, it, it) },
-        counts.crownMouldings
-            .takeIf {
-                it > 0
-            }?.let { pluralStringResource(Res.plurals.surface_count_crown_mouldings, it, it) },
-    ).joinToString(stringResource(Res.string.list_separator))
+    listOf(
+        counts.walls to Res.plurals.surface_count_walls,
+        counts.floors to Res.plurals.surface_count_floors,
+        counts.ceilings to Res.plurals.surface_count_ceilings,
+        counts.skirtings to Res.plurals.surface_count_skirtings,
+        counts.crownMouldings to Res.plurals.surface_count_crown_mouldings,
+        counts.customs to Res.plurals.surface_count_customs,
+    ).filter { (count, _) -> count > 0 }
+        .map { (count, label) -> pluralStringResource(label, count, count) }
+        .joinToString(stringResource(Res.string.list_separator))
 
 /** E.g. "1 zrobione · 2 do zrobienia". */
 @Composable

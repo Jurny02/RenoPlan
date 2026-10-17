@@ -48,6 +48,15 @@ class CostsTest {
     }
 
     @Test
+    fun customQuantityIsTakenAsTyped() {
+        assertEquals(4.5, room.quantity(Surface.Custom(4.5, MeasureUnit.SQUARE_METRE)))
+        assertEquals(
+            SurfaceCounts(walls = 1, customs = 1),
+            SurfaceCounts.of(setOf(Surface.Wall(1), Surface.Custom(2.0, MeasureUnit.SQUARE_METRE))),
+        )
+    }
+
+    @Test
     fun wallThatNoLongerExistsCountsAsZero() {
         assertEquals(0.0, room.quantity(Surface.Wall(7)))
     }

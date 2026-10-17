@@ -35,6 +35,7 @@ import renoplan.shared.generated.resources.price_per_unit
 import renoplan.shared.generated.resources.room_details_wall
 import renoplan.shared.generated.resources.surface_ceiling
 import renoplan.shared.generated.resources.surface_crown_moulding
+import renoplan.shared.generated.resources.surface_custom
 import renoplan.shared.generated.resources.surface_floor
 import renoplan.shared.generated.resources.surface_skirting
 import renoplan.shared.generated.resources.surface_walls
@@ -107,6 +108,7 @@ fun surfaceLabel(surface: Surface): String =
         Surface.Ceiling -> stringResource(Res.string.surface_ceiling)
         Surface.Skirting -> stringResource(Res.string.surface_skirting)
         Surface.CrownMoulding -> stringResource(Res.string.surface_crown_moulding)
+        is Surface.Custom -> stringResource(Res.string.surface_custom, quantityLabel(surface.quantity, surface.unit))
     }
 
 /** E.g. "Ściany 1, 2, 4 · Sufit"; a single wall stays "Ściana 1". */
