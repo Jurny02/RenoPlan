@@ -32,6 +32,7 @@ import dev.jurczyk.renoplan.presentation.templates.TemplateEditorUiState
 import dev.jurczyk.renoplan.presentation.templates.TemplateEditorViewModel
 import dev.jurczyk.renoplan.ui.components.BackButton
 import dev.jurczyk.renoplan.ui.components.ConfirmDeleteDialog
+import dev.jurczyk.renoplan.ui.components.KeyboardDoneBar
 import dev.jurczyk.renoplan.ui.operation.PricingFields
 import dev.jurczyk.renoplan.ui.theme.RenoPlanTheme
 import org.jetbrains.compose.resources.stringResource
@@ -82,6 +83,7 @@ fun TemplateEditorContent(
     val title = if (state.isNew) Res.string.template_new_title else Res.string.template_edit_title
     Scaffold(
         modifier = modifier,
+        bottomBar = { KeyboardDoneBar() },
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(title)) },

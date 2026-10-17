@@ -38,6 +38,7 @@ import dev.jurczyk.renoplan.domain.calculator.PricePerSquareMetre
 import dev.jurczyk.renoplan.domain.model.Money
 import dev.jurczyk.renoplan.presentation.calculator.CalculatorUiState
 import dev.jurczyk.renoplan.presentation.calculator.CalculatorViewModel
+import dev.jurczyk.renoplan.ui.components.KeyboardDoneBar
 import dev.jurczyk.renoplan.ui.components.UnitTextField
 import dev.jurczyk.renoplan.ui.components.plainTextClipEntry
 import dev.jurczyk.renoplan.ui.format.formatDecimal
@@ -121,6 +122,7 @@ fun CalculatorContent(
 ) {
     Scaffold(
         modifier = modifier,
+        bottomBar = { KeyboardDoneBar() },
         topBar = { TopAppBar(title = { Text(stringResource(Res.string.screen_calculator)) }) },
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { padding ->

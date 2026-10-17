@@ -40,6 +40,7 @@ import dev.jurczyk.renoplan.presentation.roomeditor.RoomEditorViewModel
 import dev.jurczyk.renoplan.presentation.roomeditor.ShapeMode
 import dev.jurczyk.renoplan.presentation.roomeditor.WallRow
 import dev.jurczyk.renoplan.ui.components.BackButton
+import dev.jurczyk.renoplan.ui.components.KeyboardDoneBar
 import dev.jurczyk.renoplan.ui.components.UnitTextField
 import dev.jurczyk.renoplan.ui.format.formatDecimal
 import dev.jurczyk.renoplan.ui.theme.RenoPlanTheme
@@ -133,6 +134,7 @@ fun RoomEditorContent(
     val title = if (state.isNew) Res.string.room_editor_new_title else Res.string.room_editor_edit_title
     Scaffold(
         modifier = modifier,
+        bottomBar = { KeyboardDoneBar() },
         topBar = {
             TopAppBar(title = { Text(stringResource(title)) }, navigationIcon = { BackButton(onClick = onBack) })
         },

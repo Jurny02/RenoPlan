@@ -39,6 +39,7 @@ import dev.jurczyk.renoplan.presentation.roomdetails.OpeningForm
 import dev.jurczyk.renoplan.presentation.roomdetails.RoomDetailsUiState
 import dev.jurczyk.renoplan.presentation.roomdetails.SizeMode
 import dev.jurczyk.renoplan.ui.components.ChoiceChips
+import dev.jurczyk.renoplan.ui.components.KeyboardDoneBar
 import dev.jurczyk.renoplan.ui.components.UnitTextField
 import dev.jurczyk.renoplan.ui.components.hideKeyboardOnTapOrDrag
 import dev.jurczyk.renoplan.ui.format.formatDecimal
@@ -88,13 +89,17 @@ fun OpeningSheet(
         modifier = modifier,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
     ) {
-        OpeningSheetContent(
-            state = state,
-            form = form,
-            onFormChange = onFormChange,
-            onSave = onSave,
-            onDelete = onDelete,
-        )
+        Column {
+            OpeningSheetContent(
+                state = state,
+                form = form,
+                onFormChange = onFormChange,
+                onSave = onSave,
+                onDelete = onDelete,
+                modifier = Modifier.weight(1f, fill = false),
+            )
+            KeyboardDoneBar()
+        }
     }
 }
 

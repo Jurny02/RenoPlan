@@ -299,4 +299,6 @@
         <item quantity="many">%1$d własnych ilości</item>
         <item quantity="other">%1$d własnej ilości</item>
     </plurals>
+
+    <string name="keyboard_done">Gotowe</string>
 </resources>

@@ -51,6 +51,7 @@ import dev.jurczyk.renoplan.presentation.operation.PricingForm
 import dev.jurczyk.renoplan.ui.components.BackButton
 import dev.jurczyk.renoplan.ui.components.ChoiceChips
 import dev.jurczyk.renoplan.ui.components.ConfirmDeleteDialog
+import dev.jurczyk.renoplan.ui.components.KeyboardDoneBar
 import dev.jurczyk.renoplan.ui.components.UnitTextField
 import dev.jurczyk.renoplan.ui.roomeditor.OutlinePreview
 import dev.jurczyk.renoplan.ui.theme.RenoPlanTheme
@@ -147,6 +148,7 @@ fun OperationEditorContent(
     val title = if (state.isNew) Res.string.operation_new_title else Res.string.operation_edit_title
     Scaffold(
         modifier = modifier,
+        bottomBar = { KeyboardDoneBar() },
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(title)) },
