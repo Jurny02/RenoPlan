@@ -25,6 +25,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,7 +39,9 @@ import dev.jurczyk.renoplan.presentation.roomdetails.OpeningForm
 import dev.jurczyk.renoplan.presentation.roomdetails.RoomDetailsUiState
 import dev.jurczyk.renoplan.presentation.roomdetails.SizeMode
 import dev.jurczyk.renoplan.ui.components.ChoiceChips
+import dev.jurczyk.renoplan.ui.components.KeyboardDoneBar
 import dev.jurczyk.renoplan.ui.components.UnitTextField
+import dev.jurczyk.renoplan.ui.components.hideKeyboardOnTapOrDrag
 import dev.jurczyk.renoplan.ui.format.formatDecimal
 import dev.jurczyk.renoplan.ui.theme.RenoPlanTheme
 import org.jetbrains.compose.resources.stringResource
@@ -86,13 +89,17 @@ fun OpeningSheet(
         modifier = modifier,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
     ) {
-        OpeningSheetContent(
-            state = state,
-            form = form,
-            onFormChange = onFormChange,
-            onSave = onSave,
-            onDelete = onDelete,
-        )
+        Column {
+            OpeningSheetContent(
+                state = state,
+                form = form,
+                onFormChange = onFormChange,
+                onSave = onSave,
+                onDelete = onDelete,
+                modifier = Modifier.weight(1f, fill = false),
+            )
+            KeyboardDoneBar()
+        }
     }
 }
 
@@ -105,10 +112,13 @@ fun OpeningSheetContent(
     onDelete: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    // The sheet is a separate window, so the app-wide keyboard handling does not reach it.
+    val focusManager = LocalFocusManager.current
     Column(
         modifier =
             modifier
                 .fillMaxWidth()
+                .hideKeyboardOnTapOrDrag(focusManager)
                 .imePadding()
                 .verticalScroll(rememberScrollState())
                 .padding(start = 16.dp, end = 16.dp, bottom = 24.dp),

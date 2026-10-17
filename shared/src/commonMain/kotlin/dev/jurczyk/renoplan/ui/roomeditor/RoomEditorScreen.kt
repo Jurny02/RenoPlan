@@ -32,7 +32,6 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.jurczyk.renoplan.domain.geometry.OutlineError
 import dev.jurczyk.renoplan.domain.model.Turn
 import dev.jurczyk.renoplan.presentation.roomeditor.OutlineProblem
@@ -41,6 +40,7 @@ import dev.jurczyk.renoplan.presentation.roomeditor.RoomEditorViewModel
 import dev.jurczyk.renoplan.presentation.roomeditor.ShapeMode
 import dev.jurczyk.renoplan.presentation.roomeditor.WallRow
 import dev.jurczyk.renoplan.ui.components.BackButton
+import dev.jurczyk.renoplan.ui.components.KeyboardDoneBar
 import dev.jurczyk.renoplan.ui.components.UnitTextField
 import dev.jurczyk.renoplan.ui.format.formatDecimal
 import dev.jurczyk.renoplan.ui.theme.RenoPlanTheme
@@ -84,7 +84,7 @@ fun RoomEditorScreen(
     modifier: Modifier = Modifier,
     viewModel: RoomEditorViewModel = koinViewModel { parametersOf(levelId, roomId) },
 ) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
+    val state = viewModel.state
     val currentOnBack by rememberUpdatedState(onBack)
     LaunchedEffect(state.isSaved) { if (state.isSaved) currentOnBack() }
     RoomEditorContent(
@@ -134,6 +134,7 @@ fun RoomEditorContent(
     val title = if (state.isNew) Res.string.room_editor_new_title else Res.string.room_editor_edit_title
     Scaffold(
         modifier = modifier,
+        bottomBar = { KeyboardDoneBar() },
         topBar = {
             TopAppBar(title = { Text(stringResource(title)) }, navigationIcon = { BackButton(onClick = onBack) })
         },

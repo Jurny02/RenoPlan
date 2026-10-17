@@ -1,5 +1,8 @@
 package dev.jurczyk.renoplan.presentation.roomdetails
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.jurczyk.renoplan.domain.cost.CostSummary
@@ -21,9 +24,8 @@ import dev.jurczyk.renoplan.domain.model.OperationStatus
 import dev.jurczyk.renoplan.domain.model.Room
 import dev.jurczyk.renoplan.domain.repository.RoomRepository
 import dev.jurczyk.renoplan.presentation.common.WhileUiSubscribed
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlin.uuid.Uuid
@@ -90,41 +92,49 @@ class RoomDetailsViewModel(
     private val roomId: Uuid,
     private val roomRepository: RoomRepository,
 ) : ViewModel() {
-    private val form = MutableStateFlow<OpeningForm?>(null)
+    /**
+     * The open opening sheet, or `null`. Compose state rather than a flow, so text fields get every
+     * change synchronously; asynchronous updates move the cursor (seen on iOS). The screen combines it
+     * with [state].
+     */
+    var form: OpeningForm? by mutableStateOf(null)
+        private set
 
+    /** The room, without the sheet; see [form]. */
     val state: StateFlow<RoomDetailsUiState> =
-        combine(roomRepository.observeRoom(roomId), form) { room, form ->
-            RoomDetailsUiState(room = room, isLoading = false, form = form)
-        }.stateIn(viewModelScope, WhileUiSubscribed, RoomDetailsUiState())
+        roomRepository
+            .observeRoom(roomId)
+            .map { room -> RoomDetailsUiState(room = room, isLoading = false) }
+            .stateIn(viewModelScope, WhileUiSubscribed, RoomDetailsUiState())
 
     /** Opens the sheet for a new opening, on [wallNumber] when opened from a wall. */
     fun addOpening(wallNumber: Int = 1) {
-        form.value = OpeningForm.new(wallNumber)
+        form = OpeningForm.new(wallNumber)
     }
 
     fun editOpening(id: Uuid) {
         viewModelScope.launch {
             val room = roomRepository.getRoom(roomId) ?: return@launch
             val wall = room.walls.find { wall -> wall.openings.any { it.id == id } } ?: return@launch
-            form.value = OpeningForm.edit(wall.openings.first { it.id == id }, wall.number)
+            form = OpeningForm.edit(wall.openings.first { it.id == id }, wall.number)
         }
     }
 
     fun onFormChange(changed: OpeningForm) {
-        form.value = changed
+        form = changed
     }
 
     fun dismissForm() {
-        form.value = null
+        form = null
     }
 
     fun saveOpening() {
-        val current = form.value ?: return
+        val current = form ?: return
         viewModelScope.launch {
             val state = RoomDetailsUiState(room = roomRepository.getRoom(roomId), isLoading = false, form = current)
             val changed = state.formRoom?.takeIf { state.canSaveForm } ?: return@launch
             roomRepository.saveRoom(levelId, changed)
-            form.value = null
+            form = null
         }
     }
 
@@ -141,11 +151,11 @@ class RoomDetailsViewModel(
     }
 
     fun deleteOpening() {
-        val current = form.value ?: return
+        val current = form ?: return
         viewModelScope.launch {
             val room = roomRepository.getRoom(roomId) ?: return@launch
             roomRepository.saveRoom(levelId, room.withoutOpening(current.id))
-            form.value = null
+            form = null
         }
     }
 }

@@ -16,6 +16,9 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -48,9 +51,11 @@ import dev.jurczyk.renoplan.presentation.operation.OperationEditorViewModel
 import dev.jurczyk.renoplan.presentation.operation.OperationForm
 import dev.jurczyk.renoplan.presentation.operation.OperationKind
 import dev.jurczyk.renoplan.presentation.operation.PricingForm
+import dev.jurczyk.renoplan.presentation.operation.QuantityMode
 import dev.jurczyk.renoplan.ui.components.BackButton
 import dev.jurczyk.renoplan.ui.components.ChoiceChips
 import dev.jurczyk.renoplan.ui.components.ConfirmDeleteDialog
+import dev.jurczyk.renoplan.ui.components.KeyboardDoneBar
 import dev.jurczyk.renoplan.ui.components.UnitTextField
 import dev.jurczyk.renoplan.ui.roomeditor.OutlinePreview
 import dev.jurczyk.renoplan.ui.theme.RenoPlanTheme
@@ -73,6 +78,7 @@ import renoplan.shared.generated.resources.operation_from_template
 import renoplan.shared.generated.resources.operation_hide_outline
 import renoplan.shared.generated.resources.operation_new_title
 import renoplan.shared.generated.resources.operation_quantity
+import renoplan.shared.generated.resources.operation_quantity_from_surfaces
 import renoplan.shared.generated.resources.operation_save_as_template
 import renoplan.shared.generated.resources.operation_show_outline
 import renoplan.shared.generated.resources.operation_status_label
@@ -94,7 +100,9 @@ fun OperationEditorScreen(
     modifier: Modifier = Modifier,
     viewModel: OperationEditorViewModel = koinViewModel { parametersOf(levelId, roomId, operationId) },
 ) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
+    val stored by viewModel.state.collectAsStateWithLifecycle()
+    // The form is read straight from the ViewModel so typing is never delayed.
+    val state = stored.copy(form = viewModel.form)
     val currentOnBack by rememberUpdatedState(onBack)
     LaunchedEffect(state.form.isSaved) { if (state.form.isSaved) currentOnBack() }
     OperationEditorContent(
@@ -106,8 +114,9 @@ fun OperationEditorScreen(
                 onKindChange = viewModel::onKindChange,
                 onSurfaceToggle = viewModel::onSurfaceToggle,
                 onAllWallsToggle = viewModel::onAllWallsToggle,
-                onCustomQuantityChange = viewModel::onCustomQuantityChange,
-                onCustomUnitChange = viewModel::onCustomUnitChange,
+                onQuantityModeChange = viewModel::onQuantityModeChange,
+                onCustomQuantityChange = { viewModel.onCustomQuantityChange(quantity = it) },
+                onCustomUnitChange = { viewModel.onCustomQuantityChange(unit = it) },
                 onStatusChange = viewModel::onStatusChange,
                 onSaveAsTemplateChange = viewModel::onSaveAsTemplateChange,
                 onApplyTemplate = viewModel::applyTemplate,
@@ -125,6 +134,7 @@ class OperationEditorActions(
     val onKindChange: (OperationKind) -> Unit = {},
     val onSurfaceToggle: (Surface) -> Unit = {},
     val onAllWallsToggle: () -> Unit = {},
+    val onQuantityModeChange: (QuantityMode) -> Unit = {},
     val onCustomQuantityChange: (String) -> Unit = {},
     val onCustomUnitChange: (MeasureUnit) -> Unit = {},
     val onStatusChange: (OperationStatus) -> Unit = {},
@@ -145,6 +155,7 @@ fun OperationEditorContent(
     val title = if (state.isNew) Res.string.operation_new_title else Res.string.operation_edit_title
     Scaffold(
         modifier = modifier,
+        bottomBar = { KeyboardDoneBar() },
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(title)) },
@@ -204,11 +215,9 @@ private fun OperationFields(
             onKindChange = actions.onKindChange,
         )
         SurfacePicker(state, actions)
-        ChoiceChips(
+        StatusPicker(
             title = stringResource(Res.string.operation_status_label),
-            options = OperationStatus.entries,
             selected = state.form.status,
-            optionLabel = { stringResource(it.label) },
             onSelect = actions.onStatusChange,
         )
         SaveAsTemplateRow(state.form.saveAsTemplate, actions.onSaveAsTemplateChange)
@@ -232,9 +241,46 @@ private fun TemplatePicker(
     )
 }
 
-/** Surface chips ("all walls" is `null` among them), the room's outline on demand and a typed quantity. */
+/** Where the quantity comes from: chosen surfaces, or a number typed by the user. */
 @Composable
 private fun SurfacePicker(
+    state: OperationEditorUiState,
+    actions: OperationEditorActions,
+    modifier: Modifier = Modifier,
+) {
+    val mode = state.form.quantityMode
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(stringResource(Res.string.operation_surfaces_label), style = MaterialTheme.typography.labelLarge)
+        SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+            QuantityMode.entries.forEachIndexed { index, option ->
+                SegmentedButton(
+                    selected = mode == option,
+                    onClick = { actions.onQuantityModeChange(option) },
+                    shape = SegmentedButtonDefaults.itemShape(index = index, count = QuantityMode.entries.size),
+                    icon = {},
+                ) {
+                    Text(
+                        stringResource(
+                            if (option == QuantityMode.SURFACES) {
+                                Res.string.operation_quantity_from_surfaces
+                            } else {
+                                Res.string.operation_custom_quantity_label
+                            },
+                        ),
+                    )
+                }
+            }
+        }
+        when (mode) {
+            QuantityMode.SURFACES -> SurfaceChips(state, actions)
+            QuantityMode.CUSTOM -> CustomQuantityField(state, actions)
+        }
+    }
+}
+
+/** Surface chips ("all walls" is `null` among them) and the room's outline on demand. */
+@Composable
+private fun SurfaceChips(
     state: OperationEditorUiState,
     actions: OperationEditorActions,
     modifier: Modifier = Modifier,
@@ -248,7 +294,7 @@ private fun SurfacePicker(
     var showOutline by rememberSaveable { mutableStateOf(false) }
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
         ChoiceChips(
-            title = stringResource(Res.string.operation_surfaces_label),
+            title = "",
             options = options,
             isSelected = { surface -> if (surface == null) allWalls else surface in state.form.surfaces },
             optionLabel = { surface -> surface?.let { surfaceLabel(it) } ?: allWallsLabel },
@@ -267,7 +313,6 @@ private fun SurfacePicker(
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        CustomQuantityField(state, actions, modifier = Modifier.padding(top = 8.dp))
     }
 }
 
@@ -283,24 +328,21 @@ private fun CustomQuantityField(
             MeasureUnit.METRE to stringResource(Res.string.unit_metres_unit),
         )
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        ChoiceChips(
+            title = "",
+            options = MeasureUnit.entries,
+            selected = state.form.customUnit,
+            optionLabel = { unitLabels.getValue(it) },
+            onSelect = actions.onCustomUnitChange,
+        )
         UnitTextField(
             value = state.form.customQuantity,
             onValueChange = actions.onCustomQuantityChange,
             label = stringResource(Res.string.operation_custom_quantity_label),
-            unit = unitLabels.getValue(state.customUnit),
+            unit = unitLabels.getValue(state.form.customUnit),
             isError = state.customQuantityError,
             errorText = stringResource(Res.string.operation_custom_quantity_error),
         )
-        // With surfaces selected, the typed quantity uses their unit.
-        if (state.form.surfaces.isEmpty()) {
-            ChoiceChips(
-                title = "",
-                options = MeasureUnit.entries,
-                selected = state.form.customUnit,
-                optionLabel = { unitLabels.getValue(it) },
-                onSelect = actions.onCustomUnitChange,
-            )
-        }
         Text(
             text = stringResource(Res.string.operation_custom_quantity_hint),
             style = MaterialTheme.typography.bodySmall,

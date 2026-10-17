@@ -30,7 +30,8 @@ class RoomDetailsViewModelTest : MainDispatcherTest() {
     private val store = FakeStore().apply { levels.value = listOf(Level(LEVEL_ID, "Parter", listOf(kitchen))) }
     private val viewModel = RoomDetailsViewModel(LEVEL_ID, kitchen.id, store.roomRepository)
 
-    private suspend fun loaded() = viewModel.state.first { !it.isLoading }
+    /** The state as the screen sees it: stored room plus the open sheet. */
+    private suspend fun loaded() = viewModel.state.first { !it.isLoading }.copy(form = viewModel.form)
 
     private fun room() = store.rooms().single()
 

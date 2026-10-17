@@ -14,7 +14,7 @@ class CalculatorViewModelTest : MainDispatcherTest() {
     private val calculator = CalculatorViewModel()
 
     private val price: Money? get() =
-        calculator.state.value.result
+        calculator.state.result
             ?.price
 
     private fun fill(
@@ -29,7 +29,7 @@ class CalculatorViewModelTest : MainDispatcherTest() {
 
     @Test
     fun startsEmptyWithTwoCoatsAndLitres() {
-        val state = calculator.state.value
+        val state = calculator.state
 
         assertEquals("2", state.coats)
         assertEquals(PackageUnit.LITRE, state.unit)
@@ -40,7 +40,7 @@ class CalculatorViewModelTest : MainDispatcherTest() {
     @Test
     fun liveResult() {
         fill()
-        val result = assertNotNull(calculator.state.value.result)
+        val result = assertNotNull(calculator.state.result)
 
         assertEquals(17.5, result.areaPerPackage, 1e-9)
         assertEquals(Money(1_143), result.price)
@@ -68,7 +68,7 @@ class CalculatorViewModelTest : MainDispatcherTest() {
         fill()
         calculator.onUnitChange(PackageUnit.KILOGRAM)
 
-        assertEquals(PackageUnit.KILOGRAM, calculator.state.value.unit)
+        assertEquals(PackageUnit.KILOGRAM, calculator.state.unit)
         assertEquals(Money(1_143), price)
     }
 
@@ -76,7 +76,7 @@ class CalculatorViewModelTest : MainDispatcherTest() {
     fun invalidInputShowsErrorsAndNoResult() {
         fill(price = "abc", amount = "0", coverage = "-3")
         calculator.onCoatsChange("1,5")
-        val state = calculator.state.value
+        val state = calculator.state
 
         assertTrue(state.packagePriceError)
         assertTrue(state.amountError)
@@ -89,9 +89,40 @@ class CalculatorViewModelTest : MainDispatcherTest() {
     fun blankFieldsShowNoErrors() {
         fill(price = "", amount = "", coverage = "")
         calculator.onCoatsChange("")
-        val state = calculator.state.value
+        val state = calculator.state
 
         assertFalse(state.packagePriceError || state.amountError || state.coverageError || state.coatsError)
         assertNull(state.result)
+    }
+
+    @Test
+    fun metreModeGivesThePricePerMetre() {
+        val viewModel = CalculatorViewModel()
+        viewModel.onModeChange(CalculatorMode.METRE)
+        viewModel.onPackagePriceChange("50")
+        viewModel.onMetresChange("2,5")
+
+        assertEquals(Money.fromZloty(20.0), viewModel.state.pricePerMetre)
+        assertNull(viewModel.state.result)
+    }
+
+    @Test
+    fun metreModeWaitsForValidMetres() {
+        val viewModel = CalculatorViewModel()
+        viewModel.onModeChange(CalculatorMode.METRE)
+        viewModel.onPackagePriceChange("50")
+        viewModel.onMetresChange("0")
+
+        assertTrue(viewModel.state.metresError)
+        assertNull(viewModel.state.pricePerMetre)
+    }
+
+    @Test
+    fun squareMetreModeIgnoresTheMetresField() {
+        val viewModel = CalculatorViewModel()
+        viewModel.onPackagePriceChange("50")
+        viewModel.onMetresChange("2,5")
+
+        assertNull(viewModel.state.pricePerMetre)
     }
 }

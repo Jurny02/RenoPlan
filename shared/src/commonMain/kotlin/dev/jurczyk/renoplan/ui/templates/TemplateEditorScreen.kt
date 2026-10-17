@@ -25,7 +25,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.jurczyk.renoplan.presentation.operation.LabourMode
 import dev.jurczyk.renoplan.presentation.operation.OperationKind
 import dev.jurczyk.renoplan.presentation.operation.PricingForm
@@ -33,6 +32,7 @@ import dev.jurczyk.renoplan.presentation.templates.TemplateEditorUiState
 import dev.jurczyk.renoplan.presentation.templates.TemplateEditorViewModel
 import dev.jurczyk.renoplan.ui.components.BackButton
 import dev.jurczyk.renoplan.ui.components.ConfirmDeleteDialog
+import dev.jurczyk.renoplan.ui.components.KeyboardDoneBar
 import dev.jurczyk.renoplan.ui.operation.PricingFields
 import dev.jurczyk.renoplan.ui.theme.RenoPlanTheme
 import org.jetbrains.compose.resources.stringResource
@@ -56,7 +56,7 @@ fun TemplateEditorScreen(
     modifier: Modifier = Modifier,
     viewModel: TemplateEditorViewModel = koinViewModel { parametersOf(templateId) },
 ) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
+    val state = viewModel.state
     val currentOnBack by rememberUpdatedState(onBack)
     LaunchedEffect(state.isSaved) { if (state.isSaved) currentOnBack() }
     TemplateEditorContent(
@@ -83,6 +83,7 @@ fun TemplateEditorContent(
     val title = if (state.isNew) Res.string.template_new_title else Res.string.template_edit_title
     Scaffold(
         modifier = modifier,
+        bottomBar = { KeyboardDoneBar() },
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(title)) },

@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Card
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -18,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import dev.jurczyk.renoplan.domain.cost.CostSummary
 import dev.jurczyk.renoplan.domain.cost.OperationCost
 import dev.jurczyk.renoplan.domain.model.Operation
-import dev.jurczyk.renoplan.ui.operation.label
+import dev.jurczyk.renoplan.ui.operation.StatusChip
 import dev.jurczyk.renoplan.ui.operation.moneyLabel
 import dev.jurczyk.renoplan.ui.operation.operationTypeLabel
 import dev.jurczyk.renoplan.ui.operation.quantityLabel
@@ -100,10 +99,7 @@ fun OperationCard(
                 )
                 Text(moneyLabel(cost.total), style = MaterialTheme.typography.bodyLarge)
             }
-            AssistChip(
-                onClick = { onCycleStatus(operation.id) },
-                label = { Text(stringResource(operation.status.label)) },
-            )
+            StatusChip(status = operation.status, onClick = { onCycleStatus(operation.id) })
         }
     }
 }

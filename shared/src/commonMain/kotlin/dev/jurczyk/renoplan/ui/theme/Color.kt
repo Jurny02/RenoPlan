@@ -28,3 +28,9 @@ internal val TertiaryDark = Color(0xFFD1C78F)
 internal val OnTertiaryDark = Color(0xFF363107)
 internal val TertiaryContainerDark = Color(0xFF4D4719)
 internal val OnTertiaryContainerDark = Color(0xFFEEE3A9)
+
+// "Done" status: a green outside the brand palette, so finished work stands out.
+internal val DoneContainerLight = Color(0xFFC3EFC0)
+internal val OnDoneContainerLight = Color(0xFF00210A)
+internal val DoneContainerDark = Color(0xFF1F5129)
+internal val OnDoneContainerDark = Color(0xFFC3EFC0)

@@ -59,7 +59,8 @@ Because `quantity` is derived from geometry, changing a room's dimensions update
   changed) counts as 0. Floor and ceiling use their areas, skirting and crown moulding their lengths
   from [03](03-calculations.md#mouldings).
 - A custom surface (`Surface.Custom`) counts its typed quantity as is, e.g. half a wall in m² or
-  crown moulding along one wall in m. An operation has at most one.
+  crown moulding along one wall in m. The editor uses it instead of measured surfaces, never
+  together with them.
 - One operation cannot mix area surfaces (walls, floor, ceiling) with linear ones (skirting, crown
   moulding), because its prices are per unit.
 - *Done* in the summaries is the cost of operations with status `DONE`; *progress* is done ÷ total.
@@ -101,3 +102,14 @@ price per m²     = package price / area per package
 
 Example: 200 PLN, 5 L, coverage 7 m²/L, 2 coats → 5 · 7 / 2 = 17.5 m² per package →
 **11.43 PLN/m²** (5.71 PLN/m² for one coat).
+
+### Price per metre
+
+For material sold by length (skirting, crown moulding, trims): package price and metres in the
+package.
+
+```
+price per m = package price / metres
+```
+
+Example: 50 PLN for a 2.5 m strip → **20.00 PLN/m**.

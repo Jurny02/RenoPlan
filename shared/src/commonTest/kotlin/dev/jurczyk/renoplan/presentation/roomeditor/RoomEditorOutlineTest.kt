@@ -25,7 +25,7 @@ class RoomEditorOutlineTest : MainDispatcherTest() {
     private val store = FakeStore().apply { levels.value = listOf(Level(LEVEL_ID, "Parter")) }
     private val editor = RoomEditorViewModel(LEVEL_ID, roomId = null, roomRepository = store.roomRepository)
 
-    private val state get() = editor.state.value
+    private val state get() = editor.state
 
     /** Types rows like `"3,2 R 2,5 R 2,8 R"` into the outline editor, replacing the current rows. */
     private fun typeOutline(outline: String) {
@@ -194,10 +194,10 @@ class RoomEditorOutlineTest : MainDispatcherTest() {
             store.roomRepository.saveRoom(LEVEL_ID, kitchen)
 
             val edit = RoomEditorViewModel(LEVEL_ID, kitchen.id, store.roomRepository)
-            assertEquals(ShapeMode.OUTLINE, edit.state.value.shapeMode)
+            assertEquals(ShapeMode.OUTLINE, edit.state.shapeMode)
             assertEquals(
                 "0,4",
-                edit.state.value.rows[3]
+                edit.state.rows[3]
                     .length,
             )
 
@@ -206,7 +206,7 @@ class RoomEditorOutlineTest : MainDispatcherTest() {
             edit.removeRow(3)
             edit.onRowLengthChange(2, "3,2")
             edit.onRowLengthChange(3, "2,5")
-            assertEquals(listOf(5), edit.state.value.wallsLosingOpenings)
+            assertEquals(listOf(5), edit.state.wallsLosingOpenings)
 
             edit.save()
             val saved = store.rooms().single()

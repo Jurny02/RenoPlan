@@ -36,7 +36,7 @@ class RoomEditorViewModelTest : MainDispatcherTest() {
 
     @Test
     fun newRoomStartsEmptyAndCannotBeSaved() {
-        val state = newRoomEditor().state.value
+        val state = newRoomEditor().state
 
         assertTrue(state.isNew)
         assertFalse(state.canSave)
@@ -46,7 +46,7 @@ class RoomEditorViewModelTest : MainDispatcherTest() {
     @Test
     fun liveResults() {
         val editor = newRoomEditor().apply { fill() }
-        val state = editor.state.value
+        val state = editor.state
 
         assertEquals(8.0, state.floorArea!!, 1e-9)
         assertEquals(11_400.mm, state.perimeter)
@@ -56,7 +56,7 @@ class RoomEditorViewModelTest : MainDispatcherTest() {
 
     @Test
     fun floorAreaAndPerimeterNeedNoHeight() {
-        val state = newRoomEditor().apply { fill(height = "") }.state.value
+        val state = newRoomEditor().apply { fill(height = "") }.state
 
         assertEquals(8.0, state.floorArea!!, 1e-9)
         assertNull(state.volume)
@@ -66,13 +66,13 @@ class RoomEditorViewModelTest : MainDispatcherTest() {
     @Test
     fun invalidInputIsReportedOnlyOnceTyped() {
         val editor = newRoomEditor()
-        assertFalse(editor.state.value.lengthError)
+        assertFalse(editor.state.lengthError)
 
         editor.onLengthChange("0")
-        assertTrue(editor.state.value.lengthError)
+        assertTrue(editor.state.lengthError)
 
         editor.onLengthChange("3,2")
-        assertFalse(editor.state.value.lengthError)
+        assertFalse(editor.state.lengthError)
     }
 
     @Test
@@ -80,7 +80,7 @@ class RoomEditorViewModelTest : MainDispatcherTest() {
         assertFalse(
             newRoomEditor()
                 .apply { fill(name = "  ") }
-                .state.value.canSave,
+                .state.canSave,
         )
     }
 
@@ -95,7 +95,7 @@ class RoomEditorViewModelTest : MainDispatcherTest() {
             assertEquals("Kuchnia", room.name)
             assertEquals(2_600.mm, room.height)
             assertEquals(ShapeInput.Rectangle(3_200.mm, 2_500.mm), room.shapeInput)
-            assertTrue(editor.state.value.isSaved)
+            assertTrue(editor.state.isSaved)
         }
 
     @Test
@@ -120,7 +120,7 @@ class RoomEditorViewModelTest : MainDispatcherTest() {
             store.roomRepository.saveRoom(LEVEL_ID, room)
 
             val editor = RoomEditorViewModel(LEVEL_ID, room.id, store.roomRepository)
-            val loaded = editor.state.value
+            val loaded = editor.state
             assertFalse(loaded.isNew)
             assertEquals(
                 listOf("Kuchnia", "2,65", "3,2", "2,5"),

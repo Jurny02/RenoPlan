@@ -153,8 +153,9 @@ Bottom sheet for adding or editing an opening.
   selected. Selecting a surface of the other unit (m² vs m) starts a new selection instead of mixing
   them.
 - **Show the room's walls** toggles the outline preview with wall numbers, to match numbers to walls.
-- **Custom quantity**: a typed amount (e.g. half a wall, crown moulding on one wall) added to the
-  selected surfaces, in their unit; with no surface selected the user picks m² or m.
+- The quantity is **either** computed from surfaces (**From surfaces**: wall, floor, ceiling and
+  moulding chips) **or** typed (**Custom quantity**: e.g. half a wall or crown moulding on one wall,
+  in m² or m; a moulding type picks m). A toggle chooses; only the chosen one counts.
 - **Delete** (with confirmation) in the top bar when editing.
 
 ## 7. Summary
@@ -181,7 +182,9 @@ single room from Room details).
 
 ## 9. Calculator
 
-- Inputs: package price, package amount, unit (L / kg), coverage (m² per unit), coats (default 2).
+- Toggle **Per m²** / **Per metre**.
+- Per m² inputs: package price, package amount, unit (L / kg), coverage (m² per unit), coats (default 2).
+- Per metre inputs: package price and metres in the package; result: price per metre.
 - Results: area per package, **price per m²**, and the 1-coat price for reference.
 - Copy-to-clipboard button for the result; the user enters it into an operation manually.
   It copies the bare amount (e.g. `11,43`) and confirms with a snackbar.
@@ -220,6 +223,12 @@ Follows the [roadmap](01-scope.md#roadmap):
   scroll instead of clipping, and labels are not shrunk to fit.
 - Icons that act on their own have a content description; decorative ones next to a label do not.
 - Toggles are whole rows (switch, checkbox) so the label is part of the touch target.
+- While the keyboard is open, a **Done** bar sits on top of it in every editor, the calculator and the
+  opening sheet; it closes the keyboard (the iOS number pad has no return key).
+- Tapping outside a field or dragging the content with a finger hides the keyboard on every screen and in the
+  opening sheet; the iOS number pad has no key to close it.
+- Operation statuses differ by icon and colour (to do: empty circle, grey; in progress: half circle,
+  yellow; done: check mark, green), so colour is never the only cue.
 
 ## Out of scope for the MVP
 

@@ -1,5 +1,8 @@
 package dev.jurczyk.renoplan.presentation.operation
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.jurczyk.renoplan.domain.cost.OperationCost
@@ -17,22 +20,26 @@ import dev.jurczyk.renoplan.domain.repository.TemplateRepository
 import dev.jurczyk.renoplan.presentation.common.WhileUiSubscribed
 import dev.jurczyk.renoplan.presentation.common.parseSquareMetres
 import dev.jurczyk.renoplan.presentation.common.toSquareMetresInput
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.uuid.Uuid
+
+/** Where an operation's quantity comes from: measured surfaces, or a number the user types. */
+enum class QuantityMode {
+    SURFACES,
+    CUSTOM,
+}
 
 /** What the user has entered in the operation editor. */
 data class OperationForm(
     val pricing: PricingForm = PricingForm(),
-    /** Measured surfaces; a typed quantity lives in [customQuantity]. */
+    val quantityMode: QuantityMode = QuantityMode.SURFACES,
+    /** Measured surfaces, used in [QuantityMode.SURFACES]. */
     val surfaces: Set<Surface> = emptySet(),
-    /** Extra quantity typed by the user (e.g. half a wall), added to the surfaces; blank means none. */
+    /** The typed quantity (e.g. half a wall), used in [QuantityMode.CUSTOM]. */
     val customQuantity: String = "",
-    /** Unit of [customQuantity] when no surface is selected; otherwise the surfaces decide. */
     val customUnit: MeasureUnit = MeasureUnit.SQUARE_METRE,
     val status: OperationStatus = OperationStatus.TODO,
     val saveAsTemplate: Boolean = false,
@@ -48,23 +55,33 @@ data class OperationEditorUiState(
 ) {
     val isLoading: Boolean get() = room == null || !form.isLoaded
 
-    /** The unit a typed quantity uses: the selected surfaces' unit, or the one chosen for it. */
-    val customUnit: MeasureUnit get() = form.surfaces.firstOrNull()?.unit ?: form.customUnit
-
     val customQuantityError: Boolean get() =
-        form.customQuantity.isNotBlank() &&
+        form.quantityMode == QuantityMode.CUSTOM &&
+            form.customQuantity.isNotBlank() &&
             parseSquareMetres(form.customQuantity) == null
 
-    /** Every surface of the operation, including the typed quantity. */
+    /** The surfaces of the operation: the selected ones, or the typed quantity alone. */
     val allSurfaces: Set<Surface>
         get() =
-            form.surfaces +
-                listOfNotNull(parseSquareMetres(form.customQuantity)?.let { Surface.Custom(it, customUnit) })
+            when (form.quantityMode) {
+                QuantityMode.SURFACES -> {
+                    form.surfaces
+                }
+
+                QuantityMode.CUSTOM -> {
+                    setOfNotNull(parseSquareMetres(form.customQuantity)?.let { Surface.Custom(it, form.customUnit) })
+                }
+            }
 
     /** The unit of the operation, or `null` before anything is selected or typed. */
-    val unit: MeasureUnit? get() = allSurfaces.firstOrNull()?.unit
+    val unit: MeasureUnit?
+        get() =
+            when (form.quantityMode) {
+                QuantityMode.SURFACES -> form.surfaces.firstOrNull()?.unit
+                QuantityMode.CUSTOM -> form.customUnit
+            }
 
-    /** m² or m of the selected surfaces and the typed quantity. */
+    /** m² or m of the selected surfaces, or the typed quantity. */
     val quantity: Double get() = room?.let { room -> allSurfaces.sumOf { room.quantity(it) } } ?: 0.0
 
     fun operation(id: Uuid): Operation? {
@@ -93,22 +110,25 @@ class OperationEditorViewModel(
     private val roomRepository: RoomRepository,
     private val templateRepository: TemplateRepository,
 ) : ViewModel() {
-    private val form = MutableStateFlow(OperationForm(isLoaded = operationId == null))
+    /**
+     * What the user has entered. Compose state rather than a flow, so text fields get every change
+     * synchronously; asynchronous updates move the cursor (seen on iOS). The screen combines it with
+     * [state].
+     */
+    var form: OperationForm by mutableStateOf(OperationForm(isLoaded = operationId == null))
+        private set
 
+    /** The room and templates, without the form; see [form]. */
     val state: StateFlow<OperationEditorUiState> =
-        combine(
-            roomRepository.observeRoom(roomId),
-            templateRepository.observeTemplates(),
-            form,
-        ) { room, templates, form ->
-            OperationEditorUiState(isNew = operationId == null, room = room, templates = templates, form = form)
+        combine(roomRepository.observeRoom(roomId), templateRepository.observeTemplates()) { room, templates ->
+            OperationEditorUiState(isNew = operationId == null, room = room, templates = templates)
         }.stateIn(viewModelScope, WhileUiSubscribed, OperationEditorUiState(isNew = operationId == null))
 
     init {
         if (operationId != null) viewModelScope.launch { load(operationId) }
     }
 
-    fun onPricingChange(pricing: PricingForm) = form.update { it.copy(pricing = pricing) }
+    fun onPricingChange(pricing: PricingForm) = updateForm { it.copy(pricing = pricing) }
 
     /**
      * Skirting and crown moulding select their own surface unless other mouldings are already chosen
@@ -116,7 +136,7 @@ class OperationEditorViewModel(
      * moulding it selected.
      */
     fun onKindChange(kind: OperationKind) =
-        form.update { current ->
+        updateForm { current ->
             val moulding = kind.moulding
             val previous = current.pricing.kind.moulding
             val surfaces =
@@ -133,16 +153,22 @@ class OperationEditorViewModel(
                         current.surfaces
                     }
                 }
-            current.copy(pricing = current.pricing.copy(kind = kind), surfaces = surfaces)
+            val customUnit = if (moulding != null) MeasureUnit.METRE else current.customUnit
+            current.copy(pricing = current.pricing.copy(kind = kind), surfaces = surfaces, customUnit = customUnit)
         }
 
-    fun onCustomQuantityChange(quantity: String) = form.update { it.copy(customQuantity = quantity) }
+    /** Switching keeps what was entered in the other mode, but only the chosen one counts. */
+    fun onQuantityModeChange(mode: QuantityMode) = updateForm { it.copy(quantityMode = mode) }
 
-    fun onCustomUnitChange(unit: MeasureUnit) = form.update { it.copy(customUnit = unit) }
+    /** Changes the typed quantity, its unit, or both. */
+    fun onCustomQuantityChange(
+        quantity: String = form.customQuantity,
+        unit: MeasureUnit = form.customUnit,
+    ) = updateForm { it.copy(customQuantity = quantity, customUnit = unit) }
 
     /** Selecting a surface of the other unit (m² vs m) starts a new selection, because they cannot be mixed. */
     fun onSurfaceToggle(surface: Surface) =
-        form.update { current ->
+        updateForm { current ->
             val surfaces =
                 when {
                     surface in current.surfaces -> current.surfaces - surface
@@ -162,7 +188,7 @@ class OperationEditorViewModel(
                     .orEmpty()
                     .map { Surface.Wall(it.number) }
                     .toSet()
-            form.update { current ->
+            updateForm { current ->
                 val surfaces =
                     when {
                         current.surfaces.containsAll(walls) -> current.surfaces - walls
@@ -174,16 +200,16 @@ class OperationEditorViewModel(
         }
     }
 
-    fun onStatusChange(status: OperationStatus) = form.update { it.copy(status = status) }
+    fun onStatusChange(status: OperationStatus) = updateForm { it.copy(status = status) }
 
-    fun onSaveAsTemplateChange(saveAsTemplate: Boolean) = form.update { it.copy(saveAsTemplate = saveAsTemplate) }
+    fun onSaveAsTemplateChange(saveAsTemplate: Boolean) = updateForm { it.copy(saveAsTemplate = saveAsTemplate) }
 
     /** Copies the template's type and prices; later edits of the template do not change this operation. */
     fun applyTemplate(template: OperationTemplate) =
-        form.update { it.copy(pricing = PricingForm.from(template.type, template.materialPrice, template.labour)) }
+        updateForm { it.copy(pricing = PricingForm.from(template.type, template.materialPrice, template.labour)) }
 
     fun save() {
-        val current = form.value
+        val current = form
         viewModelScope.launch {
             val room = roomRepository.getRoom(roomId) ?: return@launch
             val ui = OperationEditorUiState(isNew = operationId == null, room = room, form = current)
@@ -200,7 +226,7 @@ class OperationEditorViewModel(
                     OperationTemplate(Uuid.random(), operation.type, operation.materialPrice, operation.labour),
                 )
             }
-            form.update { it.copy(isSaved = true) }
+            updateForm { it.copy(isSaved = true) }
         }
     }
 
@@ -209,19 +235,24 @@ class OperationEditorViewModel(
         viewModelScope.launch {
             val room = roomRepository.getRoom(roomId) ?: return@launch
             roomRepository.saveRoom(levelId, room.copy(operations = room.operations.filterNot { it.id == id }))
-            form.update { it.copy(isSaved = true) }
+            updateForm { it.copy(isSaved = true) }
         }
+    }
+
+    private fun updateForm(change: (OperationForm) -> OperationForm) {
+        form = change(form)
     }
 
     private suspend fun load(id: Uuid) {
         val operation = roomRepository.getRoom(roomId)?.operations?.find { it.id == id }
-        form.value =
+        form =
             if (operation == null) {
                 OperationForm(isLoaded = true)
             } else {
                 val custom = operation.surfaces.filterIsInstance<Surface.Custom>().firstOrNull()
                 OperationForm(
                     pricing = PricingForm.from(operation.type, operation.materialPrice, operation.labour),
+                    quantityMode = if (custom != null) QuantityMode.CUSTOM else QuantityMode.SURFACES,
                     surfaces = operation.surfaces.filterNot { it is Surface.Custom }.toSet(),
                     customQuantity = custom?.quantity?.toSquareMetresInput().orEmpty(),
                     customUnit = custom?.unit ?: MeasureUnit.SQUARE_METRE,
