@@ -132,6 +132,115 @@ class OperationEditorViewModelTest : MainDispatcherTest() {
         }
 
     @Test
+    fun switchingBetweenMouldingTypesSwitchesTheSurface() =
+        runTest {
+            val editor = editor()
+            editor.onKindChange(OperationKind.SKIRTING)
+            editor.onKindChange(OperationKind.CROWN_MOULDING)
+            assertEquals(setOf<Surface>(Surface.CrownMoulding), editor.loaded().form.surfaces)
+
+            editor.onKindChange(OperationKind.PAINTING)
+            assertTrue(
+                editor
+                    .loaded()
+                    .form.surfaces
+                    .isEmpty(),
+            )
+        }
+
+    @Test
+    fun mouldingTypeReplacesAnAreaSelection() =
+        runTest {
+            val editor = editor()
+            editor.onSurfaceToggle(Surface.Wall(1))
+            editor.onKindChange(OperationKind.CROWN_MOULDING)
+
+            assertEquals(setOf<Surface>(Surface.CrownMoulding), editor.loaded().form.surfaces)
+        }
+
+    @Test
+    fun mouldingTypeKeepsMouldingsChosenByHand() =
+        runTest {
+            val editor = editor()
+            editor.onKindChange(OperationKind.CUSTOM)
+            editor.onSurfaceToggle(Surface.Skirting)
+            editor.onSurfaceToggle(Surface.CrownMoulding)
+            editor.onKindChange(OperationKind.SKIRTING)
+
+            assertEquals(setOf(Surface.Skirting, Surface.CrownMoulding), editor.loaded().form.surfaces)
+        }
+
+    @Test
+    fun customQuantityAloneUsesItsOwnUnit() =
+        runTest {
+            val editor = editor()
+            editor.onKindChange(OperationKind.CROWN_MOULDING)
+            editor.onSurfaceToggle(Surface.CrownMoulding)
+            editor.onCustomUnitChange(MeasureUnit.METRE)
+            editor.onCustomQuantityChange("4")
+            editor.onPricingChange(
+                editor
+                    .loaded()
+                    .form.pricing
+                    .copy(materialPrice = "10", labourMode = LabourMode.SELF_DONE),
+            )
+
+            val state = editor.loaded()
+            assertEquals(MeasureUnit.METRE, state.unit)
+            assertEquals(4.0, state.quantity, 1e-9)
+            assertEquals(Money.fromZloty(40.0), state.cost?.total)
+        }
+
+    @Test
+    fun customQuantityIsAddedToTheSelectedSurfacesInTheirUnit() =
+        runTest {
+            val editor = editor()
+            editor.onPricingChange(PricingForm(OperationKind.PAINTING, "zielony", "10", LabourMode.SELF_DONE))
+            editor.onSurfaceToggle(Surface.Ceiling)
+            editor.onCustomUnitChange(MeasureUnit.METRE)
+            editor.onCustomQuantityChange("5")
+
+            val state = editor.loaded()
+            assertEquals(MeasureUnit.SQUARE_METRE, state.customUnit)
+            assertEquals(17.0, state.quantity, 1e-9)
+
+            editor.save()
+            assertEquals(
+                setOf(Surface.Ceiling, Surface.Custom(5.0, MeasureUnit.SQUARE_METRE)),
+                savedOperations().single().surfaces,
+            )
+        }
+
+    @Test
+    fun invalidCustomQuantityBlocksSaving() =
+        runTest {
+            val editor = editor()
+            editor.onPricingChange(PricingForm(OperationKind.PRIMING))
+            editor.onCustomQuantityChange("abc")
+
+            assertTrue(editor.loaded().customQuantityError)
+            assertFalse(editor.loaded().canSave)
+        }
+
+    @Test
+    fun editingLoadsTheCustomQuantityBack() =
+        runTest {
+            val half =
+                Operation(
+                    Uuid.random(),
+                    OperationType.Painting("zielony"),
+                    setOf(Surface.Custom(4.5, MeasureUnit.SQUARE_METRE)),
+                    Money(600),
+                    Labour.SelfDone,
+                )
+            store.roomRepository.saveRoom(LEVEL_ID, room.copy(operations = listOf(half)))
+
+            val form = editor(half.id).loaded().form
+            assertEquals("4,5", form.customQuantity)
+            assertTrue(form.surfaces.isEmpty())
+        }
+
+    @Test
     fun lumpSumLabour() =
         runTest {
             val editor = editor()

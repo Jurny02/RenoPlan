@@ -1,6 +1,7 @@
 package dev.jurczyk.renoplan.data.mapper
 
 import dev.jurczyk.renoplan.domain.model.Labour
+import dev.jurczyk.renoplan.domain.model.MeasureUnit
 import dev.jurczyk.renoplan.domain.model.Money
 import dev.jurczyk.renoplan.domain.model.Operation
 import dev.jurczyk.renoplan.domain.model.OperationStatus
@@ -77,6 +78,23 @@ class OperationMappersTest {
             )
 
         assertEquals(skirting, skirting.toEntity("room", 0).toDomain())
+    }
+
+    @Test
+    fun customQuantitiesSurviveARoundTrip() {
+        val custom =
+            Operation(
+                Uuid.random(),
+                OperationType.CrownMoulding,
+                setOf(Surface.CrownMoulding, Surface.Custom(3.25, MeasureUnit.METRE)),
+                Money(2_500),
+                Labour.SelfDone,
+            )
+
+        val entity = custom.toEntity("room", 0)
+
+        assertEquals("CROWN_MOULDING,CUSTOM:METRE:3.25", entity.surfaces)
+        assertEquals(custom, entity.toDomain())
     }
 
     @Test

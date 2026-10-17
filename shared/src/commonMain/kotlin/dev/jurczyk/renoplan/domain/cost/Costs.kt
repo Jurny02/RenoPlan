@@ -24,6 +24,7 @@ fun Room.quantity(surface: Surface): Double =
         Surface.Ceiling -> ceilingArea
         Surface.Skirting -> skirtingLength.metres
         Surface.CrownMoulding -> crownMouldingLength.metres
+        is Surface.Custom -> surface.quantity
     }
 
 data class OperationCost(

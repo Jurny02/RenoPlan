@@ -58,6 +58,8 @@ Because `quantity` is derived from geometry, changing a room's dimensions update
 - The quantity of a wall surface is its net area; a wall that no longer exists (after the room's shape
   changed) counts as 0. Floor and ceiling use their areas, skirting and crown moulding their lengths
   from [03](03-calculations.md#mouldings).
+- A custom surface (`Surface.Custom`) counts its typed quantity as is, e.g. half a wall in m² or
+  crown moulding along one wall in m. An operation has at most one.
 - One operation cannot mix area surfaces (walls, floor, ceiling) with linear ones (skirting, crown
   moulding), because its prices are per unit.
 - *Done* in the summaries is the cost of operations with status `DONE`; *progress* is done ÷ total.

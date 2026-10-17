@@ -11,7 +11,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-/** A titled row of chips; [isSelected] decides which are selected, so it works for single and multiple choice. */
+/**
+ * A row of chips under an optional [title] (empty for none); [isSelected] decides which are selected,
+ * so it works for single and multiple choice.
+ */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun <T> ChoiceChips(
@@ -23,7 +26,7 @@ fun <T> ChoiceChips(
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Text(title, style = MaterialTheme.typography.labelLarge)
+        if (title.isNotEmpty()) Text(title, style = MaterialTheme.typography.labelLarge)
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             options.forEach { option ->
                 FilterChip(

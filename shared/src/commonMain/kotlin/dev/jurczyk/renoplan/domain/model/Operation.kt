@@ -59,6 +59,7 @@ val Surface.unit: MeasureUnit
         when (this) {
             Surface.Skirting, Surface.CrownMoulding -> MeasureUnit.METRE
             is Surface.Wall, Surface.Floor, Surface.Ceiling -> MeasureUnit.SQUARE_METRE
+            is Surface.Custom -> unit
         }
 
 /**

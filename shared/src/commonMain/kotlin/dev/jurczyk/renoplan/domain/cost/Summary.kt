@@ -23,6 +23,8 @@ data class SurfaceCounts(
     val ceilings: Int = 0,
     val skirtings: Int = 0,
     val crownMouldings: Int = 0,
+    /** Quantities typed by the user. */
+    val customs: Int = 0,
 ) {
     operator fun plus(other: SurfaceCounts): SurfaceCounts =
         SurfaceCounts(
@@ -31,6 +33,7 @@ data class SurfaceCounts(
             ceilings + other.ceilings,
             skirtings + other.skirtings,
             crownMouldings + other.crownMouldings,
+            customs + other.customs,
         )
 
     companion object {
@@ -41,6 +44,7 @@ data class SurfaceCounts(
                 ceilings = surfaces.count { it == Surface.Ceiling },
                 skirtings = surfaces.count { it == Surface.Skirting },
                 crownMouldings = surfaces.count { it == Surface.CrownMoulding },
+                customs = surfaces.count { it is Surface.Custom },
             )
     }
 }
