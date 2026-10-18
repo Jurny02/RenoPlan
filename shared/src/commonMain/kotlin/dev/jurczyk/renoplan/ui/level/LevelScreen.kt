@@ -86,12 +86,26 @@ fun LevelScreen(
         onBack = onBack,
         onAddRoom = onAddRoom,
         onOpenRoom = onOpenRoom,
-        onOpenOperation = onOpenOperation,
+        costsActions =
+            CostsActions(
+                onOpenOperation = onOpenOperation,
+                onEditPrices = viewModel::openBulkPrice,
+                onSelfDone = viewModel::applySelfDone,
+            ),
         onRenameRoom = viewModel::renameRoom,
         onDuplicateRoom = viewModel::duplicateRoom,
         onDeleteRoom = viewModel::deleteRoom,
         modifier = modifier,
     )
+    viewModel.bulkPriceForm?.let { form ->
+        BulkPriceSheet(
+            form = form,
+            preview = state.bulkPreview(form),
+            onPricingChange = viewModel::onBulkPricingChange,
+            onApply = viewModel::applyBulkPrice,
+            onDismiss = viewModel::dismissBulkPrice,
+        )
+    }
 }
 
 private enum class LevelTab(
@@ -113,7 +127,7 @@ fun LevelContent(
     onDuplicateRoom: (Uuid, String) -> Unit,
     onDeleteRoom: (Uuid) -> Unit,
     modifier: Modifier = Modifier,
-    onOpenOperation: (roomId: Uuid, operationId: Uuid) -> Unit = { _, _ -> },
+    costsActions: CostsActions = CostsActions(),
 ) {
     var selectedTab by rememberSaveable { mutableStateOf(LevelTab.ROOMS) }
     Scaffold(
@@ -162,7 +176,7 @@ fun LevelContent(
             }
 
             LevelTab.COSTS -> {
-                CostsTab(state = state, onOpenOperation = onOpenOperation, modifier = contentModifier)
+                CostsTab(state = state, actions = costsActions, modifier = contentModifier)
             }
         }
     }
