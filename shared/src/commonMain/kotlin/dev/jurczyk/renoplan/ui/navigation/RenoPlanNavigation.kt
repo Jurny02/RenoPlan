@@ -61,7 +61,13 @@ fun RenoPlanNavigation(
                 TopLevelDestination.entries.forEach { destination ->
                     NavigationBarItem(
                         selected = currentDestination.isOnTopLevel(destination),
-                        onClick = { navController.navigateToTopLevel(destination) },
+                        onClick = {
+                            if (currentDestination.isOnTopLevel(destination)) {
+                                navController.returnToStart(destination)
+                            } else {
+                                navController.navigateToTopLevel(destination)
+                            }
+                        },
                         icon = { Icon(painterResource(destination.icon), contentDescription = null) },
                         label = { Text(stringResource(destination.label)) },
                     )
@@ -192,6 +198,14 @@ private fun NavGraphBuilder.templatesGraph(navController: NavHostController) {
 
 private fun NavDestination?.isOnTopLevel(destination: TopLevelDestination): Boolean =
     this?.hierarchy?.any { it.hasRoute(destination.route::class) } == true
+
+/**
+ * Tapping the selected tab goes back to its first screen, as on iOS, and does nothing when already
+ * there. Navigating to the tab again would replay the screen transition for no reason.
+ */
+private fun NavHostController.returnToStart(destination: TopLevelDestination) {
+    popBackStack(destination.startRoute, inclusive = false)
+}
 
 /** Switches tabs keeping one back stack per tab, as recommended for bottom navigation. */
 private fun NavHostController.navigateToTopLevel(destination: TopLevelDestination) {

@@ -32,6 +32,9 @@ flowchart TD
     C[9. Calculator]
 ```
 
+Switching tabs keeps one back stack per tab. Tapping the selected tab returns to its start screen
+(as on iOS) and does nothing when already there.
+
 Every derived number (areas, lengths, costs) is recalculated live on every screen; nothing needs a
 "recalculate" button.
 
