@@ -329,4 +329,12 @@
     </plurals>
     <string name="bulk_price_cost">Koszt: %1$s → %2$s</string>
     <string name="bulk_price_apply">Zastosuj</string>
+
+    <!-- Wall names -->
+    <string name="wall_named">%1$s · %2$s</string>
+    <string name="wall_name_add">Nazwij ścianę</string>
+    <string name="wall_name_change">Zmień nazwę ściany</string>
+    <string name="wall_name_title">Nazwa ściany %1$d</string>
+    <string name="wall_name_label">Np. zlew, telewizor, szafa</string>
+    <string name="wall_name_hint">Puste pole usuwa nazwę.</string>
 </resources>

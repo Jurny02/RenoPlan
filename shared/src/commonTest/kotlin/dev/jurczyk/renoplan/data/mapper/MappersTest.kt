@@ -69,6 +69,21 @@ class MappersTest {
     }
 
     @Test
+    fun wallNamesSurviveARoundTrip() {
+        val named = kitchen.withWallName(1, "Zlew").withWallName(3, "Lodówka")
+
+        assertEquals(named, roundTrip(named))
+        assertEquals(
+            "Zlew",
+            named
+                .toEntities(levelId)
+                .walls
+                .first()
+                .name,
+        )
+    }
+
+    @Test
     fun rectangleShapeSurvivesARoundTrip() {
         val bathroom = Room.rectangle(Uuid.random(), "Bathroom", 2_500.mm, 2_000.mm, 2_600.mm)
 

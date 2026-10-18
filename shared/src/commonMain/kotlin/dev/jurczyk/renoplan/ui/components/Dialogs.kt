@@ -37,6 +37,9 @@ fun NameDialog(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
     initialName: String = "",
+    /** Lets the user confirm an empty name, e.g. to remove an optional one. */
+    allowBlank: Boolean = false,
+    supportingText: String? = null,
 ) {
     var field by rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(TextFieldValue(initialName, selection = TextRange(0, initialName.length)))
@@ -44,7 +47,7 @@ fun NameDialog(
     val name = field.text
     val focusRequester = remember { FocusRequester() }
     LaunchedEffect(focusRequester) { focusRequester.requestFocus() }
-    val confirm = { if (name.isNotBlank()) onConfirm(name) }
+    val confirm = { if (allowBlank || name.isNotBlank()) onConfirm(name) }
     AlertDialog(
         onDismissRequest = onDismiss,
         modifier = modifier,
@@ -58,11 +61,14 @@ fun NameDialog(
                 keyboardOptions =
                     KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onDone = { confirm() }),
+                supportingText = supportingText?.let { { Text(it) } },
                 modifier = Modifier.focusRequester(focusRequester),
             )
         },
         confirmButton = {
-            TextButton(onClick = confirm, enabled = name.isNotBlank()) { Text(stringResource(Res.string.action_save)) }
+            TextButton(onClick = confirm, enabled = allowBlank || name.isNotBlank()) {
+                Text(stringResource(Res.string.action_save))
+            }
         },
         dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(Res.string.action_cancel)) } },
     )

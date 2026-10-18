@@ -146,6 +146,17 @@ class RoomDetailsViewModel(
         }
     }
 
+    /** Names wall [number], e.g. "Zlew"; a blank [name] removes it. */
+    fun renameWall(
+        number: Int,
+        name: String,
+    ) {
+        viewModelScope.launch {
+            val room = roomRepository.getRoom(roomId) ?: return@launch
+            roomRepository.saveRoom(levelId, room.withWallName(number, name))
+        }
+    }
+
     /** Moves the operation's status on: to do → in progress → done → to do. */
     fun cycleStatus(operationId: Uuid) {
         viewModelScope.launch {

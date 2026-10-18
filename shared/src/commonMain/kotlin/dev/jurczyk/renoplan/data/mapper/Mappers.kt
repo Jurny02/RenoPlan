@@ -40,6 +40,7 @@ fun RoomWithWalls.toDomain(): Room {
                     length = Millimetres(wall.lengthMm),
                     turn = Turn.valueOf(wall.turn),
                     openings = openingsByWall[wall.number].orEmpty().map { it.toDomain() },
+                    name = wall.name,
                 )
             },
         shapeInput = room.toShapeInput(),
@@ -77,6 +78,7 @@ fun Room.toEntities(levelId: Uuid): RoomEntities {
                     number = it.number,
                     lengthMm = it.length.value,
                     turn = it.turn.name,
+                    name = it.name,
                 )
             },
         openings =

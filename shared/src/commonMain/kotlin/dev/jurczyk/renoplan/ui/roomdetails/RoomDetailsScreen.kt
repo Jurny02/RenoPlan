@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -44,7 +45,9 @@ import dev.jurczyk.renoplan.domain.model.mm
 import dev.jurczyk.renoplan.presentation.roomdetails.RoomDetailsUiState
 import dev.jurczyk.renoplan.presentation.roomdetails.RoomDetailsViewModel
 import dev.jurczyk.renoplan.ui.components.BackButton
+import dev.jurczyk.renoplan.ui.components.NameDialog
 import dev.jurczyk.renoplan.ui.format.formatDecimal
+import dev.jurczyk.renoplan.ui.operation.wallLabel
 import dev.jurczyk.renoplan.ui.theme.RenoPlanTheme
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.pluralStringResource
@@ -73,6 +76,11 @@ import renoplan.shared.generated.resources.room_summary_open
 import renoplan.shared.generated.resources.unit_cubic_metres
 import renoplan.shared.generated.resources.unit_metres
 import renoplan.shared.generated.resources.unit_square_metres
+import renoplan.shared.generated.resources.wall_name_add
+import renoplan.shared.generated.resources.wall_name_change
+import renoplan.shared.generated.resources.wall_name_hint
+import renoplan.shared.generated.resources.wall_name_label
+import renoplan.shared.generated.resources.wall_name_title
 import kotlin.uuid.Uuid
 
 @Composable
@@ -97,6 +105,7 @@ fun RoomDetailsScreen(
         onBack = onBack,
         onEditShape = onEditShape,
         onOpenSummary = onOpenSummary,
+        onRenameWall = viewModel::renameWall,
         onAddOpening = viewModel::addOpening,
         onEditOpening = viewModel::editOpening,
         operationActions =
@@ -130,8 +139,10 @@ fun RoomDetailsContent(
     operationActions: OperationActions,
     modifier: Modifier = Modifier,
     onOpenSummary: () -> Unit = {},
+    onRenameWall: (number: Int, name: String) -> Unit = { _, _ -> },
 ) {
     var expandedWall by rememberSaveable { mutableStateOf<Int?>(null) }
+    var renamingWall by remember { mutableStateOf<Wall?>(null) }
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -165,26 +176,74 @@ fun RoomDetailsContent(
                     Text(stringResource(Res.string.room_summary_open))
                 }
             }
-            item {
-                Text(
-                    text = stringResource(Res.string.room_details_walls),
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(top = 8.dp),
-                )
-            }
-            items(room.walls, key = { it.number }) { wall ->
-                WallCard(
-                    room = room,
-                    wall = wall,
-                    expanded = expandedWall == wall.number,
-                    onToggle = { expandedWall = if (expandedWall == wall.number) null else wall.number },
-                    onAddOpening = { onAddOpening(wall.number) },
-                    onEditOpening = onEditOpening,
-                )
-            }
+            wallsSection(
+                room = room,
+                expandedWall = expandedWall,
+                onToggle = { number -> expandedWall = if (expandedWall == number) null else number },
+                onAddOpening = onAddOpening,
+                onEditOpening = onEditOpening,
+                onRename = { renamingWall = it },
+            )
             operationsSection(state, operationActions)
         }
     }
+    renamingWall?.let { wall ->
+        WallNameDialog(
+            wall = wall,
+            onConfirm = {
+                onRenameWall(wall.number, it)
+                renamingWall = null
+            },
+            onDismiss = { renamingWall = null },
+        )
+    }
+}
+
+private fun LazyListScope.wallsSection(
+    room: Room,
+    expandedWall: Int?,
+    onToggle: (Int) -> Unit,
+    onAddOpening: (Int) -> Unit,
+    onEditOpening: (Uuid) -> Unit,
+    onRename: (Wall) -> Unit,
+) {
+    item {
+        Text(
+            text = stringResource(Res.string.room_details_walls),
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(top = 8.dp),
+        )
+    }
+    items(room.walls, key = { it.number }) { wall ->
+        WallCard(
+            room = room,
+            wall = wall,
+            expanded = expandedWall == wall.number,
+            onToggle = { onToggle(wall.number) },
+            onAddOpening = { onAddOpening(wall.number) },
+            onEditOpening = onEditOpening,
+            onRename = { onRename(wall) },
+        )
+    }
+}
+
+@Composable
+private fun WallNameDialog(
+    wall: Wall,
+    onConfirm: (String) -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    NameDialog(
+        title = stringResource(Res.string.wall_name_title, wall.number),
+        label = stringResource(Res.string.wall_name_label),
+        initialName = wall.name.orEmpty(),
+        allowBlank = true,
+        supportingText = stringResource(Res.string.wall_name_hint),
+        onConfirm = onConfirm,
+        onDismiss = onDismiss,
+        modifier = modifier,
+    )
 }
 
 /** Operation callbacks, grouped to keep [RoomDetailsContent]'s signature short. */
@@ -279,6 +338,7 @@ private fun WallCard(
     onToggle: () -> Unit,
     onAddOpening: () -> Unit,
     onEditOpening: (Uuid) -> Unit,
+    onRename: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(modifier = modifier.fillMaxWidth()) {
@@ -286,10 +346,7 @@ private fun WallCard(
             modifier = Modifier.clickable(onClick = onToggle).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            Text(
-                stringResource(Res.string.room_details_wall, wall.number),
-                style = MaterialTheme.typography.titleMedium,
-            )
+            Text(wallLabel(wall.number, wall.name), style = MaterialTheme.typography.titleMedium)
             Text(
                 text =
                     stringResource(
@@ -306,7 +363,7 @@ private fun WallCard(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
-        if (expanded) WallOpenings(wall, onAddOpening, onEditOpening)
+        if (expanded) WallOpenings(wall, onAddOpening, onEditOpening, onRename)
     }
 }
 
@@ -315,6 +372,7 @@ private fun WallOpenings(
     wall: Wall,
     onAddOpening: () -> Unit,
     onEditOpening: (Uuid) -> Unit,
+    onRename: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
@@ -330,6 +388,9 @@ private fun WallOpenings(
         TextButton(onClick = onAddOpening, modifier = Modifier.padding(horizontal = 8.dp)) {
             Icon(painterResource(Res.drawable.ic_add), contentDescription = null)
             Text(stringResource(Res.string.opening_add_on_wall, wall.number), modifier = Modifier.padding(start = 8.dp))
+        }
+        TextButton(onClick = onRename, modifier = Modifier.padding(horizontal = 8.dp)) {
+            Text(stringResource(if (wall.name == null) Res.string.wall_name_add else Res.string.wall_name_change))
         }
     }
 }

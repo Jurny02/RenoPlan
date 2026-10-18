@@ -44,6 +44,7 @@ A rectangle is just a convenience: `Rectangle(length, width)` generates four wal
 | length | Millimetres | |
 | turn | `LEFT` \| `RIGHT` | direction of the 90° turn at the end of this wall |
 | openings | List<Opening> | |
+| name | String? | optional label to recognise the wall, e.g. "Zlew", "Telewizor"; kept by wall number when the shape changes |
 
 ## Opening
 

@@ -118,7 +118,9 @@ The main working screen of a room.
 - Header: floor, ceiling, net walls, perimeter, skirting, volume. Button **Edit shape** → Room editor.
   Button **Room summary** → the Summary filtered to this room (screen 7).
 - **Walls** section: row per wall `Wall 1 – 3.20 m – 7.20 m² net – 2 openings`; tap a wall to see its
-  openings (tap an opening to edit it); **Add opening** → Opening sheet. The floating **Add opening**
+  openings (tap an opening to edit it); **Add opening** → Opening sheet; **Name the wall** gives it a
+  label such as "Zlew" or "Szafa" (empty removes it). A named wall shows as "Wall 1 · Zlew" here, in
+  the Operation editor's surface chips and in the Opening sheet's wall picker. The floating **Add opening**
   button preselects the expanded wall, or wall 1.
 - **Operations** section: row per operation with type, surfaces, quantity, cost and status chip;
   tap the status chip to cycle *to do → in progress → done*; **Add operation** → Operation editor.
