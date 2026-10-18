@@ -2,6 +2,7 @@ package dev.jurczyk.renoplan.ui.roomdetails
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,8 +28,10 @@ import dev.jurczyk.renoplan.domain.model.Surface
 import dev.jurczyk.renoplan.domain.model.mm
 import dev.jurczyk.renoplan.presentation.roomdetails.RoomDetailsUiState
 import dev.jurczyk.renoplan.presentation.roomdetails.RoomDetailsViewModel
+import dev.jurczyk.renoplan.ui.components.AppCard
 import dev.jurczyk.renoplan.ui.components.BackButton
 import dev.jurczyk.renoplan.ui.level.summaryItems
+import dev.jurczyk.renoplan.ui.roomeditor.OutlinePreview
 import dev.jurczyk.renoplan.ui.theme.RenoPlanTheme
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -74,12 +77,18 @@ fun RoomSummaryContent(
             )
         },
     ) { padding ->
-        if (state.room == null) return@Scaffold
+        val room = state.room ?: return@Scaffold
         LazyColumn(
             modifier = Modifier.padding(padding),
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
+            // The numbered walls, so quantities can be matched to the real room.
+            if (room.walls.isNotEmpty()) {
+                item(key = "outline") {
+                    AppCard(modifier = Modifier.fillMaxWidth()) { OutlinePreview(walls = room.walls) }
+                }
+            }
             summaryItems(state.geometryTotals, state.operationGroups, key = "room")
         }
     }
