@@ -6,9 +6,12 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Shows the launch screen from Theme.RenoPlan.Starting until the first frame is drawn.
+        installSplashScreen()
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
