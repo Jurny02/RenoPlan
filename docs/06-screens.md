@@ -61,6 +61,10 @@ Levels list.
 Last page: **Create your first level** (asks for a name, opens the Level) or **Skip**.
 A "seen" flag is stored locally so onboarding does not show again.
 
+As built: the pages swipe or move on with **Next**; **Skip** is in the top corner of every page, and
+the bottom bar is hidden while onboarding is open. Skipping, finishing or creating a level marks it
+seen (`AppSettings.onboardingSeen`). Reopened from the help icon, it returns to the Levels list.
+
 ## 1. Levels list
 
 Home screen of the Project tab.

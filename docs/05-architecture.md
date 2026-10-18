@@ -66,7 +66,8 @@ Icons are vector drawables in `composeResources/drawable/`.
 
 ## Persistence
 
-Room KMP with the bundled SQLite driver; small settings in multiplatform-settings.
+Room KMP with the bundled SQLite driver; small settings in multiplatform-settings (`AppSettings`,
+e.g. whether onboarding was seen, implemented by `data/settings/LocalAppSettings`).
 Dependency injection with Koin, navigation with Navigation Compose
 ([ADR 0004](adr/0004-core-libraries.md)).
 

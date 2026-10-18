@@ -2,6 +2,10 @@ package dev.jurczyk.renoplan.ui.navigation
 
 import kotlinx.serialization.Serializable
 
+/** Onboarding: the start screen on the first run, later reopened from the help icon. */
+@Serializable
+data object OnboardingRoute
+
 /** The Project tab: levels, a level and its rooms. */
 @Serializable
 data object ProjectGraph

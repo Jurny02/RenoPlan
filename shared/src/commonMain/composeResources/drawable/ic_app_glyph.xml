@@ -1,0 +1,23 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="96dp"
+    android:height="96dp"
+    android:viewportWidth="60"
+    android:viewportHeight="60">
+    <!-- The app icon's glyph (see androidApp/.../ic_launcher_foreground.xml), cropped to its outline. -->
+    <group
+        android:translateX="-24"
+        android:translateY="-22">
+        <path
+            android:pathData="M32,40 L76,40 L76,66 L64,66 L64,78 L32,78 Z"
+            android:strokeWidth="5"
+            android:strokeColor="#FF000000"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round" />
+        <path
+            android:pathData="M32,30 L76,30 M32,26 L32,34 M76,26 L76,34"
+            android:strokeWidth="3"
+            android:strokeColor="#FF000000"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round" />
+    </group>
+</vector>

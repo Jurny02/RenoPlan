@@ -12,6 +12,21 @@
 
     <string name="placeholder_coming_soon">Wkrótce</string>
 
+    <!-- Onboarding -->
+    <string name="onboarding_open">Jak to działa</string>
+    <string name="onboarding_skip">Pomiń</string>
+    <string name="onboarding_next">Dalej</string>
+    <string name="onboarding_create_level">Utwórz pierwszy poziom</string>
+    <string name="onboarding_page">Strona %1$d z %2$d</string>
+    <string name="onboarding_plan_title">Zaplanuj remont</string>
+    <string name="onboarding_plan_text">Pokoje, powierzchnie, prace i koszty w jednym miejscu. Gdy zmienisz wymiary, wszystko przeliczy się samo.</string>
+    <string name="onboarding_measure_title">Zmierz pokoje</string>
+    <string name="onboarding_measure_text">Podaj wymiary prostokąta albo obrys ściana po ścianie. Ściany są ponumerowane, a okna i drzwi odejmują się od ich powierzchni.</string>
+    <string name="onboarding_work_title">Dodaj prace i ceny</string>
+    <string name="onboarding_work_text">Malowanie, gładź, płytki czy listwy na ścianach, podłodze i suficie. Wpisz cenę materiału i robocizny albo zaznacz, że robisz sam.</string>
+    <string name="onboarding_track_title">Śledź koszty i postęp</string>
+    <string name="onboarding_track_text">Podsumowanie pokoju albo całego poziomu. Oznaczaj prace jako zrobione i sprawdzaj, ile zostało do wydania.</string>
+
     <!-- Calculator -->
     <string name="calculator_package_price_label">Cena opakowania</string>
     <string name="calculator_amount_label">Ilość w opakowaniu</string>

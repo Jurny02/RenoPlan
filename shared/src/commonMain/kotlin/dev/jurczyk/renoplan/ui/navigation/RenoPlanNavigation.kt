@@ -9,6 +9,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.navigation.NavDestination
@@ -23,10 +24,12 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import dev.jurczyk.renoplan.domain.repository.AppSettings
 import dev.jurczyk.renoplan.ui.calculator.CalculatorScreen
 import dev.jurczyk.renoplan.ui.components.hideKeyboardOnTapOrDrag
 import dev.jurczyk.renoplan.ui.level.LevelScreen
 import dev.jurczyk.renoplan.ui.levels.LevelsScreen
+import dev.jurczyk.renoplan.ui.onboarding.OnboardingScreen
 import dev.jurczyk.renoplan.ui.operation.OperationEditorScreen
 import dev.jurczyk.renoplan.ui.roomdetails.RoomDetailsScreen
 import dev.jurczyk.renoplan.ui.roomdetails.RoomSummaryScreen
@@ -35,6 +38,7 @@ import dev.jurczyk.renoplan.ui.templates.TemplateEditorScreen
 import dev.jurczyk.renoplan.ui.templates.TemplatesScreen
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 import kotlin.uuid.Uuid
 
 @Composable
@@ -44,11 +48,15 @@ fun RenoPlanNavigation(
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
+    val appSettings = koinInject<AppSettings>()
+    // Read once: the flag only decides where the app starts.
+    val startDestination: Any = remember { if (appSettings.onboardingSeen) ProjectGraph else OnboardingRoute }
 
     val focusManager = LocalFocusManager.current
     Scaffold(
         modifier = modifier.hideKeyboardOnTapOrDrag(focusManager),
         bottomBar = {
+            if (currentDestination?.hasRoute(OnboardingRoute::class) == true) return@Scaffold
             NavigationBar {
                 TopLevelDestination.entries.forEach { destination ->
                     NavigationBarItem(
@@ -63,7 +71,7 @@ fun RenoPlanNavigation(
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = ProjectGraph,
+            startDestination = startDestination,
             // Screens have their own Scaffold; consuming the insets keeps them from padding twice.
             modifier = Modifier.padding(innerPadding).consumeWindowInsets(innerPadding),
             enterTransition = enterTransition,
@@ -71,6 +79,15 @@ fun RenoPlanNavigation(
             popEnterTransition = popEnterTransition,
             popExitTransition = popExitTransition,
         ) {
+            composable<OnboardingRoute> {
+                OnboardingScreen(
+                    onDone = { navController.leaveOnboarding() },
+                    onOpenLevel = { levelId ->
+                        navController.leaveOnboarding()
+                        navController.navigate(LevelRoute(levelId.toString()))
+                    },
+                )
+            }
             projectGraph(navController)
             templatesGraph(navController)
             composable<CalculatorRoute> { CalculatorScreen() }
@@ -78,10 +95,20 @@ fun RenoPlanNavigation(
     }
 }
 
+/** Back to where onboarding was opened from, or into the app after the first run. */
+private fun NavHostController.leaveOnboarding() {
+    if (!popBackStack()) {
+        navigate(ProjectGraph) { popUpTo(OnboardingRoute) { inclusive = true } }
+    }
+}
+
 private fun NavGraphBuilder.projectGraph(navController: NavHostController) {
     navigation<ProjectGraph>(startDestination = LevelsRoute) {
         composable<LevelsRoute> {
-            LevelsScreen(onOpenLevel = { navController.navigate(LevelRoute(it.toString())) })
+            LevelsScreen(
+                onOpenLevel = { navController.navigate(LevelRoute(it.toString())) },
+                onOpenHelp = { navController.navigate(OnboardingRoute) },
+            )
         }
         composable<LevelRoute> { entry ->
             val route = entry.toRoute<LevelRoute>()
