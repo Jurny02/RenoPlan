@@ -1,16 +1,20 @@
 package dev.jurczyk.renoplan.di
 
+import com.russhwolf.settings.Settings
 import dev.jurczyk.renoplan.data.local.RenoPlanDatabase
 import dev.jurczyk.renoplan.data.local.buildDatabase
 import dev.jurczyk.renoplan.data.repository.LocalLevelRepository
 import dev.jurczyk.renoplan.data.repository.LocalRoomRepository
 import dev.jurczyk.renoplan.data.repository.LocalTemplateRepository
+import dev.jurczyk.renoplan.data.settings.LocalAppSettings
+import dev.jurczyk.renoplan.domain.repository.AppSettings
 import dev.jurczyk.renoplan.domain.repository.LevelRepository
 import dev.jurczyk.renoplan.domain.repository.RoomRepository
 import dev.jurczyk.renoplan.domain.repository.TemplateRepository
 import dev.jurczyk.renoplan.presentation.calculator.CalculatorViewModel
 import dev.jurczyk.renoplan.presentation.level.LevelViewModel
 import dev.jurczyk.renoplan.presentation.levels.LevelsViewModel
+import dev.jurczyk.renoplan.presentation.onboarding.OnboardingViewModel
 import dev.jurczyk.renoplan.presentation.operation.OperationEditorViewModel
 import dev.jurczyk.renoplan.presentation.roomdetails.RoomDetailsViewModel
 import dev.jurczyk.renoplan.presentation.roomeditor.RoomEditorViewModel
@@ -34,6 +38,8 @@ val dataModule =
         singleOf(::LocalLevelRepository) bind LevelRepository::class
         singleOf(::LocalRoomRepository) bind RoomRepository::class
         singleOf(::LocalTemplateRepository) bind TemplateRepository::class
+        single<Settings> { Settings() }
+        singleOf(::LocalAppSettings) bind AppSettings::class
     }
 
 /** Use cases and calculations. */
@@ -51,6 +57,7 @@ val presentationModule =
             OperationEditorViewModel(levelId, roomId, operationId, get(), get())
         }
         viewModelOf(::TemplatesViewModel)
+        viewModelOf(::OnboardingViewModel)
         viewModel { (templateId: Uuid?) -> TemplateEditorViewModel(templateId, get()) }
     }
 
