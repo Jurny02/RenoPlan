@@ -49,6 +49,43 @@ import kotlin.uuid.Uuid
 // A faint tint behind the selected tab icon.
 private const val NAV_INDICATOR_ALPHA = 0.12f
 
+/** Bottom bar with the top-level tabs; tapping the current tab goes back to its start screen. */
+@Composable
+private fun AppNavigationBar(
+    currentDestination: NavDestination?,
+    navController: NavHostController,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier) {
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+        NavigationBar(containerColor = MaterialTheme.colorScheme.surfaceContainerLow, tonalElevation = 0.dp) {
+            TopLevelDestination.entries.forEach { destination ->
+                NavigationBarItem(
+                    selected = currentDestination.isOnTopLevel(destination),
+                    onClick = {
+                        if (currentDestination.isOnTopLevel(destination)) {
+                            navController.returnToStart(destination)
+                        } else {
+                            navController.navigateToTopLevel(destination)
+                        }
+                    },
+                    icon = { Icon(painterResource(destination.icon), contentDescription = null) },
+                    label = { Text(stringResource(destination.label)) },
+                    colors =
+                        NavigationBarItemDefaults.colors(
+                            selectedIconColor = MaterialTheme.colorScheme.primary,
+                            selectedTextColor = MaterialTheme.colorScheme.primary,
+                            indicatorColor =
+                                MaterialTheme.colorScheme.primary.copy(
+                                    alpha = NAV_INDICATOR_ALPHA,
+                                ),
+                        ),
+                )
+            }
+        }
+    }
+}
+
 @Composable
 fun RenoPlanNavigation(
     modifier: Modifier = Modifier,
@@ -65,28 +102,7 @@ fun RenoPlanNavigation(
         modifier = modifier.hideKeyboardOnTapOrDrag(focusManager),
         bottomBar = {
             if (currentDestination?.hasRoute(OnboardingRoute::class) == true) return@Scaffold
-            Column {
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                NavigationBar(containerColor = MaterialTheme.colorScheme.surfaceContainerLow, tonalElevation = 0.dp) {
-                    TopLevelDestination.entries.forEach { destination ->
-                        NavigationBarItem(
-                            selected = currentDestination.isOnTopLevel(destination),
-                            onClick = { navController.navigateToTopLevel(destination) },
-                            icon = { Icon(painterResource(destination.icon), contentDescription = null) },
-                            label = { Text(stringResource(destination.label)) },
-                            colors =
-                                NavigationBarItemDefaults.colors(
-                                    selectedIconColor = MaterialTheme.colorScheme.primary,
-                                    selectedTextColor = MaterialTheme.colorScheme.primary,
-                                    indicatorColor =
-                                        MaterialTheme.colorScheme.primary.copy(
-                                            alpha = NAV_INDICATOR_ALPHA,
-                                        ),
-                                ),
-                        )
-                    }
-                }
-            }
+            AppNavigationBar(currentDestination, navController)
         },
     ) { innerPadding ->
         NavHost(
@@ -212,6 +228,14 @@ private fun NavGraphBuilder.templatesGraph(navController: NavHostController) {
 
 private fun NavDestination?.isOnTopLevel(destination: TopLevelDestination): Boolean =
     this?.hierarchy?.any { it.hasRoute(destination.route::class) } == true
+
+/**
+ * Tapping the selected tab goes back to its first screen, as on iOS, and does nothing when already
+ * there. Navigating to the tab again would replay the screen transition for no reason.
+ */
+private fun NavHostController.returnToStart(destination: TopLevelDestination) {
+    popBackStack(destination.startRoute, inclusive = false)
+}
 
 /** Switches tabs keeping one back stack per tab, as recommended for bottom navigation. */
 private fun NavHostController.navigateToTopLevel(destination: TopLevelDestination) {
