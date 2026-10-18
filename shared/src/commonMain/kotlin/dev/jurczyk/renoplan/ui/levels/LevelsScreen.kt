@@ -12,6 +12,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -45,6 +46,7 @@ import renoplan.shared.generated.resources.Res
 import renoplan.shared.generated.resources.action_delete
 import renoplan.shared.generated.resources.action_rename
 import renoplan.shared.generated.resources.ic_add
+import renoplan.shared.generated.resources.ic_help
 import renoplan.shared.generated.resources.level_add
 import renoplan.shared.generated.resources.level_card_details
 import renoplan.shared.generated.resources.level_delete_text
@@ -55,6 +57,7 @@ import renoplan.shared.generated.resources.level_room_count
 import renoplan.shared.generated.resources.levels_empty_action
 import renoplan.shared.generated.resources.levels_empty_text
 import renoplan.shared.generated.resources.levels_empty_title
+import renoplan.shared.generated.resources.onboarding_open
 import renoplan.shared.generated.resources.screen_levels
 import renoplan.shared.generated.resources.unit_square_metres
 import kotlin.uuid.Uuid
@@ -62,6 +65,7 @@ import kotlin.uuid.Uuid
 @Composable
 fun LevelsScreen(
     onOpenLevel: (Uuid) -> Unit,
+    onOpenHelp: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: LevelsViewModel = koinViewModel(),
 ) {
@@ -72,6 +76,24 @@ fun LevelsScreen(
         onAddLevel = viewModel::addLevel,
         onRenameLevel = viewModel::renameLevel,
         onDeleteLevel = viewModel::deleteLevel,
+        modifier = modifier,
+        onOpenHelp = onOpenHelp,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun LevelsTopBar(
+    onOpenHelp: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    TopAppBar(
+        title = { Text(stringResource(Res.string.screen_levels)) },
+        actions = {
+            IconButton(onClick = onOpenHelp) {
+                Icon(painterResource(Res.drawable.ic_help), stringResource(Res.string.onboarding_open))
+            }
+        },
         modifier = modifier,
     )
 }
@@ -97,11 +119,12 @@ fun LevelsContent(
     onRenameLevel: (Uuid, String) -> Unit,
     onDeleteLevel: (Uuid) -> Unit,
     modifier: Modifier = Modifier,
+    onOpenHelp: () -> Unit = {},
 ) {
     var dialog by remember { mutableStateOf<LevelDialog?>(null) }
     Scaffold(
         modifier = modifier,
-        topBar = { TopAppBar(title = { Text(stringResource(Res.string.screen_levels)) }) },
+        topBar = { LevelsTopBar(onOpenHelp) },
         floatingActionButton = {
             if (state.levels.isNotEmpty()) {
                 ExtendedFloatingActionButton(
