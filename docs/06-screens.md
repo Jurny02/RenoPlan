@@ -206,7 +206,9 @@ Money: what it costs and how prices are set. Costs tab of a Level.
   and apply them to every operation of that type on the level. Shows how many operations will change
   and the cost before → after.
 - Toggle labour **I do it myself** for a whole group, to see quickly how much doing it yourself saves.
-- *Edit price for all* and the group-wide *I do it myself* toggle are not built yet.
+- Both live in the menu (⋮) of a type group in the **By operation type** view. *I do it myself* asks
+  for confirmation, showing the saving, and keeps material prices; to bring labour back, use
+  *Edit price for all*. Both change the stored operations, not just the view.
 - Levels list cards show each level's total, so the cost of the whole apartment is visible on the
   home screen.
 

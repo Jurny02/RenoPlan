@@ -50,6 +50,8 @@ fun PricingFields(
     onPricingChange: (PricingForm) -> Unit,
     modifier: Modifier = Modifier,
     onKindChange: (OperationKind) -> Unit = { onPricingChange(pricing.copy(kind = it)) },
+    /** `false` when the type is fixed, e.g. when changing prices for a whole group. */
+    showType: Boolean = true,
 ) {
     val unitPrice =
         stringResource(
@@ -61,14 +63,16 @@ fun PricingFields(
         )
     val priceError = stringResource(Res.string.operation_price_error)
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        ChoiceChips(
-            title = stringResource(Res.string.operation_type_label),
-            options = OperationKind.entries,
-            selected = pricing.kind,
-            optionLabel = { stringResource(it.label) },
-            onSelect = onKindChange,
-        )
-        if (pricing.needsText) TypeTextField(pricing, onPricingChange)
+        if (showType) {
+            ChoiceChips(
+                title = stringResource(Res.string.operation_type_label),
+                options = OperationKind.entries,
+                selected = pricing.kind,
+                optionLabel = { stringResource(it.label) },
+                onSelect = onKindChange,
+            )
+            if (pricing.needsText) TypeTextField(pricing, onPricingChange)
+        }
         UnitTextField(
             value = pricing.materialPrice,
             onValueChange = { onPricingChange(pricing.copy(materialPrice = it)) },

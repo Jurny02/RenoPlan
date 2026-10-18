@@ -313,4 +313,20 @@
     <!-- Single-room summary -->
     <string name="room_summary_open">Podsumowanie pokoju</string>
     <string name="room_summary_title">Podsumowanie: %1$s</string>
+
+    <!-- Edit price for all -->
+    <string name="costs_edit_price_all">Edytuj cenę dla wszystkich</string>
+    <string name="costs_self_done_all">Robię sam dla wszystkich</string>
+    <string name="costs_self_done_title">Robię sam dla całej grupy?</string>
+    <string name="costs_self_done_text">Robocizna w operacjach „%1$s” na tym poziomie zostanie ustawiona na „robię sam”. Oszczędzasz %2$s. Ceny materiału się nie zmienią.</string>
+    <string name="costs_self_done_confirm">Ustaw</string>
+    <string name="bulk_price_title">Edytuj cenę dla wszystkich</string>
+    <plurals name="bulk_price_count">
+        <item quantity="one">Zmieni się %1$d operacja</item>
+        <item quantity="few">Zmienią się %1$d operacje</item>
+        <item quantity="many">Zmieni się %1$d operacji</item>
+        <item quantity="other">Zmieni się %1$d operacji</item>
+    </plurals>
+    <string name="bulk_price_cost">Koszt: %1$s → %2$s</string>
+    <string name="bulk_price_apply">Zastosuj</string>
 </resources>
