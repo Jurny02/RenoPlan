@@ -20,11 +20,13 @@ const val DATABASE_NAME = "renoplan.db"
         OperationEntity::class,
         TemplateEntity::class,
     ],
-    version = 2,
+    version = 3,
     exportSchema = true,
     autoMigrations = [
         // Adds the operations and templates tables.
         AutoMigration(from = 1, to = 2),
+        // Adds the walls.name column.
+        AutoMigration(from = 2, to = 3),
     ],
 )
 @ConstructedBy(RenoPlanDatabaseConstructor::class)

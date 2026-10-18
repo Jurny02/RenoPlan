@@ -76,4 +76,21 @@ class RoomTest {
         assertEquals(emptyList(), changed.walls[0].openings)
         assertEquals(listOf(window), changed.walls[3].openings)
     }
+
+    @Test
+    fun wallNamesStayWithTheirWallNumber() {
+        val named = room.withWallName(1, "  Zlew ").withWallName(4, "Szafa")
+        assertEquals("Zlew", named.walls[0].name)
+
+        val changed = named.withWalls(ShapeInput.Rectangle(4_000.mm, 2_000.mm).toWalls().take(3))
+
+        assertEquals(listOf("Zlew", null, null), changed.walls.map { it.name })
+    }
+
+    @Test
+    fun blankWallNameRemovesIt() {
+        val named = room.withWallName(2, "Telewizor")
+
+        assertEquals(null, named.withWallName(2, "   ").walls[1].name)
+    }
 }

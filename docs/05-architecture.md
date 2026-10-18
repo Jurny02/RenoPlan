@@ -85,7 +85,8 @@ Dependency injection with Koin, navigation with Navigation Compose
   the platform builder comes from Koin's `platformModule` (Android: app context, iOS: Documents folder).
 - Schemas are exported to `shared/schemas/` and committed. Every schema change bumps the version and
   comes with a migration (an `AutoMigration` where Room can derive it), because the app is already
-  installed on test devices. Version 2 added `operations` and `templates`.
+  installed on test devices. Version 2 added `operations` and `templates`; version 3 added
+  `walls.name`.
 - Database tests run in `iosTest` on the simulator, because the Android database builder needs a `Context`
   and the JVM host tests have no Robolectric; entity mappers are tested in `commonTest`.
 

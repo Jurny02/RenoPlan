@@ -27,12 +27,27 @@ data class Room(
         )
 
     /**
-     * Replaces the walls, keeping each old wall's openings on the wall with the same number.
-     * Openings of walls that no longer exist are dropped.
+     * Replaces the walls, keeping each old wall's openings and name on the wall with the same number.
+     * Openings and names of walls that no longer exist are dropped.
      */
     fun withWalls(newWalls: List<Wall>): Room {
-        val openingsByNumber = walls.associate { it.number to it.openings }
-        return copy(walls = newWalls.map { it.copy(openings = openingsByNumber[it.number].orEmpty()) })
+        val oldByNumber = walls.associateBy { it.number }
+        return copy(
+            walls =
+                newWalls.map { wall ->
+                    val old = oldByNumber[wall.number]
+                    wall.copy(openings = old?.openings.orEmpty(), name = old?.name)
+                },
+        )
+    }
+
+    /** Names wall [number]; a blank [name] removes the name. */
+    fun withWallName(
+        number: Int,
+        name: String,
+    ): Room {
+        val trimmed = name.trim().takeIf { it.isNotEmpty() }
+        return copy(walls = walls.map { if (it.number == number) it.copy(name = trimmed) else it })
     }
 
     /**

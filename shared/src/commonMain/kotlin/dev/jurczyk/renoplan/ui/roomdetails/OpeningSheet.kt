@@ -71,6 +71,7 @@ import renoplan.shared.generated.resources.unit_metres_short
 import renoplan.shared.generated.resources.unit_square_metres
 import renoplan.shared.generated.resources.unit_square_metres_short
 import renoplan.shared.generated.resources.value_missing
+import renoplan.shared.generated.resources.wall_named
 import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -141,7 +142,14 @@ fun OpeningSheetContent(
                     .orEmpty()
                     .map { it.number },
             selected = form.wallNumber,
-            optionLabel = { it.toString() },
+            optionLabel = { number ->
+                val name =
+                    state.room
+                        ?.walls
+                        ?.find { it.number == number }
+                        ?.name
+                if (name == null) number.toString() else stringResource(Res.string.wall_named, number.toString(), name)
+            },
             onSelect = { onFormChange(form.copy(wallNumber = it)) },
         )
         StartsAtFloorRow(form, onFormChange)

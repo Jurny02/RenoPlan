@@ -44,6 +44,7 @@ import renoplan.shared.generated.resources.template_labour_self_done
 import renoplan.shared.generated.resources.unit_metres
 import renoplan.shared.generated.resources.unit_square_metres
 import renoplan.shared.generated.resources.unit_zloty
+import renoplan.shared.generated.resources.wall_named
 
 val OperationKind.label: StringResource
     get() =
@@ -98,6 +99,16 @@ fun operationTypeLabel(type: OperationType): String =
             type.name
         }
     }
+
+/** "Ściana 1", or "Ściana 1 · Zlew" when the wall has a name. */
+@Composable
+fun wallLabel(
+    number: Int,
+    name: String?,
+): String {
+    val label = stringResource(Res.string.room_details_wall, number)
+    return if (name == null) label else stringResource(Res.string.wall_named, label, name)
+}
 
 /** A single surface, e.g. "Ściana 2" or "Sufit". */
 @Composable

@@ -116,6 +116,23 @@ class LocalRepositoriesTest {
         }
 
     @Test
+    fun wallNamesAreStored() =
+        runTest {
+            levels.saveLevel(groundFloor)
+            val named = kitchen.withWallName(2, "Telewizor")
+            rooms.saveRoom(groundFloor.id, named)
+
+            assertEquals(
+                "Telewizor",
+                rooms
+                    .getRoom(kitchen.id)
+                    ?.walls
+                    ?.get(1)
+                    ?.name,
+            )
+        }
+
+    @Test
     fun savingARoomAgainReplacesItsWallsAndKeepsItsPosition() =
         runTest {
             levels.saveLevel(groundFloor)

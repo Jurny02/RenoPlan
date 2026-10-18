@@ -57,6 +57,8 @@ data class WallEntity(
     val number: Int,
     val lengthMm: Long,
     val turn: String,
+    /** Added in schema version 3. */
+    val name: String? = null,
 )
 
 /** Either [widthMm] and [heightMm] or [areaSquareMetres] is set. */

@@ -224,6 +224,16 @@ class RoomDetailsViewModelTest : MainDispatcherTest() {
         }
 
     @Test
+    fun renameWall() =
+        runTest {
+            viewModel.renameWall(3, "Biurko")
+            assertEquals("Biurko", room().walls[2].name)
+
+            viewModel.renameWall(3, "")
+            assertNull(room().walls[2].name)
+        }
+
+    @Test
     fun deletedRoomIsMissing() =
         runTest {
             store.roomRepository.deleteRoom(kitchen.id)

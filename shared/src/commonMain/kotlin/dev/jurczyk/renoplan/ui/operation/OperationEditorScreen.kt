@@ -297,7 +297,13 @@ private fun SurfaceChips(
             title = "",
             options = options,
             isSelected = { surface -> if (surface == null) allWalls else surface in state.form.surfaces },
-            optionLabel = { surface -> surface?.let { surfaceLabel(it) } ?: allWallsLabel },
+            optionLabel = { surface ->
+                when (surface) {
+                    null -> allWallsLabel
+                    is Surface.Wall -> wallLabel(surface.number, walls.find { it.number == surface.number }?.name)
+                    else -> surfaceLabel(surface)
+                }
+            },
             onSelect = { surface -> surface?.let(actions.onSurfaceToggle) ?: actions.onAllWallsToggle() },
         )
         TextButton(onClick = { showOutline = !showOutline }) {
