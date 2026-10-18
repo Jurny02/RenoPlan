@@ -19,6 +19,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
@@ -192,44 +196,65 @@ private fun StartsAtFloorRow(
 }
 
 @Composable
+private fun SizeModeToggle(
+    form: OpeningForm,
+    onFormChange: (OpeningForm) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    PillToggle(
+        options = SizeMode.entries,
+        selected = form.sizeMode,
+        optionLabel = {
+            stringResource(
+                if (it ==
+                    SizeMode.DIMENSIONS
+                ) {
+                    Res.string.opening_size_dimensions
+                } else {
+                    Res.string.opening_size_area
+                },
+            )
+        },
+        onSelect = { onFormChange(form.withSizeMode(it)) },
+        isEnabled = { it == SizeMode.DIMENSIONS || form.canUseArea },
+        modifier = modifier,
+    )
+}
+
+@Composable
 private fun SizeFields(
     form: OpeningForm,
     onFormChange: (OpeningForm) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        PillToggle(
-            options = SizeMode.entries,
-            selected = form.sizeMode,
-            optionLabel = {
-                stringResource(
-                    if (it ==
-                        SizeMode.DIMENSIONS
-                    ) {
-                        Res.string.opening_size_dimensions
-                    } else {
-                        Res.string.opening_size_area
-                    },
-                )
-            },
-            onSelect = { onFormChange(form.withSizeMode(it)) },
-            isEnabled = { it == SizeMode.DIMENSIONS || form.canUseArea },
-        )
+        SizeModeToggle(form, onFormChange)
+        // The typed text lives here, in the sheet's own composition. The sheet is a separate window,
+        // and waiting for the form to come back through the screen moved the cursor on iOS.
+        var width by remember(form.id) { mutableStateOf(form.width) }
+        var height by remember(form.id) { mutableStateOf(form.height) }
+        var area by remember(form.id) { mutableStateOf(form.area) }
         val metres = stringResource(Res.string.unit_metres_short)
         val lengthError = stringResource(Res.string.room_length_error)
         when (form.sizeMode) {
             SizeMode.DIMENSIONS -> {
                 UnitTextField(
-                    form.width,
-                    { onFormChange(form.copy(width = it)) },
+                    width,
+                    {
+                        width = it
+                        onFormChange(form.copy(width = it, height = height, area = area))
+                    },
                     stringResource(Res.string.opening_width_label),
                     metres,
                     form.widthError,
                     lengthError,
                 )
                 UnitTextField(
-                    form.height,
-                    { onFormChange(form.copy(height = it)) },
+                    height,
+                    {
+                        height = it
+                        onFormChange(form.copy(width = width, height = it, area = area))
+                    },
                     stringResource(Res.string.opening_height_label),
                     metres,
                     form.heightError,
@@ -240,8 +265,11 @@ private fun SizeFields(
 
             SizeMode.AREA -> {
                 UnitTextField(
-                    form.area,
-                    { onFormChange(form.copy(area = it)) },
+                    area,
+                    {
+                        area = it
+                        onFormChange(form.copy(width = width, height = height, area = it))
+                    },
                     stringResource(Res.string.opening_area_label),
                     stringResource(Res.string.unit_square_metres_short),
                     form.areaError,
