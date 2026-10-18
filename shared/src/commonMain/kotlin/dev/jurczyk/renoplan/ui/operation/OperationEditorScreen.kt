@@ -11,14 +11,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -52,10 +48,15 @@ import dev.jurczyk.renoplan.presentation.operation.OperationForm
 import dev.jurczyk.renoplan.presentation.operation.OperationKind
 import dev.jurczyk.renoplan.presentation.operation.PricingForm
 import dev.jurczyk.renoplan.presentation.operation.QuantityMode
+import dev.jurczyk.renoplan.ui.components.AppCard
 import dev.jurczyk.renoplan.ui.components.BackButton
 import dev.jurczyk.renoplan.ui.components.ChoiceChips
 import dev.jurczyk.renoplan.ui.components.ConfirmDeleteDialog
+import dev.jurczyk.renoplan.ui.components.FieldLabel
+import dev.jurczyk.renoplan.ui.components.HeroCard
 import dev.jurczyk.renoplan.ui.components.KeyboardDoneBar
+import dev.jurczyk.renoplan.ui.components.PillToggle
+import dev.jurczyk.renoplan.ui.components.SectionLabel
 import dev.jurczyk.renoplan.ui.components.UnitTextField
 import dev.jurczyk.renoplan.ui.roomeditor.OutlinePreview
 import dev.jurczyk.renoplan.ui.theme.RenoPlanTheme
@@ -250,27 +251,21 @@ private fun SurfacePicker(
 ) {
     val mode = state.form.quantityMode
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(stringResource(Res.string.operation_surfaces_label), style = MaterialTheme.typography.labelLarge)
-        SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-            QuantityMode.entries.forEachIndexed { index, option ->
-                SegmentedButton(
-                    selected = mode == option,
-                    onClick = { actions.onQuantityModeChange(option) },
-                    shape = SegmentedButtonDefaults.itemShape(index = index, count = QuantityMode.entries.size),
-                    icon = {},
-                ) {
-                    Text(
-                        stringResource(
-                            if (option == QuantityMode.SURFACES) {
-                                Res.string.operation_quantity_from_surfaces
-                            } else {
-                                Res.string.operation_custom_quantity_label
-                            },
-                        ),
-                    )
-                }
-            }
-        }
+        FieldLabel(stringResource(Res.string.operation_surfaces_label))
+        PillToggle(
+            options = QuantityMode.entries,
+            selected = mode,
+            optionLabel = {
+                stringResource(
+                    if (it == QuantityMode.SURFACES) {
+                        Res.string.operation_quantity_from_surfaces
+                    } else {
+                        Res.string.operation_custom_quantity_label
+                    },
+                )
+            },
+            onSelect = actions.onQuantityModeChange,
+        )
         when (mode) {
             QuantityMode.SURFACES -> SurfaceChips(state, actions)
             QuantityMode.CUSTOM -> CustomQuantityField(state, actions)
@@ -313,7 +308,7 @@ private fun SurfaceChips(
                 ),
             )
         }
-        if (showOutline && walls.isNotEmpty()) Card { OutlinePreview(walls = walls) }
+        if (showOutline && walls.isNotEmpty()) AppCard { OutlinePreview(walls = walls) }
         Text(
             text = stringResource(Res.string.operation_surfaces_hint),
             style = MaterialTheme.typography.bodySmall,
@@ -385,25 +380,21 @@ private fun CostCard(
     val missing = stringResource(Res.string.value_missing)
     val cost = state.cost
     val unit = state.unit
-    Card(modifier = modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            CostRow(
-                stringResource(Res.string.operation_quantity),
-                unit?.let { quantityLabel(state.quantity, it) } ?: missing,
-            )
-            CostRow(
-                stringResource(Res.string.operation_cost_material),
-                cost?.let { moneyLabel(it.material) } ?: missing,
-            )
-            CostRow(stringResource(Res.string.operation_cost_labour), cost?.let { moneyLabel(it.labour) } ?: missing)
-            CostRow(
-                stringResource(Res.string.operation_cost_total),
-                cost?.let {
-                    moneyLabel(it.total)
-                } ?: missing,
-                emphasized = true,
-            )
-        }
+    HeroCard(modifier = modifier.fillMaxWidth()) {
+        SectionLabel(
+            stringResource(Res.string.operation_cost_total),
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
+        )
+        Text(cost?.let { moneyLabel(it.total) } ?: missing, style = MaterialTheme.typography.displaySmall)
+        CostRow(
+            stringResource(Res.string.operation_quantity),
+            unit?.let { quantityLabel(state.quantity, it) } ?: missing,
+        )
+        CostRow(
+            stringResource(Res.string.operation_cost_material),
+            cost?.let { moneyLabel(it.material) } ?: missing,
+        )
+        CostRow(stringResource(Res.string.operation_cost_labour), cost?.let { moneyLabel(it.labour) } ?: missing)
     }
 }
 
@@ -412,12 +403,10 @@ private fun CostRow(
     label: String,
     value: String,
     modifier: Modifier = Modifier,
-    emphasized: Boolean = false,
 ) {
-    val style = if (emphasized) MaterialTheme.typography.titleMedium else MaterialTheme.typography.bodyLarge
-    Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        Text(label, style = style)
-        Text(value, style = style)
+    Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text(label, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+        Text(value, style = MaterialTheme.typography.titleMedium)
     }
 }
 

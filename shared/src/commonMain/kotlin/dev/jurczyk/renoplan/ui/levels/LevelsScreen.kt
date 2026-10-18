@@ -8,15 +8,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,16 +25,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import dev.jurczyk.renoplan.domain.cost.CostSummary
 import dev.jurczyk.renoplan.presentation.levels.LevelCard
 import dev.jurczyk.renoplan.presentation.levels.LevelsUiState
 import dev.jurczyk.renoplan.presentation.levels.LevelsViewModel
+import dev.jurczyk.renoplan.ui.components.AppCard
+import dev.jurczyk.renoplan.ui.components.AppProgressBar
 import dev.jurczyk.renoplan.ui.components.ConfirmDeleteDialog
 import dev.jurczyk.renoplan.ui.components.EmptyState
 import dev.jurczyk.renoplan.ui.components.MenuAction
 import dev.jurczyk.renoplan.ui.components.NameDialog
 import dev.jurczyk.renoplan.ui.components.OverflowMenu
+import dev.jurczyk.renoplan.ui.components.ScreenHeader
+import dev.jurczyk.renoplan.ui.components.SectionLabel
+import dev.jurczyk.renoplan.ui.components.StatValue
 import dev.jurczyk.renoplan.ui.format.formatDecimal
 import dev.jurczyk.renoplan.ui.operation.CostProgress
+import dev.jurczyk.renoplan.ui.operation.moneyLabel
+import dev.jurczyk.renoplan.ui.operation.percentDone
 import dev.jurczyk.renoplan.ui.theme.RenoPlanTheme
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.pluralStringResource
@@ -45,6 +51,8 @@ import org.koin.compose.viewmodel.koinViewModel
 import renoplan.shared.generated.resources.Res
 import renoplan.shared.generated.resources.action_delete
 import renoplan.shared.generated.resources.action_rename
+import renoplan.shared.generated.resources.app_name
+import renoplan.shared.generated.resources.app_tagline
 import renoplan.shared.generated.resources.ic_add
 import renoplan.shared.generated.resources.ic_help
 import renoplan.shared.generated.resources.level_add
@@ -57,7 +65,11 @@ import renoplan.shared.generated.resources.level_room_count
 import renoplan.shared.generated.resources.levels_empty_action
 import renoplan.shared.generated.resources.levels_empty_text
 import renoplan.shared.generated.resources.levels_empty_title
+import renoplan.shared.generated.resources.levels_total_area
+import renoplan.shared.generated.resources.levels_total_cost
+import renoplan.shared.generated.resources.levels_total_progress
 import renoplan.shared.generated.resources.onboarding_open
+import renoplan.shared.generated.resources.percent_value
 import renoplan.shared.generated.resources.screen_levels
 import renoplan.shared.generated.resources.unit_square_metres
 import kotlin.uuid.Uuid
@@ -81,14 +93,14 @@ fun LevelsScreen(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun LevelsTopBar(
+private fun LevelsHeader(
     onOpenHelp: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    TopAppBar(
-        title = { Text(stringResource(Res.string.screen_levels)) },
+    ScreenHeader(
+        title = stringResource(Res.string.app_name),
+        subtitle = stringResource(Res.string.app_tagline),
         actions = {
             IconButton(onClick = onOpenHelp) {
                 Icon(painterResource(Res.drawable.ic_help), stringResource(Res.string.onboarding_open))
@@ -110,7 +122,6 @@ private sealed interface LevelDialog {
     ) : LevelDialog
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LevelsContent(
     state: LevelsUiState,
@@ -124,14 +135,20 @@ fun LevelsContent(
     var dialog by remember { mutableStateOf<LevelDialog?>(null) }
     Scaffold(
         modifier = modifier,
-        topBar = { LevelsTopBar(onOpenHelp) },
+        topBar = { LevelsHeader(onOpenHelp) },
         floatingActionButton = {
             if (state.levels.isNotEmpty()) {
-                ExtendedFloatingActionButton(
+                FloatingActionButton(
                     onClick = { dialog = LevelDialog.Add },
-                    icon = { Icon(painterResource(Res.drawable.ic_add), contentDescription = null) },
-                    text = { Text(stringResource(Res.string.level_add)) },
-                )
+                    shape = CircleShape,
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                ) {
+                    Icon(
+                        painterResource(Res.drawable.ic_add),
+                        contentDescription = stringResource(Res.string.level_add),
+                    )
+                }
             }
         },
     ) { padding ->
@@ -151,20 +168,13 @@ fun LevelsContent(
             }
 
             else -> {
-                LazyColumn(
+                LevelsList(
+                    levels = state.levels,
+                    onOpenLevel = onOpenLevel,
+                    onRename = { dialog = LevelDialog.Rename(it) },
+                    onDelete = { dialog = LevelDialog.Delete(it) },
                     modifier = Modifier.padding(padding),
-                    contentPadding = PaddingValues(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 96.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    items(state.levels, key = { it.id.toString() }) { level ->
-                        LevelCardItem(
-                            level = level,
-                            onClick = { onOpenLevel(level.id) },
-                            onRename = { dialog = LevelDialog.Rename(level) },
-                            onDelete = { dialog = LevelDialog.Delete(level) },
-                        )
-                    }
-                }
+                )
             }
         }
     }
@@ -175,6 +185,37 @@ fun LevelsContent(
         onRenameLevel = onRenameLevel,
         onDeleteLevel = onDeleteLevel,
     )
+}
+
+@Composable
+private fun LevelsList(
+    levels: List<LevelCard>,
+    onOpenLevel: (Uuid) -> Unit,
+    onRename: (LevelCard) -> Unit,
+    onDelete: (LevelCard) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    LazyColumn(
+        modifier = modifier,
+        contentPadding = PaddingValues(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 96.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        item(key = "overview") { ApartmentOverviewCard(levels) }
+        item(key = "levels-label") {
+            SectionLabel(
+                stringResource(Res.string.screen_levels),
+                modifier = Modifier.padding(start = 4.dp, top = 12.dp),
+            )
+        }
+        items(levels, key = { it.id.toString() }) { level ->
+            LevelCardItem(
+                level = level,
+                onClick = { onOpenLevel(level.id) },
+                onRename = { onRename(level) },
+                onDelete = { onDelete(level) },
+            )
+        }
+    }
 }
 
 @Composable
@@ -229,6 +270,42 @@ private fun LevelDialogs(
     }
 }
 
+/** Totals of all levels: cost, floor area and progress of the whole apartment. */
+@Composable
+private fun ApartmentOverviewCard(
+    levels: List<LevelCard>,
+    modifier: Modifier = Modifier,
+) {
+    val cost = levels.fold(CostSummary.Zero) { total, level -> total + level.cost }
+    AppCard(modifier = modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                StatValue(
+                    label = stringResource(Res.string.levels_total_cost),
+                    value = moneyLabel(cost.total),
+                    modifier = Modifier.weight(1f),
+                )
+                StatValue(
+                    label = stringResource(Res.string.levels_total_area),
+                    value =
+                        stringResource(Res.string.unit_square_metres, formatDecimal(levels.sumOf { it.floorArea })),
+                    modifier = Modifier.weight(1f),
+                )
+            }
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    SectionLabel(stringResource(Res.string.levels_total_progress), modifier = Modifier.weight(1f))
+                    Text(
+                        text = stringResource(Res.string.percent_value, cost.percentDone),
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                }
+                AppProgressBar(progress = cost.progress.toFloat())
+            }
+        }
+    }
+}
+
 @Composable
 private fun LevelCardItem(
     level: LevelCard,
@@ -237,29 +314,28 @@ private fun LevelCardItem(
     onDelete: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Card(onClick = onClick, modifier = modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 12.dp, end = 4.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(text = level.name, style = MaterialTheme.typography.titleMedium)
-                Text(
-                    text =
-                        stringResource(
-                            Res.string.level_card_details,
-                            pluralStringResource(Res.plurals.level_room_count, level.roomCount, level.roomCount),
-                            stringResource(Res.string.unit_square_metres, formatDecimal(level.floorArea)),
-                        ),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+    AppCard(onClick = onClick, modifier = modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(start = 20.dp, top = 16.dp, end = 20.dp, bottom = 20.dp)) {
+            Row(verticalAlignment = Alignment.Top) {
+                Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(text = level.name, style = MaterialTheme.typography.titleLarge)
+                    Text(
+                        text =
+                            stringResource(
+                                Res.string.level_card_details,
+                                pluralStringResource(Res.plurals.level_room_count, level.roomCount, level.roomCount),
+                                stringResource(Res.string.unit_square_metres, formatDecimal(level.floorArea)),
+                            ),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                OverflowMenu(
+                    MenuAction(Res.string.action_rename, onRename),
+                    MenuAction(Res.string.action_delete, onDelete),
                 )
-                CostProgress(level.cost, modifier = Modifier.padding(top = 4.dp, end = 12.dp))
             }
-            OverflowMenu(
-                MenuAction(Res.string.action_rename, onRename),
-                MenuAction(Res.string.action_delete, onDelete),
-            )
+            CostProgress(level.cost, modifier = Modifier.padding(top = 12.dp))
         }
     }
 }

@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
@@ -34,6 +33,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.jurczyk.renoplan.presentation.level.LevelUiState
 import dev.jurczyk.renoplan.presentation.level.LevelViewModel
 import dev.jurczyk.renoplan.presentation.level.RoomCard
+import dev.jurczyk.renoplan.ui.components.AppCard
 import dev.jurczyk.renoplan.ui.components.BackButton
 import dev.jurczyk.renoplan.ui.components.ConfirmDeleteDialog
 import dev.jurczyk.renoplan.ui.components.EmptyState
@@ -154,6 +154,8 @@ fun LevelContent(
                     onClick = onAddRoom,
                     icon = { Icon(painterResource(Res.drawable.ic_add), contentDescription = null) },
                     text = { Text(stringResource(Res.string.room_add)) },
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
                 )
             }
         },
@@ -290,30 +292,29 @@ private fun RoomCardItem(
     onDelete: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Card(onClick = onClick, modifier = modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 12.dp, end = 4.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(text = room.name, style = MaterialTheme.typography.titleMedium)
-                Text(
-                    text =
-                        stringResource(
-                            Res.string.room_card_details,
-                            stringResource(Res.string.unit_square_metres, formatDecimal(room.floorArea)),
-                            stringResource(Res.string.unit_square_metres, formatDecimal(room.netWallArea)),
-                        ),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+    AppCard(onClick = onClick, modifier = modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(start = 20.dp, top = 16.dp, end = 20.dp, bottom = 20.dp)) {
+            Row(verticalAlignment = Alignment.Top) {
+                Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(text = room.name, style = MaterialTheme.typography.titleLarge)
+                    Text(
+                        text =
+                            stringResource(
+                                Res.string.room_card_details,
+                                stringResource(Res.string.unit_square_metres, formatDecimal(room.floorArea)),
+                                stringResource(Res.string.unit_square_metres, formatDecimal(room.netWallArea)),
+                            ),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                OverflowMenu(
+                    MenuAction(Res.string.action_rename, onRename),
+                    MenuAction(Res.string.action_duplicate, onDuplicate),
+                    MenuAction(Res.string.action_delete, onDelete),
                 )
-                CostProgress(room.cost, modifier = Modifier.padding(top = 4.dp, end = 12.dp))
             }
-            OverflowMenu(
-                MenuAction(Res.string.action_rename, onRename),
-                MenuAction(Res.string.action_duplicate, onDuplicate),
-                MenuAction(Res.string.action_delete, onDelete),
-            )
+            CostProgress(room.cost, modifier = Modifier.padding(top = 12.dp))
         }
     }
 }

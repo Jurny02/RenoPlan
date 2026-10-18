@@ -11,14 +11,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -39,8 +34,11 @@ import dev.jurczyk.renoplan.presentation.roomeditor.RoomEditorUiState
 import dev.jurczyk.renoplan.presentation.roomeditor.RoomEditorViewModel
 import dev.jurczyk.renoplan.presentation.roomeditor.ShapeMode
 import dev.jurczyk.renoplan.presentation.roomeditor.WallRow
+import dev.jurczyk.renoplan.ui.components.AppCard
 import dev.jurczyk.renoplan.ui.components.BackButton
 import dev.jurczyk.renoplan.ui.components.KeyboardDoneBar
+import dev.jurczyk.renoplan.ui.components.LabeledTextField
+import dev.jurczyk.renoplan.ui.components.PillToggle
 import dev.jurczyk.renoplan.ui.components.UnitTextField
 import dev.jurczyk.renoplan.ui.format.formatDecimal
 import dev.jurczyk.renoplan.ui.theme.RenoPlanTheme
@@ -150,11 +148,10 @@ fun RoomEditorContent(
                     .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            OutlinedTextField(
+            LabeledTextField(
                 value = state.name,
                 onValueChange = onNameChange,
-                label = { Text(stringResource(Res.string.room_name_label)) },
-                singleLine = true,
+                label = stringResource(Res.string.room_name_label),
                 keyboardOptions =
                     KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Next),
                 modifier = Modifier.fillMaxWidth(),
@@ -163,7 +160,7 @@ fun RoomEditorContent(
             ShapeToggle(state = state, onShapeModeChange = onShapeModeChange)
             ShapeFields(state, onLengthChange, onWidthChange, outlineCallbacks)
             state.outlineProblem?.let { WarningText(outlineProblemText(it), color = MaterialTheme.colorScheme.error) }
-            state.walls?.let { walls -> Card { OutlinePreview(walls = walls) } }
+            state.walls?.let { walls -> AppCard { OutlinePreview(walls = walls) } }
             if (state.wallsLosingOpenings.isNotEmpty()) {
                 WarningText(
                     stringResource(Res.string.room_openings_lost, state.wallsLosingOpenings.joinToString()),
@@ -246,16 +243,13 @@ private fun ShapeToggle(
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-            ShapeMode.entries.forEachIndexed { index, mode ->
-                SegmentedButton(
-                    selected = state.shapeMode == mode,
-                    onClick = { onShapeModeChange(mode) },
-                    enabled = mode != ShapeMode.RECTANGLE || state.canSwitchToRectangle,
-                    shape = SegmentedButtonDefaults.itemShape(index = index, count = ShapeMode.entries.size),
-                ) { Text(stringResource(mode.label)) }
-            }
-        }
+        PillToggle(
+            options = ShapeMode.entries,
+            selected = state.shapeMode,
+            optionLabel = { stringResource(it.label) },
+            onSelect = onShapeModeChange,
+            isEnabled = { it != ShapeMode.RECTANGLE || state.canSwitchToRectangle },
+        )
         if (!state.canSwitchToRectangle) {
             Text(
                 text = stringResource(Res.string.room_shape_rectangle_disabled),
@@ -327,7 +321,7 @@ private fun Results(
     modifier: Modifier = Modifier,
 ) {
     val missing = stringResource(Res.string.value_missing)
-    Card(modifier = modifier.fillMaxWidth()) {
+    AppCard(modifier = modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             ResultRow(
                 label = stringResource(Res.string.room_results_floor_area),

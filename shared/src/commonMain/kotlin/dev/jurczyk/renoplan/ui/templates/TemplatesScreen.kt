@@ -7,14 +7,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -27,7 +24,9 @@ import dev.jurczyk.renoplan.domain.model.OperationTemplate
 import dev.jurczyk.renoplan.domain.model.OperationType
 import dev.jurczyk.renoplan.presentation.templates.TemplatesUiState
 import dev.jurczyk.renoplan.presentation.templates.TemplatesViewModel
+import dev.jurczyk.renoplan.ui.components.AppCard
 import dev.jurczyk.renoplan.ui.components.EmptyState
+import dev.jurczyk.renoplan.ui.components.ScreenHeader
 import dev.jurczyk.renoplan.ui.operation.labourLabel
 import dev.jurczyk.renoplan.ui.operation.operationTypeLabel
 import dev.jurczyk.renoplan.ui.operation.unitPriceLabel
@@ -37,11 +36,12 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import renoplan.shared.generated.resources.Res
 import renoplan.shared.generated.resources.ic_add
-import renoplan.shared.generated.resources.screen_templates
+import renoplan.shared.generated.resources.nav_templates
 import renoplan.shared.generated.resources.template_add
 import renoplan.shared.generated.resources.template_details
 import renoplan.shared.generated.resources.templates_empty_text
 import renoplan.shared.generated.resources.templates_empty_title
+import renoplan.shared.generated.resources.templates_subtitle
 import kotlin.uuid.Uuid
 
 @Composable
@@ -55,7 +55,6 @@ fun TemplatesScreen(
     TemplatesContent(state = state, onAddTemplate = onAddTemplate, onOpenTemplate = onOpenTemplate, modifier = modifier)
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TemplatesContent(
     state: TemplatesUiState,
@@ -65,12 +64,19 @@ fun TemplatesContent(
 ) {
     Scaffold(
         modifier = modifier,
-        topBar = { TopAppBar(title = { Text(stringResource(Res.string.screen_templates)) }) },
+        topBar = {
+            ScreenHeader(
+                title = stringResource(Res.string.nav_templates),
+                subtitle = stringResource(Res.string.templates_subtitle),
+            )
+        },
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = onAddTemplate,
                 icon = { Icon(painterResource(Res.drawable.ic_add), contentDescription = null) },
                 text = { Text(stringResource(Res.string.template_add)) },
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
             )
         },
     ) { padding ->
@@ -108,7 +114,7 @@ private fun TemplateCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Card(onClick = onClick, modifier = modifier.fillMaxWidth()) {
+    AppCard(onClick = onClick, modifier = modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(operationTypeLabel(template.type), style = MaterialTheme.typography.titleMedium)
             Text(

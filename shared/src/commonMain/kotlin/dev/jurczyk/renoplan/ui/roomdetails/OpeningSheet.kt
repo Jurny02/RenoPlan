@@ -11,13 +11,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -38,8 +34,10 @@ import dev.jurczyk.renoplan.domain.model.mm
 import dev.jurczyk.renoplan.presentation.roomdetails.OpeningForm
 import dev.jurczyk.renoplan.presentation.roomdetails.RoomDetailsUiState
 import dev.jurczyk.renoplan.presentation.roomdetails.SizeMode
+import dev.jurczyk.renoplan.ui.components.AppCard
 import dev.jurczyk.renoplan.ui.components.ChoiceChips
 import dev.jurczyk.renoplan.ui.components.KeyboardDoneBar
+import dev.jurczyk.renoplan.ui.components.PillToggle
 import dev.jurczyk.renoplan.ui.components.UnitTextField
 import dev.jurczyk.renoplan.ui.components.hideKeyboardOnTapOrDrag
 import dev.jurczyk.renoplan.ui.format.formatDecimal
@@ -200,28 +198,23 @@ private fun SizeFields(
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-            SizeMode.entries.forEachIndexed { index, mode ->
-                SegmentedButton(
-                    selected = form.sizeMode == mode,
-                    onClick = { onFormChange(form.withSizeMode(mode)) },
-                    enabled = mode == SizeMode.DIMENSIONS || form.canUseArea,
-                    shape = SegmentedButtonDefaults.itemShape(index = index, count = SizeMode.entries.size),
-                ) {
-                    Text(
-                        stringResource(
-                            if (mode ==
-                                SizeMode.DIMENSIONS
-                            ) {
-                                Res.string.opening_size_dimensions
-                            } else {
-                                Res.string.opening_size_area
-                            },
-                        ),
-                    )
-                }
-            }
-        }
+        PillToggle(
+            options = SizeMode.entries,
+            selected = form.sizeMode,
+            optionLabel = {
+                stringResource(
+                    if (it ==
+                        SizeMode.DIMENSIONS
+                    ) {
+                        Res.string.opening_size_dimensions
+                    } else {
+                        Res.string.opening_size_area
+                    },
+                )
+            },
+            onSelect = { onFormChange(form.withSizeMode(it)) },
+            isEnabled = { it == SizeMode.DIMENSIONS || form.canUseArea },
+        )
         val metres = stringResource(Res.string.unit_metres_short)
         val lengthError = stringResource(Res.string.room_length_error)
         when (form.sizeMode) {
@@ -312,7 +305,7 @@ private fun FormResults(
     val squareMetres = @Composable { value: Double? ->
         value?.let { stringResource(Res.string.unit_square_metres, formatDecimal(it)) } ?: missing
     }
-    Card(modifier = modifier.fillMaxWidth()) {
+    AppCard(modifier = modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             ResultRow(stringResource(Res.string.opening_result_area), squareMetres(form.opening?.area))
             ResultRow(

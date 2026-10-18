@@ -1,10 +1,14 @@
 package dev.jurczyk.renoplan.ui.navigation
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -12,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -41,6 +46,9 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import kotlin.uuid.Uuid
 
+// A faint tint behind the selected tab icon.
+private const val NAV_INDICATOR_ALPHA = 0.12f
+
 @Composable
 fun RenoPlanNavigation(
     modifier: Modifier = Modifier,
@@ -57,14 +65,26 @@ fun RenoPlanNavigation(
         modifier = modifier.hideKeyboardOnTapOrDrag(focusManager),
         bottomBar = {
             if (currentDestination?.hasRoute(OnboardingRoute::class) == true) return@Scaffold
-            NavigationBar {
-                TopLevelDestination.entries.forEach { destination ->
-                    NavigationBarItem(
-                        selected = currentDestination.isOnTopLevel(destination),
-                        onClick = { navController.navigateToTopLevel(destination) },
-                        icon = { Icon(painterResource(destination.icon), contentDescription = null) },
-                        label = { Text(stringResource(destination.label)) },
-                    )
+            Column {
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                NavigationBar(containerColor = MaterialTheme.colorScheme.surfaceContainerLow, tonalElevation = 0.dp) {
+                    TopLevelDestination.entries.forEach { destination ->
+                        NavigationBarItem(
+                            selected = currentDestination.isOnTopLevel(destination),
+                            onClick = { navController.navigateToTopLevel(destination) },
+                            icon = { Icon(painterResource(destination.icon), contentDescription = null) },
+                            label = { Text(stringResource(destination.label)) },
+                            colors =
+                                NavigationBarItemDefaults.colors(
+                                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                                    selectedTextColor = MaterialTheme.colorScheme.primary,
+                                    indicatorColor =
+                                        MaterialTheme.colorScheme.primary.copy(
+                                            alpha = NAV_INDICATOR_ALPHA,
+                                        ),
+                                ),
+                        )
+                    }
                 }
             }
         },
