@@ -28,6 +28,13 @@ data class RoomEditorRoute(
     val roomId: String? = null,
 )
 
+/** Summary (quantities only) of one room. */
+@Serializable
+data class RoomSummaryRoute(
+    val levelId: String,
+    val roomId: String,
+)
+
 /** Adds an operation when [operationId] is `null`, otherwise edits it. */
 @Serializable
 data class OperationEditorRoute(

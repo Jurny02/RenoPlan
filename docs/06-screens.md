@@ -109,6 +109,7 @@ is warned which openings and operations will lose that wall.
 The main working screen of a room.
 
 - Header: floor, ceiling, net walls, perimeter, skirting, volume. Button **Edit shape** → Room editor.
+  Button **Room summary** → the Summary filtered to this room (screen 7).
 - **Walls** section: row per wall `Wall 1 – 3.20 m – 7.20 m² net – 2 openings`; tap a wall to see its
   openings (tap an opening to edit it); **Add opening** → Opening sheet. The floating **Add opening**
   button preselects the expanded wall, or wall 1.
@@ -170,7 +171,8 @@ single room from Room details).
   - Whole level: one row per type, e.g. "Skim coat – 10 walls – 100.00 m²".
 - A group is one operation type and unit: painting is grouped per colour, custom work per name.
   Mouldings count the rooms they are in ("skirting in 4 rooms").
-- The single-room view from Room details is not built yet.
+- The single-room view opens from **Room summary** in Room details: the same geometry block and
+  groups, for that room only.
 
 ## 8. Templates
 

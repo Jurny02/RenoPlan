@@ -16,6 +16,7 @@ import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -68,6 +69,7 @@ import renoplan.shared.generated.resources.room_details_wall_summary
 import renoplan.shared.generated.resources.room_details_walls
 import renoplan.shared.generated.resources.room_details_walls_net
 import renoplan.shared.generated.resources.room_operations
+import renoplan.shared.generated.resources.room_summary_open
 import renoplan.shared.generated.resources.unit_cubic_metres
 import renoplan.shared.generated.resources.unit_metres
 import renoplan.shared.generated.resources.unit_square_metres
@@ -79,6 +81,7 @@ fun RoomDetailsScreen(
     roomId: Uuid,
     onBack: () -> Unit,
     onEditShape: () -> Unit,
+    onOpenSummary: () -> Unit,
     onAddOperation: () -> Unit,
     onEditOperation: (Uuid) -> Unit,
     modifier: Modifier = Modifier,
@@ -93,6 +96,7 @@ fun RoomDetailsScreen(
         state = state,
         onBack = onBack,
         onEditShape = onEditShape,
+        onOpenSummary = onOpenSummary,
         onAddOpening = viewModel::addOpening,
         onEditOpening = viewModel::editOpening,
         operationActions =
@@ -125,6 +129,7 @@ fun RoomDetailsContent(
     onEditOpening: (Uuid) -> Unit,
     operationActions: OperationActions,
     modifier: Modifier = Modifier,
+    onOpenSummary: () -> Unit = {},
 ) {
     var expandedWall by rememberSaveable { mutableStateOf<Int?>(null) }
     Scaffold(
@@ -155,6 +160,11 @@ fun RoomDetailsContent(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             item { RoomMetrics(state) }
+            item {
+                OutlinedButton(onClick = onOpenSummary, modifier = Modifier.fillMaxWidth()) {
+                    Text(stringResource(Res.string.room_summary_open))
+                }
+            }
             item {
                 Text(
                     text = stringResource(Res.string.room_details_walls),

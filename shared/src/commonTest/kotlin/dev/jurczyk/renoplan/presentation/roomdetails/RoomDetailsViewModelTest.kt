@@ -204,6 +204,26 @@ class RoomDetailsViewModelTest : MainDispatcherTest() {
         }
 
     @Test
+    fun summaryOfTheRoom() =
+        runTest {
+            val ceiling =
+                Operation(
+                    Uuid.random(),
+                    OperationType.Painting("biały"),
+                    setOf(Surface.Ceiling),
+                    Money(600),
+                    Labour.SelfDone,
+                )
+            store.roomRepository.saveRoom(LEVEL_ID, kitchen.copy(operations = listOf(ceiling)))
+
+            val state = loaded()
+            assertEquals(8.0, state.geometryTotals.floorArea, 1e-9)
+            assertEquals(11_400.mm, state.geometryTotals.skirtingLength)
+            assertEquals(listOf(OperationType.Painting("biały")), state.operationGroups.map { it.type })
+            assertEquals(8.0, state.operationGroups.single().quantity, 1e-9)
+        }
+
+    @Test
     fun deletedRoomIsMissing() =
         runTest {
             store.roomRepository.deleteRoom(kitchen.id)

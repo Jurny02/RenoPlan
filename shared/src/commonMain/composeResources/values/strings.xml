@@ -309,4 +309,8 @@
     </plurals>
 
     <string name="keyboard_done">Gotowe</string>
+
+    <!-- Single-room summary -->
+    <string name="room_summary_open">Podsumowanie pokoju</string>
+    <string name="room_summary_title">Podsumowanie: %1$s</string>
 </resources>
