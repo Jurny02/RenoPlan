@@ -6,9 +6,13 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.jurczyk.renoplan.domain.cost.CostSummary
+import dev.jurczyk.renoplan.domain.cost.GeometryTotals
 import dev.jurczyk.renoplan.domain.cost.OperationCost
+import dev.jurczyk.renoplan.domain.cost.OperationGroup
 import dev.jurczyk.renoplan.domain.cost.cost
 import dev.jurczyk.renoplan.domain.cost.costSummary
+import dev.jurczyk.renoplan.domain.cost.geometryTotals
+import dev.jurczyk.renoplan.domain.cost.operationGroups
 import dev.jurczyk.renoplan.domain.geometry.OpeningError
 import dev.jurczyk.renoplan.domain.geometry.ceilingArea
 import dev.jurczyk.renoplan.domain.geometry.floorArea
@@ -85,6 +89,10 @@ data class RoomDetailsUiState(
         get() = room?.let { room -> room.operations.map { it to room.cost(it) } }.orEmpty()
 
     val costSummary: CostSummary? get() = room?.costSummary
+
+    /** The room's part of the Summary: its geometry and operations grouped by type. */
+    val geometryTotals: GeometryTotals get() = geometryTotals(listOfNotNull(room))
+    val operationGroups: List<OperationGroup> get() = room?.operationGroups.orEmpty()
 }
 
 class RoomDetailsViewModel(

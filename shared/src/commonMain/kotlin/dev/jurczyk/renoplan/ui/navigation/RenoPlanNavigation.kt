@@ -29,6 +29,7 @@ import dev.jurczyk.renoplan.ui.level.LevelScreen
 import dev.jurczyk.renoplan.ui.levels.LevelsScreen
 import dev.jurczyk.renoplan.ui.operation.OperationEditorScreen
 import dev.jurczyk.renoplan.ui.roomdetails.RoomDetailsScreen
+import dev.jurczyk.renoplan.ui.roomdetails.RoomSummaryScreen
 import dev.jurczyk.renoplan.ui.roomeditor.RoomEditorScreen
 import dev.jurczyk.renoplan.ui.templates.TemplateEditorScreen
 import dev.jurczyk.renoplan.ui.templates.TemplatesScreen
@@ -96,21 +97,7 @@ private fun NavGraphBuilder.projectGraph(navController: NavHostController) {
                 },
             )
         }
-        composable<RoomDetailsRoute> { entry ->
-            val route = entry.toRoute<RoomDetailsRoute>()
-            RoomDetailsScreen(
-                levelId = Uuid.parse(route.levelId),
-                roomId = Uuid.parse(route.roomId),
-                onBack = navController::popBackStack,
-                onEditShape = { navController.navigate(RoomEditorRoute(route.levelId, route.roomId)) },
-                onAddOperation = { navController.navigate(OperationEditorRoute(route.levelId, route.roomId)) },
-                onEditOperation = {
-                    navController.navigate(
-                        OperationEditorRoute(route.levelId, route.roomId, it.toString()),
-                    )
-                },
-            )
-        }
+        roomDestinations(navController)
         composable<OperationEditorRoute> { entry ->
             val route = entry.toRoute<OperationEditorRoute>()
             OperationEditorScreen(
@@ -128,6 +115,34 @@ private fun NavGraphBuilder.projectGraph(navController: NavHostController) {
                 onBack = navController::popBackStack,
             )
         }
+    }
+}
+
+/** Room details and the screens opened from it. */
+private fun NavGraphBuilder.roomDestinations(navController: NavHostController) {
+    composable<RoomDetailsRoute> { entry ->
+        val route = entry.toRoute<RoomDetailsRoute>()
+        RoomDetailsScreen(
+            levelId = Uuid.parse(route.levelId),
+            roomId = Uuid.parse(route.roomId),
+            onBack = navController::popBackStack,
+            onEditShape = { navController.navigate(RoomEditorRoute(route.levelId, route.roomId)) },
+            onOpenSummary = { navController.navigate(RoomSummaryRoute(route.levelId, route.roomId)) },
+            onAddOperation = { navController.navigate(OperationEditorRoute(route.levelId, route.roomId)) },
+            onEditOperation = {
+                navController.navigate(
+                    OperationEditorRoute(route.levelId, route.roomId, it.toString()),
+                )
+            },
+        )
+    }
+    composable<RoomSummaryRoute> { entry ->
+        val route = entry.toRoute<RoomSummaryRoute>()
+        RoomSummaryScreen(
+            levelId = Uuid.parse(route.levelId),
+            roomId = Uuid.parse(route.roomId),
+            onBack = navController::popBackStack,
+        )
     }
 }
 

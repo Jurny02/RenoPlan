@@ -118,7 +118,8 @@ fun SummaryTab(
     }
 }
 
-private fun LazyListScope.summaryItems(
+/** Geometry and operation groups; shared by the level Summary and the single-room summary. */
+internal fun LazyListScope.summaryItems(
     geometry: GeometryTotals,
     groups: List<OperationGroup>,
     key: String,
