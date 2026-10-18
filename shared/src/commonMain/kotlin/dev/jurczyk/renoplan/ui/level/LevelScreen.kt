@@ -1,11 +1,13 @@
 package dev.jurczyk.renoplan.ui.level
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -135,17 +137,7 @@ fun LevelContent(
         topBar = {
             Column {
                 TopAppBar(title = { Text(state.name) }, navigationIcon = { BackButton(onClick = onBack) })
-                // Scrollable, so labels keep one line at large font sizes instead of breaking mid-word.
-                PrimaryScrollableTabRow(selectedTabIndex = selectedTab.ordinal, edgePadding = 8.dp) {
-                    LevelTab.entries.forEach { tab ->
-                        Tab(
-                            selected = tab == selectedTab,
-                            onClick = { selectedTab = tab },
-                            text = { Text(stringResource(tab.label), maxLines = 1) },
-                            unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                }
+                LevelTabRow(selected = selectedTab, onSelect = { selectedTab = it })
             }
         },
         floatingActionButton = {
@@ -279,6 +271,32 @@ private fun RoomDialogs(
 
         null -> {
             Unit
+        }
+    }
+}
+
+/**
+ * Tabs share the full width equally. The row still scrolls, so at large font sizes a label that
+ * needs more than its share keeps one line instead of breaking mid-word.
+ */
+@Composable
+private fun LevelTabRow(
+    selected: LevelTab,
+    onSelect: (LevelTab) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
+        val minTabWidth = maxWidth / LevelTab.entries.size
+        PrimaryScrollableTabRow(selectedTabIndex = selected.ordinal, edgePadding = 0.dp) {
+            LevelTab.entries.forEach { tab ->
+                Tab(
+                    selected = tab == selected,
+                    onClick = { onSelect(tab) },
+                    text = { Text(stringResource(tab.label), maxLines = 1) },
+                    unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.widthIn(min = minTabWidth),
+                )
+            }
         }
     }
 }
