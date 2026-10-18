@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand terracotta, the primary colour of the app theme (shared/.../ui/theme/Color.kt). -->
+    <color name="brand">#FF9A4521</color>
+</resources>

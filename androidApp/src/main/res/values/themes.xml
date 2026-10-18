@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.RenoPlan" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <!-- Launch screen (SplashScreen API): the app glyph on the brand colour while the app starts. -->
+    <style name="Theme.RenoPlan.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/brand</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="postSplashScreenTheme">@style/Theme.RenoPlan</item>
+    </style>
+</resources>
