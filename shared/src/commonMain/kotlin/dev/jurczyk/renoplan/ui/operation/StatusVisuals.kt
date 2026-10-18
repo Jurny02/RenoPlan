@@ -1,11 +1,15 @@
 package dev.jurczyk.renoplan.ui.operation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.FilterChip
@@ -16,11 +20,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dev.jurczyk.renoplan.domain.model.OperationStatus
+import dev.jurczyk.renoplan.ui.components.FieldLabel
 import dev.jurczyk.renoplan.ui.theme.DoneContainerDark
 import dev.jurczyk.renoplan.ui.theme.DoneContainerLight
 import dev.jurczyk.renoplan.ui.theme.OnDoneContainerDark
@@ -88,6 +94,7 @@ fun StatusChip(
                 labelColor = status.contentColor(),
                 leadingIconContentColor = status.contentColor(),
             ),
+        shape = CircleShape,
         // "To do" shares the card's grey, so it keeps an outline to read as a button.
         border = if (status == OperationStatus.TODO) AssistChipDefaults.assistChipBorder(enabled = true) else null,
         modifier = modifier,
@@ -113,12 +120,33 @@ fun StatusLabel(
 
 /** On a plain surface the container colours are too pale for text, so labels use stronger tones. */
 @Composable
-private fun OperationStatus.textColor(): Color =
+fun OperationStatus.textColor(): Color =
     when (this) {
         OperationStatus.TODO -> MaterialTheme.colorScheme.onSurfaceVariant
         OperationStatus.IN_PROGRESS -> MaterialTheme.colorScheme.tertiary
         OperationStatus.DONE -> if (isDarkScheme()) DoneContainerLight else DoneContainerDark
     }
+
+/** A dot and the status name on a pill in the status colour, e.g. for a level's overall progress. */
+@Composable
+fun StatusPill(
+    status: OperationStatus,
+    modifier: Modifier = Modifier,
+) {
+    val color = status.textColor()
+    Row(
+        modifier =
+            modifier
+                .clip(CircleShape)
+                .background(status.containerColor())
+                .padding(horizontal = 12.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(color))
+        Text(stringResource(status.label), style = MaterialTheme.typography.labelLarge, color = color)
+    }
+}
 
 /** Choosing a status in the operation editor. */
 @OptIn(ExperimentalLayoutApi::class)
@@ -130,7 +158,7 @@ fun StatusPicker(
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Text(title, style = MaterialTheme.typography.labelLarge)
+        FieldLabel(title)
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             OperationStatus.entries.forEach { status ->
                 FilterChip(
@@ -168,6 +196,7 @@ private fun StatusVisualsPreview() {
                 ) {
                     StatusChip(status, onClick = {})
                     StatusLabel(status)
+                    StatusPill(status)
                 }
             }
             StatusPicker(title = "Status", selected = OperationStatus.IN_PROGRESS, onSelect = {})

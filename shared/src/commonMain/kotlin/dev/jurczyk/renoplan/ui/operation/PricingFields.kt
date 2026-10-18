@@ -4,12 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
@@ -21,6 +15,9 @@ import dev.jurczyk.renoplan.presentation.operation.LabourMode
 import dev.jurczyk.renoplan.presentation.operation.OperationKind
 import dev.jurczyk.renoplan.presentation.operation.PricingForm
 import dev.jurczyk.renoplan.ui.components.ChoiceChips
+import dev.jurczyk.renoplan.ui.components.FieldLabel
+import dev.jurczyk.renoplan.ui.components.LabeledTextField
+import dev.jurczyk.renoplan.ui.components.PillToggle
 import dev.jurczyk.renoplan.ui.components.UnitTextField
 import dev.jurczyk.renoplan.ui.theme.RenoPlanTheme
 import org.jetbrains.compose.resources.stringResource
@@ -97,12 +94,11 @@ private fun TypeTextField(
             else -> Res.string.operation_custom_name_label
         }
     val required = stringResource(Res.string.operation_text_required)
-    OutlinedTextField(
+    LabeledTextField(
         value = pricing.text,
         onValueChange = { onPricingChange(pricing.copy(text = it)) },
-        label = { Text(stringResource(label)) },
-        supportingText = if (pricing.text.isBlank()) ({ Text(required) }) else null,
-        singleLine = true,
+        label = stringResource(label),
+        supportingText = if (pricing.text.isBlank()) required else null,
         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.None, imeAction = ImeAction.Next),
         modifier = modifier.fillMaxWidth(),
     )
@@ -117,18 +113,13 @@ private fun LabourFields(
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(stringResource(Res.string.operation_labour_label), style = MaterialTheme.typography.labelLarge)
-        SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-            LabourMode.entries.forEachIndexed { index, mode ->
-                SegmentedButton(
-                    selected = pricing.labourMode == mode,
-                    onClick = { onPricingChange(pricing.copy(labourMode = mode)) },
-                    shape = SegmentedButtonDefaults.itemShape(index = index, count = LabourMode.entries.size),
-                    // No check mark: three labels need the room at large font sizes.
-                    icon = {},
-                ) { Text(stringResource(mode.label)) }
-            }
-        }
+        FieldLabel(stringResource(Res.string.operation_labour_label))
+        PillToggle(
+            options = LabourMode.entries,
+            selected = pricing.labourMode,
+            optionLabel = { stringResource(it.label) },
+            onSelect = { onPricingChange(pricing.copy(labourMode = it)) },
+        )
         if (pricing.labourMode != LabourMode.SELF_DONE) {
             val lumpSum = pricing.labourMode == LabourMode.LUMP_SUM
             val label =

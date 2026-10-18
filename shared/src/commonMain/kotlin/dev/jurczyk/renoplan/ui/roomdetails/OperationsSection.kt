@@ -6,8 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Card
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,14 +15,21 @@ import androidx.compose.ui.unit.dp
 import dev.jurczyk.renoplan.domain.cost.CostSummary
 import dev.jurczyk.renoplan.domain.cost.OperationCost
 import dev.jurczyk.renoplan.domain.model.Operation
+import dev.jurczyk.renoplan.ui.components.AppCard
+import dev.jurczyk.renoplan.ui.components.AppProgressBar
+import dev.jurczyk.renoplan.ui.components.SectionLabel
 import dev.jurczyk.renoplan.ui.operation.StatusChip
 import dev.jurczyk.renoplan.ui.operation.moneyLabel
 import dev.jurczyk.renoplan.ui.operation.operationTypeLabel
+import dev.jurczyk.renoplan.ui.operation.percentDone
 import dev.jurczyk.renoplan.ui.operation.quantityLabel
+import dev.jurczyk.renoplan.ui.operation.status
 import dev.jurczyk.renoplan.ui.operation.surfacesLabel
+import dev.jurczyk.renoplan.ui.operation.textColor
 import org.jetbrains.compose.resources.stringResource
 import renoplan.shared.generated.resources.Res
 import renoplan.shared.generated.resources.list_separator
+import renoplan.shared.generated.resources.percent_value
 import renoplan.shared.generated.resources.room_cost_done
 import renoplan.shared.generated.resources.room_cost_remaining
 import renoplan.shared.generated.resources.room_cost_total
@@ -37,25 +42,30 @@ fun RoomCostCard(
     summary: CostSummary,
     modifier: Modifier = Modifier,
 ) {
-    Card(modifier = modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Row(modifier = Modifier.fillMaxWidth()) {
+    AppCard(modifier = modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                SectionLabel(stringResource(Res.string.room_cost_total))
+                Text(moneyLabel(summary.total), style = MaterialTheme.typography.headlineMedium)
+            }
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 listOf(
-                    Res.string.room_cost_total to summary.total,
                     Res.string.room_cost_done to summary.done,
                     Res.string.room_cost_remaining to summary.remaining,
                 ).forEach { (label, amount) ->
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            stringResource(label),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
+                    Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        SectionLabel(stringResource(label))
                         Text(moneyLabel(amount), style = MaterialTheme.typography.titleMedium)
                     }
                 }
+                Text(
+                    text = stringResource(Res.string.percent_value, summary.percentDone),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.align(Alignment.Bottom),
+                )
             }
-            LinearProgressIndicator(progress = { summary.progress.toFloat() }, modifier = Modifier.fillMaxWidth())
+            AppProgressBar(progress = summary.progress.toFloat(), color = summary.status.textColor())
         }
     }
 }
@@ -79,7 +89,7 @@ fun OperationCard(
     onCycleStatus: (Uuid) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Card(modifier = modifier.fillMaxWidth()) {
+    AppCard(modifier = modifier.fillMaxWidth()) {
         Row(
             modifier =
                 Modifier

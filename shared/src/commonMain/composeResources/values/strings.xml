@@ -7,8 +7,9 @@
     <string name="nav_calculator">Kalkulator</string>
 
     <string name="screen_levels">Poziomy</string>
-    <string name="screen_templates">Szablony operacji</string>
-    <string name="screen_calculator">Kalkulator ceny</string>
+    <string name="app_tagline">Planowanie wykończenia mieszkania</string>
+    <string name="templates_subtitle">Rodzaje prac z zapisanymi cenami</string>
+    <string name="calculator_subtitle">Szybkie przeliczenie ceny</string>
 
     <string name="placeholder_coming_soon">Wkrótce</string>
 
@@ -85,6 +86,9 @@
         <item quantity="many">%1$d pokoi</item>
         <item quantity="other">%1$d pokoju</item>
     </plurals>
+    <string name="levels_total_cost">Łączny koszt</string>
+    <string name="levels_total_area">Powierzchnia</string>
+    <string name="levels_total_progress">Postęp ogólny</string>
     <string name="level_card_details">%1$s · podłoga %2$s</string>
 
     <!-- Level -->
@@ -260,7 +264,7 @@
     <string name="template_editor_hint">Ceny są za jednostkę operacji: m² dla ścian, podłogi i sufitu, metr dla listew. Zmiana szablonu nie zmienia operacji dodanych wcześniej.</string>
 
     <!-- Level summary and costs -->
-    <string name="cost_progress">Koszt %1$s · zrobione %2$d%</string>
+    <string name="percent_value">%1$d%</string>
     <string name="summary_by_room">Według pokoi</string>
     <string name="summary_whole_level">Cały poziom</string>
     <string name="costs_by_type">Według rodzaju</string>

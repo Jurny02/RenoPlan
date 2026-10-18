@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -29,6 +28,7 @@ import dev.jurczyk.renoplan.domain.model.OperationStatus
 import dev.jurczyk.renoplan.domain.model.sum
 import dev.jurczyk.renoplan.presentation.level.LevelUiState
 import dev.jurczyk.renoplan.presentation.level.OperationEntry
+import dev.jurczyk.renoplan.ui.components.AppCard
 import dev.jurczyk.renoplan.ui.components.ConfirmDialog
 import dev.jurczyk.renoplan.ui.components.EmptyState
 import dev.jurczyk.renoplan.ui.components.MenuAction
@@ -198,7 +198,7 @@ private fun LazyListScope.costGroup(
                     )
                 }
             }
-            Card(modifier = Modifier.fillMaxWidth()) {
+            AppCard(modifier = Modifier.fillMaxWidth()) {
                 entries.forEachIndexed { index, entry ->
                     if (index > 0) HorizontalDivider()
                     CostRow(entry, byType, onClick = { actions.onOpenOperation(entry.roomId, entry.operation.id) })

@@ -9,12 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -28,7 +24,10 @@ import dev.jurczyk.renoplan.domain.cost.OperationGroup
 import dev.jurczyk.renoplan.domain.cost.SurfaceCounts
 import dev.jurczyk.renoplan.domain.model.OperationStatus
 import dev.jurczyk.renoplan.presentation.level.LevelUiState
+import dev.jurczyk.renoplan.ui.components.AppCard
 import dev.jurczyk.renoplan.ui.components.EmptyState
+import dev.jurczyk.renoplan.ui.components.PillToggle
+import dev.jurczyk.renoplan.ui.components.SectionLabel
 import dev.jurczyk.renoplan.ui.format.formatDecimal
 import dev.jurczyk.renoplan.ui.operation.operationTypeLabel
 import dev.jurczyk.renoplan.ui.operation.quantityLabel
@@ -67,15 +66,13 @@ fun GroupingToggle(
     onSelect: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    SingleChoiceSegmentedButtonRow(modifier = modifier.fillMaxWidth()) {
-        options.forEachIndexed { index, label ->
-            SegmentedButton(
-                selected = index == selected,
-                onClick = { onSelect(index) },
-                shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size),
-            ) { Text(stringResource(label)) }
-        }
-    }
+    PillToggle(
+        options = options.indices.toList(),
+        selected = selected,
+        optionLabel = { stringResource(options[it]) },
+        onSelect = onSelect,
+        modifier = modifier,
+    )
 }
 
 /** Quantities only: geometry and operation groups, by room or for the whole level. */
@@ -135,7 +132,7 @@ internal fun LazyListScope.summaryItems(
         }
     } else {
         item(key = "$key-groups") {
-            Card(modifier = Modifier.fillMaxWidth()) {
+            AppCard(modifier = Modifier.fillMaxWidth()) {
                 groups.forEachIndexed { index, group ->
                     if (index > 0) HorizontalDivider()
                     GroupRow(group)
@@ -152,9 +149,9 @@ private fun GeometryCard(
 ) {
     val area = @Composable { value: Double -> stringResource(Res.string.unit_square_metres, formatDecimal(value)) }
     val length = @Composable { value: Double -> stringResource(Res.string.unit_metres, formatDecimal(value)) }
-    Card(modifier = modifier.fillMaxWidth()) {
+    AppCard(modifier = modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Text(stringResource(Res.string.summary_geometry), style = MaterialTheme.typography.labelLarge)
+            SectionLabel(stringResource(Res.string.summary_geometry))
             ValueRow(stringResource(Res.string.room_details_floor), area(geometry.floorArea))
             ValueRow(stringResource(Res.string.room_details_ceiling), area(geometry.ceilingArea))
             ValueRow(stringResource(Res.string.room_details_walls_net), area(geometry.wallsNetArea))

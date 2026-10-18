@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.HorizontalDivider
@@ -44,8 +43,10 @@ import dev.jurczyk.renoplan.domain.model.Wall
 import dev.jurczyk.renoplan.domain.model.mm
 import dev.jurczyk.renoplan.presentation.roomdetails.RoomDetailsUiState
 import dev.jurczyk.renoplan.presentation.roomdetails.RoomDetailsViewModel
+import dev.jurczyk.renoplan.ui.components.AppCard
 import dev.jurczyk.renoplan.ui.components.BackButton
 import dev.jurczyk.renoplan.ui.components.NameDialog
+import dev.jurczyk.renoplan.ui.components.SectionLabel
 import dev.jurczyk.renoplan.ui.format.formatDecimal
 import dev.jurczyk.renoplan.ui.operation.wallLabel
 import dev.jurczyk.renoplan.ui.theme.RenoPlanTheme
@@ -291,8 +292,8 @@ private fun RoomMetrics(
         stringResource(Res.string.unit_square_metres, formatDecimal(value))
     }
     val metres = @Composable { value: Double -> stringResource(Res.string.unit_metres, formatDecimal(value)) }
-    Card(modifier = modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    AppCard(modifier = modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             MetricRow(
                 stringResource(Res.string.room_details_floor) to squareMetres(state.floorArea),
                 stringResource(Res.string.room_details_ceiling) to squareMetres(state.ceilingArea),
@@ -318,13 +319,9 @@ private fun MetricRow(
 ) {
     Row(modifier = modifier.fillMaxWidth()) {
         listOf(first, second).forEach { (label, value) ->
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    label,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Text(value, style = MaterialTheme.typography.titleMedium)
+            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                SectionLabel(label)
+                Text(value, style = MaterialTheme.typography.titleLarge)
             }
         }
     }
@@ -341,7 +338,7 @@ private fun WallCard(
     onRename: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Card(modifier = modifier.fillMaxWidth()) {
+    AppCard(modifier = modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier.clickable(onClick = onToggle).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp),
