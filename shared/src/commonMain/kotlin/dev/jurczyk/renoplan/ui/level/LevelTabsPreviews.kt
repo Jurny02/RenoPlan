@@ -63,6 +63,6 @@ private fun SummaryTabPreview() {
 @Composable
 private fun CostsTabPreview() {
     RenoPlanTheme {
-        CostsTab(state = previewState, onOpenOperation = { _, _ -> })
+        CostsTab(state = previewState, actions = CostsActions())
     }
 }

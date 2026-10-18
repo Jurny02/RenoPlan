@@ -68,6 +68,26 @@ fun NameDialog(
     )
 }
 
+/** Asks to confirm an action named [confirmLabel]. */
+@Composable
+fun ConfirmDialog(
+    title: String,
+    text: String,
+    confirmLabel: String,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        modifier = modifier,
+        title = { Text(title) },
+        text = { Text(text) },
+        confirmButton = { TextButton(onClick = onConfirm) { Text(confirmLabel) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(Res.string.action_cancel)) } },
+    )
+}
+
 @Composable
 fun ConfirmDeleteDialog(
     title: String,
